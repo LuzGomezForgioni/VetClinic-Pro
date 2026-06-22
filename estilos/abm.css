@@ -1,0 +1,299 @@
+/* PANEL IZQUIERDO */
+/* ── Variables ── */
+:root {
+    --azul-oscuro: #1a1f5e;
+    --azul-medio: #4992b5;
+    --azul-claro: #7cb3fc;
+    --blanco: #ffffff;
+    --fondo: #f4f7fb;
+    --texto-oscuro: #111827;
+    --texto-gris: #6b7280;
+    --borde: #e5e7eb;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* PANEL IZQUIERDO */
+
+.panel-izquierdo {
+    background: linear-gradient(135deg,
+            var(--azul-oscuro),
+            var(--azul-medio));
+    color: var(--blanco);
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 35px;
+    padding-bottom: 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+}
+
+.logo-img {
+    width: 120px;
+}
+
+.logo h4 {
+    margin: 0;
+    font-weight: 1000;
+}
+
+.logo span {
+    opacity: .8;
+}
+
+.contenido-principal h1 {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 30px 0px;
+}
+
+.contenido-principal h1 span {
+    color: var(--azul-claro);
+    font-size: 45px;
+}
+
+.contenido-principal p {
+    margin-top: 20px;
+    max-width: 500px;
+    line-height: 1.8;
+    opacity: .9;
+}
+
+.contenido-img {
+    max-width: 500px;
+    margin-top: 40px;
+}
+
+
+.mascota-card {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 20px;
+    color: white;
+}
+
+.pet-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, .1);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
+.beneficios p {
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+.beneficios i {
+    color: var(--azul-claro);
+}
+
+
+
+/* PANEL DERECHO */
+.panel-derecho {
+    background: #fff;
+    padding: 30px;
+}
+
+
+
+.registro-container {
+    width: 100%;
+    max-width: 650px;
+}
+
+/* Pill "Crear cuenta" */
+.portal-acceso {
+    display: inline-block;
+    background: rgba(124, 179, 252, 0.38);
+    color: var(--azul-oscuro);
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 22px;
+}
+
+/* Títulos */
+.registro-container h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--texto-oscuro);
+    margin-bottom: 10px;
+}
+
+.subtitulo {
+    color: var(--texto-gris);
+    margin-bottom: 36px;
+    font-size: 17px;
+}
+
+/* ── Inputs ── */
+.form-label {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.input-group-text {
+    background: #fafafa;
+    border: 1px solid var(--borde);
+    color: var(--texto-gris);
+    font-size: 16px;      /* antes 18px */
+    padding: 14px;        /* igual que login */
+}
+
+.form-control {
+    border: 1px solid var(--borde);
+    padding: 14px;        /* antes 16px 18px */
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    background: #fafafa;
+    color: var(--texto-oscuro);
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--azul-oscuro);
+    background: #fff;
+}
+
+.form-control::placeholder {
+    color: #c4cbd5;
+    opacity: 1;
+}
+
+/* Ajuste borde interior entre input-group-text y form-control */
+.input-group .form-control {
+    border-left: 0;
+}
+
+.input-group .input-group-text + .form-control {
+    border-left: 0;
+}
+
+/* Ícono ojo (estático, decorativo) */
+.icono-ojo {
+    cursor: pointer;
+    background: #fafafa;
+    border-left: 0;
+    font-size: 16px;      /* antes 18px */
+}
+
+
+.input-group-text,
+.form-control {
+    border-radius: 8px;
+}
+
+
+
+
+/* Texto de ayuda */
+.form-text {
+    font-size: 14px;
+    color: var(--texto-gris);
+    margin-top: 8px;
+}
+
+/* ── Nota informativa ── */
+.nota-info {
+    background: #f0f9ff;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.nota-info i {
+    color: var(--azul-oscuro);
+    font-size: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.nota-info p {
+    font-size: 15px;
+    color: var(--azul-oscuro);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ── Checkbox términos ── */
+.form-check-input {
+    border-color: #d1d5db;
+    margin-top: 4px;
+    transform: scale(1.15);
+}
+
+.form-check-input:checked {
+    background-color: var(--azul-oscuro);
+    border-color: var(--azul-oscuro);
+}
+
+.form-check-input:focus {
+    box-shadow: none;
+    border-color: var(--azul-medio);
+}
+
+.form-check-label {
+    font-size: 15px;
+    color: var(--texto-oscuro);
+    margin-left: 4px;
+}
+
+/* ── Botón principal ── */
+.btn-registro {
+width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    background: var(--azul-oscuro);
+    color: white;
+}
+
+.btn-registro:hover {
+    background: var(--azul-medio);
+    color: white;
+}
+
+/* ── Link al login ── */
+.volver-login {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 16px;
+    color: var(--texto-gris);
+}
+
+.custom-link {
+    color: var(--azul-oscuro);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.custom-link:hover {
+    color: var(--azul-medio);
+}
