@@ -128,7 +128,7 @@
 
                     <div class="registrarse">
                         ¿No tienes cuenta?
-                        <a class="custom-link" href="propietarios/alta_propietario.html" target="_blank">Registrarse</a>
+                        <a class="custom-link" href="propietarios/alta_propietario.php" target="_blank">Registrarse</a>
                     </div>
                 </div>
             </div>

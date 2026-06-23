@@ -1,3 +1,35 @@
+<?php
+include("../config/conexion.php");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $nombre = $_POST["nombre"];
+    $apellido = $_POST["apellido"];
+    $email = $_POST["email"];
+    $telefono = $_POST["telefono"];
+    $password = $_POST["password"];
+    $confirmar = $_POST["confirmar"];
+
+    if ($password != $confirmar) {
+        echo "Las contraseñas no coinciden";
+        exit();
+    }
+
+    $sql = "INSERT INTO propietarios
+            (nombre, apellido, email, telefono, password)
+            VALUES
+            ('$nombre', '$apellido', '$email', '$telefono', '$password')";
+
+    if ($conn->query($sql) === TRUE) {
+    // Registro exitoso
+    } else {
+    echo "Error: " . $conn->error;
+    }
+
+    $conn->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -88,8 +120,7 @@
 
                     <!-- FORMULARIO -->
                     <!-- action="registro_process.php" method="POST" → se conecta con PHP después -->
-                    <form action="#" method="POST" novalidate>
-
+                    <form action="" method="POST">
                         <!-- Nombre y Apellido -->
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-sm-6">
