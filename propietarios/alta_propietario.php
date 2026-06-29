@@ -10,8 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     $confirmar = $_POST["confirmar"];
 
+    // Validar contraseñas
     if ($password != $confirmar) {
-        echo "Las contraseñas no coinciden";
+        header("Location: alta_propietario.php?error=password");
         exit();
     }
 
@@ -21,11 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ('$nombre', '$apellido', '$email', '$telefono', '$password')";
 
     if ($conn->query($sql) === TRUE) {
-    // Registro exitoso
-    } else {
-    echo "Error: " . $conn->error;
-    }
 
+        header("Location: alta_propietario.php?registro=ok");
+        exit();
+    } else {
+        header("Location: alta_propietario.php?error=bd");
+        exit();
+    }
     $conn->close();
 }
 ?>
@@ -70,7 +73,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="contenido-principal d-flex flex-column justify-content-center">
                     <h1>Comenzá a cuidar a tu mascota con <span><i>tecnología.</i></span></h1>
-                    <p>Creá tu cuenta y accedé al historial clínico, turnos y recordatorios de vacunas de tus animales desde cualquier lugar.</p>
+                    <p>Creá tu cuenta y accedé al historial clínico, turnos y recordatorios de vacunas de tus animales
+                        desde cualquier lugar.</p>
                 </div>
 
 
@@ -129,14 +133,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="nombre"
-                                        name="nombre"
-                                        placeholder="Tu nombre"
-                                        required
-                                    />
+                                    <input type="text" class="form-control" id="nombre" name="nombre"
+                                        placeholder="Tu nombre" required />
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -145,14 +143,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="apellido"
-                                        name="apellido"
-                                        placeholder="Tu apellido"
-                                        required
-                                    />
+                                    <input type="text" class="form-control" id="apellido" name="apellido"
+                                        placeholder="Tu apellido" required />
                                 </div>
                             </div>
                         </div>
@@ -164,14 +156,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <span class="input-group-text">
                                     <i class="bi bi-envelope"></i>
                                 </span>
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    id="email"
-                                    name="email"
-                                    placeholder="correo@ejemplo.com"
-                                    required
-                                />
+                                <input type="email" class="form-control" id="email" name="email"
+                                    placeholder="correo@ejemplo.com" required />
                             </div>
                             <div class="form-text">Nunca compartiremos tu correo con nadie más.</div>
                         </div>
@@ -183,13 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <span class="input-group-text">
                                     <i class="bi bi-telephone"></i>
                                 </span>
-                                <input
-                                    type="tel"
-                                    class="form-control"
-                                    id="telefono"
-                                    name="telefono"
-                                    placeholder="351-555-0000"
-                                />
+                                <input type="tel" class="form-control" id="telefono" name="telefono"
+                                    placeholder="351-555-0000" />
                             </div>
                         </div>
 
@@ -201,14 +182,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-lock"></i>
                                     </span>
-                                    <input
-                                        type="password"
-                                        class="form-control"
-                                        id="password"
-                                        name="password"
-                                        placeholder="••••••••"
-                                        required
-                                    />
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        placeholder="••••••••" required />
                                     <span class="input-group-text icono-ojo">
                                         <i class="bi bi-eye"></i>
                                     </span>
@@ -220,14 +195,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-lock-fill"></i>
                                     </span>
-                                    <input
-                                        type="password"
-                                        class="form-control"
-                                        id="confirmar"
-                                        name="confirmar"
-                                        placeholder="••••••••"
-                                        required
-                                    />
+                                    <input type="password" class="form-control" id="confirmar" name="confirmar"
+                                        placeholder="••••••••" required />
                                     <span class="input-group-text icono-ojo">
                                         <i class="bi bi-eye"></i>
                                     </span>
@@ -237,13 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <!-- Términos y condiciones -->
                         <div class="form-check mb-4">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                id="terminos"
-                                name="terminos"
-                                required
-                            />
+                            <input class="form-check-input" type="checkbox" id="terminos" name="terminos" required />
                             <label class="form-check-label" for="terminos">
                                 Acepto los
                                 <a href="#" class="custom-link">términos y condiciones</a>
@@ -262,14 +225,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <!-- Link al login -->
                     <div class="volver-login">
-                        ¿Ya tenés cuenta?
-                        <a class="custom-link" href="login.html">Iniciar sesión</a>
+                        ¿Ya tienes cuenta?
+                        <a class="custom-link" href="../index.php">Iniciar sesión</a>
                     </div>
 
                 </div>
             </div>
         </div>
     </div>
-</body>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Modal para registro exitoso -->
+<?php if (isset($_GET["registro"]) && $_GET["registro"] == "ok") { ?>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: '¡Registro exitoso!',
+    text: 'Tu cuenta fue creada correctamente.',
+    confirmButtonColor: '#1a1f5e'
+}).then(() => {
+    window.location.href = "inicio_propietarios.php";
+});
+</script>
+<?php } ?>
+
+<!-- Modal para error de contraseña -->
+<?php if (isset($_GET["error"]) && $_GET["error"] == "password") { ?>
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Contraseñas diferentes',
+    text: 'Las contraseñas no coinciden.',
+    confirmButtonColor: '#d33'
+});
+</script>
+<?php } ?>
+
+<!-- Modal para error de base de datos -->
+<?php if (isset($_GET["error"]) && $_GET["error"] == "bd") { ?>
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'No se pudo registrar el propietario.',
+    confirmButtonColor: '#d33'
+});
+</script>
+<?php } ?>
+
+</body>
 </html>
