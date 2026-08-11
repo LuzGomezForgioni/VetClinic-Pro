@@ -21,14 +21,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES
             ('$nombre', '$apellido', '$email', '$telefono', '$password')";
 
-    if ($conn->query($sql) === TRUE) {
+    try {
 
-        header("Location: alta_propietario.php?registro=ok");
-        exit();
-    } else {
-        header("Location: alta_propietario.php?error=bd");
-        exit();
+        if ($conn->query($sql) === TRUE) {
+
+            header("Location: alta_propietario.php?registro=ok");
+            exit();
+
+        }
+
+    } catch (mysqli_sql_exception $e) {
+
+        if ($e->getCode() == 1062) {
+
+            header("Location: alta_propietario.php?error=email");
+            exit();
+
+        } else {
+
+            header("Location: alta_propietario.php?error=bd");
+            exit();
+
+        }
     }
+
     $conn->close();
 }
 ?>
@@ -273,6 +289,20 @@ Swal.fire({
 });
 </script>
 <?php } ?>
+
+<!-- Modal para cuenta registrada -->
+<?php if (isset($_GET["error"]) && $_GET["error"] == "email"): ?>
+
+<script>
+Swal.fire({
+    icon: 'warning',
+    title: 'Correo ya registrado',
+    text: 'Ya existe una cuenta registrada con ese correo electrónico.',
+    confirmButtonColor: '#1a1f5e'
+});
+</script>
+
+<?php endif; ?>
 
 </body>
 </html>

@@ -1,3 +1,55 @@
+<?php
+
+session_start();
+
+include("config/conexion.php");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+
+    // Buscar el propietario por email
+    $sql = "SELECT * FROM propietarios WHERE email = '$email'";
+
+    $resultado = $conn->query($sql);
+
+    if ($resultado->num_rows == 0) {
+
+        // El email no existe
+        header("Location: index.php?error=email");
+        exit();
+
+    } else {
+
+        $propietario = $resultado->fetch_assoc();
+
+        // Comprobar contraseña
+        if ($password == $propietario["password"]) {
+
+            // Guardar datos del propietario en la sesión
+            $_SESSION["id_propietario"] = $propietario["id_propietario"];
+            $_SESSION["nombre"] = $propietario["nombre"];
+            $_SESSION["apellido"] = $propietario["apellido"];
+            $_SESSION["email"] = $propietario["email"];
+
+            // Login correcto
+            header("Location: propietarios/inicio_propietarios.php");
+            exit();
+
+        } else {
+
+            // Contraseña incorrecta
+            header("Location: index.php?error=password");
+            exit();
+        }
+    }
+
+    $conn->close();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -85,7 +137,7 @@
                     <span class="portal-acceso">Portal de acceso</span>
                     <h2>Iniciar sesión</h2>
                     <p class="subtitulo">Accede a tu cuenta para continuar.</p>
-                    <form>
+                    <form action="index.php" method="POST">
                         <div class="mb-4">
                             <label class="form-label" for="exampleInputEmail1">Correo electrónico</label>
                             <div class="input-group">
@@ -93,7 +145,7 @@
                                     <i class="bi bi-envelope"></i>
                                 </span>
                                 <input type="email" class="form-control" placeholder="correo@ejemplo.com"
-                                    id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
                             </div>
                             <div id="emailHelp" class="form-text">Nunca compartiremos tu correo electrónico con nadie
                                 más.</div>
@@ -105,7 +157,8 @@
                                 <span class="input-group-text">
                                     <i class="bi bi-lock"></i>
                                 </span>
-                                <input type="password" class="form-control" placeholder="••••••••" id="contraseña">
+                                <input type="password" class="form-control" placeholder="••••••••" id="contraseña"
+                                    name="password" required>
                                 <span class="input-group-text border-start-0 bg-white">
                                     <i class="bi bi-eye"></i>
                                 </span>
@@ -134,6 +187,39 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php
+
+if (isset($_GET["error"])) {
+
+    if ($_GET["error"] == "email") {
+        echo "
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Correo no encontrado',
+                text: 'No existe una cuenta registrada con ese correo.',
+                confirmButtonColor: '#1a1f5e'
+            });
+        </script>";
+    }
+
+    if ($_GET["error"] == "password") {
+        echo "
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseña incorrecta',
+                text: 'La contraseña ingresada no es correcta.',
+                confirmButtonColor: '#1a1f5e'
+            });
+        </script>";
+    }
+}
+
+?>
 </body>
 
 </html>
