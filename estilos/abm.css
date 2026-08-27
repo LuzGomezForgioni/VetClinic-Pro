@@ -1,14 +1,15 @@
-/* PANEL IZQUIERDO */
 /* ── Variables ── */
 :root {
-    --azul-oscuro: #1a1f5e;
-    --azul-medio: #4992b5;
-    --azul-claro: #7cb3fc;
-    --blanco: #ffffff;
-    --fondo: #f4f7fb;
+    --azul-oscuro:  #1a1f5e;
+    --azul-medio:   #4992b5;
+    --azul-claro:   #7cb3fc;
+    --azul-claro-bg:#e8f1ff;
+    --blanco:       #ffffff;
+    --fondo:        #f4f7fb;
     --texto-oscuro: #111827;
-    --texto-gris: #6b7280;
-    --borde: #e5e7eb;
+    --texto-gris:   #6b7280;
+    --borde:        #e5e7eb;
+    --radio-card:   16px;
 }
 
 body {
@@ -296,4 +297,353 @@ width: 100%;
 
 .custom-link:hover {
     color: var(--azul-medio);
+}
+
+
+
+
+
+
+
+
+/* ════════════════════════════════════════════════
+   TARJETA DE MASCOTA (grilla en inicio_mascota)
+════════════════════════════════════════════════ */
+.tarjeta-mascota {
+    background: var(--blanco);
+    border-radius: var(--radio-card);
+    border: 1px solid var(--borde);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    transition: box-shadow .15s, transform .15s;
+}
+
+.tarjeta-mascota:hover {
+    box-shadow: 0 6px 24px rgba(26, 31, 94, .10);
+    transform: translateY(-2px);
+}
+
+/* Encabezado de cada tarjeta */
+.cabecera-mascota {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.emoji-mascota {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--azul-claro-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.nombre-mascota-card {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--azul-oscuro);
+    line-height: 1.1;
+}
+
+.especie-raza {
+    font-size: 12.5px;
+    color: var(--texto-gris);
+    margin-top: 3px;
+}
+
+/* Datos internos */
+.datos-mascota {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+}
+
+.dato-fila {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    color: var(--texto-oscuro);
+}
+
+.dato-fila i {
+    font-size: 15px;
+    color: var(--azul-medio);
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Botones de acción en cada tarjeta */
+.acciones-mascota {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--borde);
+}
+
+/* ════════════════════════════════════════════════
+   BOTONES
+════════════════════════════════════════════════ */
+
+/* Botón principal (agregar / guardar) */
+.btn-abm-principal {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.btn-abm-principal:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+/* Botón acción genérico */
+.btn-accion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 9px;
+    padding: 8px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background .15s;
+    flex: 1;
+    justify-content: center;
+}
+
+/* Editar */
+.btn-editar {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    border: 1.5px solid var(--azul-claro);
+}
+
+.btn-editar:hover {
+    background: #d0e6ff;
+    color: var(--azul-oscuro);
+}
+
+/* Eliminar */
+.btn-eliminar {
+    background: #fff0f0;
+    color: #991b1b;
+    border: 1.5px solid #fca5a5;
+}
+
+.btn-eliminar:hover {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+/* Volver */
+.btn-volver {
+    background: var(--fondo);
+    color: var(--texto-gris);
+    border: 1.5px solid var(--borde);
+    flex: unset;
+}
+
+.btn-volver:hover {
+    background: var(--borde);
+    color: var(--texto-oscuro);
+}
+
+/* ════════════════════════════════════════════════
+   ESTADO VACÍO (sin mascotas)
+════════════════════════════════════════════════ */
+.estado-vacio {
+    background: var(--blanco);
+    border-radius: var(--radio-card);
+    border: 1px solid var(--borde);
+    padding: 60px 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.emoji-vacio {
+    font-size: 64px;
+    line-height: 1;
+}
+
+.estado-vacio h4 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--azul-oscuro);
+    margin: 0;
+}
+
+.estado-vacio p {
+    font-size: 14px;
+    color: var(--texto-gris);
+    max-width: 380px;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* ════════════════════════════════════════════════
+   ALERTAS DE OPERACIÓN
+════════════════════════════════════════════════ */
+.alerta-operacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 16px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+}
+
+.alerta-exito {
+    background: #f0fdf4;
+    color: #065f46;
+    border-color: #22c55e;
+}
+
+.alerta-error {
+    background: #fff0f0;
+    color: #991b1b;
+    border-color: #ef4444;
+}
+
+.alerta-operacion i {
+    font-size: 17px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ════════════════════════════════════════════════
+   FORMULARIO (alta / edición)
+════════════════════════════════════════════════ */
+.tarjeta-formulario {
+    background: var(--blanco);
+    border-radius: var(--radio-card);
+    border: 1px solid var(--borde);
+    padding: 28px 28px 24px;
+}
+
+/* Label */
+.form-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--texto-oscuro);
+    margin-bottom: 6px;
+}
+
+/* Campo requerido (*) */
+.campo-requerido {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* Inputs y selects */
+.input-group-text {
+    background: #fafafa;
+    border: 1px solid var(--borde);
+    color: var(--texto-gris);
+    font-size: 15px;
+    padding: 13px 14px;
+}
+
+.form-control,
+select.form-control {
+    border: 1px solid var(--borde);
+    padding: 13px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    background: #fafafa;
+    color: var(--texto-oscuro);
+}
+
+.form-control:focus,
+select.form-control:focus {
+    box-shadow: none;
+    border-color: var(--azul-oscuro);
+    background: var(--blanco);
+}
+
+.form-control::placeholder {
+    color: #c4cbd5;
+    opacity: 1;
+}
+
+/* Borde izquierdo del input cuando va después de input-group-text */
+.input-group .form-control {
+    border-left: 0;
+}
+
+/* Checkbox castrado */
+.check-castrado {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 13px 16px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.check-castrado .form-check-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    border-color: var(--borde);
+}
+
+.check-castrado .form-check-input:checked {
+    background-color: var(--azul-oscuro);
+    border-color: var(--azul-oscuro);
+}
+
+.check-castrado .form-check-input:focus {
+    box-shadow: none;
+}
+
+.check-castrado .form-check-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--texto-oscuro);
+    cursor: pointer;
+}
+
+/* Mensajes de error bajo cada campo (JS los activa) */
+.error-campo {
+    display: none;
+    font-size: 12.5px;
+    color: #dc2626;
+    margin-top: 5px;
+    font-weight: 600;
 }
