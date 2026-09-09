@@ -1,0 +1,153 @@
+/* =====================================================
+   HORARIOS DE ATENCIÓN
+   VetClinic Pro
+===================================================== */
+
+
+/* CONTENEDOR PRINCIPAL */
+
+.contenedor-horarios {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-card);
+    padding: 24px;
+}
+
+
+/* ENCABEZADO */
+
+.encabezado-horarios {
+    margin-bottom: 24px;
+}
+
+.titulo-seccion {
+    color: var(--azul-oscuro);
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.descripcion-seccion {
+    color: var(--texto-gris);
+    font-size: 13px;
+    margin: 0;
+}
+
+
+/* FILA DE CADA DÍA */
+
+.fila-dia {
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: var(--blanco);
+}
+
+.nombre-dia {
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.texto-no-atiende {
+    color: var(--texto-gris);
+    font-size: 13px;
+}
+
+
+/* BLOQUE HORARIO */
+
+.bloque-horario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.campo-hora {
+    width: 130px;
+}
+
+.campo-hora input {
+    width: 100%;
+    border: 1px solid var(--borde);
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-family: inherit;
+    color: var(--azul-oscuro);
+    background: var(--blanco);
+}
+
+.campo-hora input:focus {
+    outline: none;
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, 0.12);
+}
+
+.texto-a {
+    color: var(--texto-gris);
+    font-size: 13px;
+}
+
+
+/* BOTÓN AGREGAR HORARIO */
+
+.boton-agregar {
+    border: 1px dashed var(--azul-medio);
+    background: transparent;
+    color: var(--azul-medio);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.boton-agregar:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+
+/* BOTÓN ELIMINAR */
+
+.boton-eliminar {
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 17px;
+    padding: 4px 6px;
+}
+
+.boton-eliminar:hover {
+    color: #b02a37;
+}
+
+
+/* BOTÓN GUARDAR */
+
+.boton-guardar {
+    background: var(--azul-oscuro);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    padding: 11px 22px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.boton-guardar:hover {
+    opacity: .92;
+}
+
+
+/* MENSAJE DE AYUDA */
+
+.ayuda-horarios {
+    background: var(--azul-claro-bg);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    margin-top: 20px;
+}
