@@ -14,17 +14,18 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* PANEL IZQUIERDO */
+/* ============================================================
+   PANEL IZQUIERDO
+============================================================ */
 
 .panel-izquierdo {
-    background: linear-gradient(135deg,
-            var(--azul-oscuro),
-            var(--azul-medio));
+    background: linear-gradient(
+        135deg,
+        var(--azul-oscuro),
+        var(--azul-medio)
+    );
     color: var(--blanco);
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-top: 35px;
-    padding-bottom: 30px;
+    padding: 35px 50px 30px;
 }
 
 .logo {
@@ -80,7 +81,6 @@ body {
     margin-top: 40px;
 }
 
-
 .mascota-card {
     background: rgba(255, 255, 255, .08);
     border: 1px solid rgba(255, 255, 255, .15);
@@ -109,80 +109,116 @@ body {
 }
 
 
-/* PANEL DERECHO */
+/* ============================================================
+   PANEL DERECHO
+============================================================ */
 
 .panel-derecho {
+    height: 100vh;
+    min-height: 100vh;
+    box-sizing: border-box;
     background: #fff;
+    padding: 18px 30px;
+    overflow: hidden;
 }
 
-.login-container {
+.panel-derecho .login-container {
     width: 100%;
-    max-width: 650px;
+    max-width: 615px;
+    margin: auto 0;
 }
 
-.portal-acceso {
+.panel-derecho .portal-acceso {
     display: inline-block;
     background: #7cb3fc63;
     color: var(--azul-oscuro);
-    padding: 8px 16px;
+    padding: 6px 16px;
     border-radius: 50px;
     font-weight: 700;
-    margin-bottom: 25px;
+    margin-bottom: 8px;
 }
 
-.login-container h2 {
-    font-size: 2.5rem;
+.panel-derecho .login-container h2 {
+    margin-bottom: 4px;
+    font-size: 2rem;
+    line-height: 1.15;
     font-weight: 800;
     color: var(--texto-oscuro);
 }
 
-.subtitulo {
+.panel-derecho .subtitulo {
+    margin-bottom: 14px;
+    font-size: .98rem;
     color: var(--texto-gris);
-    margin-bottom: 35px;
 }
 
-.input-group-text {
+
+/* ============================================================
+   FORMULARIO
+============================================================ */
+
+.login-campo {
+    margin-bottom: 12px;
+}
+
+.panel-derecho .form-label {
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.panel-derecho .input-group-text {
+    min-height: 46px;
     background: #fafafa;
     border: 1px solid var(--borde);
     color: var(--texto-gris);
     font-size: 16px;
-    padding: 14px;
+    padding: 8px 14px;
 }
 
-.form-control {
+.panel-derecho .form-control {
+    min-height: 46px;
     border: 1px solid var(--borde);
-    padding: 14px;
+    padding: 8px 14px;
     font-size: 16px;
     font-weight: 400;
     background: #fafafa;
     color: var(--texto-oscuro);
 }
 
-.form-control:focus {
+.panel-derecho .form-control:focus {
     box-shadow: none;
     border-color: var(--azul-oscuro);
 }
 
-.form-control::placeholder {
+.panel-derecho .form-control::placeholder {
     color: #9ca3af;
     opacity: 1;
 }
 
-/* ── Inputs ── */
-.form-label {
-    font-size: 16px;
-    font-weight: 700;
+.panel-derecho .form-text {
+    margin-top: 4px;
+    font-size: .82rem;
 }
 
-.btn-login {
+.icono-ojo {
+    cursor: pointer;
+}
+
+.login-opciones {
+    margin-bottom: 12px;
+}
+
+.panel-derecho .btn-login {
     width: 100%;
-    padding: 15px;
+    min-height: 48px;
+    padding: 9px 15px;
     border-radius: 14px;
     background: var(--azul-oscuro);
     color: white;
 }
 
-.btn-login:hover {
+.panel-derecho .btn-login:hover {
     background: var(--azul-medio);
     color: white;
 }
@@ -193,7 +229,32 @@ body {
     font-weight: 600;
 }
 
+
+/* ============================================================
+   GOOGLE + REGISTRO
+============================================================ */
+
+.login-separador {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.panel-derecho #google-signin-button {
+    min-height: 40px;
+}
+
+.login-aviso-veterinario {
+    margin-top: 10px;
+}
+
+.login-aviso-veterinario p {
+    font-size: .78rem;
+    line-height: 1.35;
+}
+
 .registrarse {
     text-align: center;
-    margin-top: 25px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-size: .9rem;
 }

@@ -10,21 +10,21 @@
     background: var(--blanco);
     border: 1px solid var(--borde);
     border-radius: var(--radio-card);
-    padding: 24px;
+    padding: 22px;
 }
 
 
 /* ENCABEZADO */
 
 .encabezado-horarios {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .titulo-seccion {
     color: var(--azul-oscuro);
     font-size: 18px;
     font-weight: 800;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .descripcion-seccion {
@@ -37,46 +37,69 @@
 /* FILA DE CADA DÍA */
 
 .fila-dia {
-    border: 1px solid var(--borde);
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 12px;
     background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 13px;
+    padding: 13px 16px;
+    margin-bottom: 9px;
+}
+
+.fila-dia .row {
+    min-height: 58px;
 }
 
 .nombre-dia {
     color: var(--azul-oscuro);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
+    padding: 6px 2px;
 }
 
 .texto-no-atiende {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 7px 11px;
+    border-radius: 9px;
+    background: #f5f7fa;
     color: var(--texto-gris);
-    font-size: 13px;
+    font-size: 12.5px;
+    font-weight: 500;
 }
 
 
-/* BLOQUE HORARIO */
+/* BLOQUES HORARIOS */
 
 .bloque-horario {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.bloque-horario:last-child {
+    margin-bottom: 0;
 }
 
 .campo-hora {
-    width: 130px;
+    width: 118px;
 }
 
 .campo-hora input {
     width: 100%;
+    height: 40px;
     border: 1px solid var(--borde);
     border-radius: 9px;
-    padding: 8px 10px;
+    padding: 7px 9px;
     font-family: inherit;
+    font-size: 14px;
     color: var(--azul-oscuro);
     background: var(--blanco);
+}
+
+.campo-hora input:hover {
+    border-color: #cbd5e1;
 }
 
 .campo-hora input:focus {
@@ -86,68 +109,104 @@
 }
 
 .texto-a {
+    min-width: 12px;
     color: var(--texto-gris);
-    font-size: 13px;
+    font-size: 12px;
+    text-align: center;
 }
 
 
 /* BOTÓN AGREGAR HORARIO */
 
 .boton-agregar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     border: 1px dashed var(--azul-medio);
     background: transparent;
     color: var(--azul-medio);
     border-radius: 8px;
     padding: 6px 10px;
+    margin-top: 5px;
+    font-family: inherit;
     font-size: 12px;
-    margin-top: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
 }
 
 .boton-agregar:hover {
     background: var(--azul-claro-bg);
     color: var(--azul-oscuro);
+    border-color: var(--azul-oscuro);
 }
 
 
 /* BOTÓN ELIMINAR */
 
 .boton-eliminar {
-    border: none;
-    background: transparent;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #fecdd3;
+    border-radius: 8px;
+    background: #fff1f2;
     color: #dc3545;
-    font-size: 17px;
-    padding: 4px 6px;
+    font-size: 15px;
+    padding: 0;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
 }
 
 .boton-eliminar:hover {
+    background: #ffe4e6;
+    border-color: #fda4af;
     color: #b02a37;
-}
-
-
-/* BOTÓN GUARDAR */
-
-.boton-guardar {
-    background: var(--azul-oscuro);
-    border: none;
-    color: white;
-    border-radius: 10px;
-    padding: 11px 22px;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.boton-guardar:hover {
-    opacity: .92;
 }
 
 
 /* MENSAJE DE AYUDA */
 
 .ayuda-horarios {
+    display: flex;
+    align-items: flex-start;
     background: var(--azul-claro-bg);
-    border-radius: 12px;
-    padding: 14px 16px;
+    border-radius: 11px;
+    padding: 12px 14px;
     color: var(--azul-oscuro);
     font-size: 12px;
-    margin-top: 20px;
+    line-height: 1.5;
+    margin-top: 18px;
+}
+
+
+/* BOTÓN GUARDAR */
+
+.boton-guardar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 42px;
+    background: var(--azul-oscuro);
+    border: none;
+    color: var(--blanco);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s, transform .15s;
+}
+
+.boton-guardar:hover {
+    background: #252b73;
+}
+
+.boton-guardar:active {
+    transform: translateY(1px);
 }

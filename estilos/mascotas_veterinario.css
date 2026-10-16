@@ -1,0 +1,860 @@
+/* =====================================================
+   MASCOTAS DEL VETERINARIO
+   VetClinic Pro
+===================================================== */
+
+/* LISTADO GENERAL */
+
+.encabezado-mascotas {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.contador-mascotas {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tarjeta-buscador-mascotas {
+    padding: 18px 20px;
+}
+
+.etiqueta-buscador {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    color: var(--azul-oscuro);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.etiqueta-buscador i {
+    color: var(--azul-medio);
+}
+
+.fila-buscador {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.fila-buscador .form-control {
+    min-width: 240px;
+    flex: 1;
+    border-color: var(--borde);
+    border-radius: 10px;
+    font-size: 13px;
+    min-height: 42px;
+}
+
+.fila-buscador .form-control:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.btn-buscar-mascota,
+.btn-limpiar-mascota {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 15px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-buscar-mascota {
+    border: 1px solid var(--azul-oscuro);
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-buscar-mascota:hover {
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+}
+
+.btn-limpiar-mascota {
+    border: 1px solid var(--borde);
+    background: #f8fafc;
+    color: var(--texto-gris);
+}
+
+.btn-limpiar-mascota:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.grilla-mascotas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 16px;
+}
+
+.tarjeta-mascota-veterinario {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 18px;
+    border: 1px solid var(--borde);
+    border-radius: 15px;
+    background: var(--blanco);
+}
+
+.cabecera-mascota-veterinario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-paciente {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 20px;
+}
+
+.nombre-paciente-listado {
+    color: var(--azul-oscuro);
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.detalle-paciente-listado {
+    margin-top: 3px;
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+.datos-mascota-listado {
+    display: flex;
+    align-items: center;
+    gap: 8px 14px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 11px 0;
+    border-top: 1px solid var(--borde);
+    border-bottom: 1px solid var(--borde);
+}
+
+.datos-mascota-listado span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--texto-gris);
+    font-size: 11.5px;
+}
+
+.datos-mascota-listado i {
+    color: var(--azul-medio);
+}
+
+.propietario-mascota {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 13px;
+    padding: 11px;
+    border-radius: 11px;
+    background: #f8fafc;
+}
+
+.icono-propietario {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: var(--blanco);
+    color: var(--azul-medio);
+    border: 1px solid var(--borde);
+}
+
+.etiqueta-propietario {
+    color: var(--texto-gris);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.nombre-propietario {
+    margin-top: 1px;
+    color: var(--texto-oscuro);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.resumen-clinico-mascota {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.resumen-clinico-mascota div {
+    padding: 9px 10px;
+    border-radius: 10px;
+    background: var(--fondo);
+    text-align: center;
+}
+
+.resumen-clinico-mascota strong {
+    display: block;
+    color: var(--azul-oscuro);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.resumen-clinico-mascota span {
+    display: block;
+    margin-top: 1px;
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.acciones-mascota-veterinario {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.btn-ficha-mascota {
+    flex: 1;
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-ficha-mascota:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+.btn-turnos-mascota {
+    width: 39px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--azul-oscuro);
+    text-decoration: none;
+}
+
+.btn-turnos-mascota:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.estado-vacio-mascotas {
+    padding: 42px 24px;
+    text-align: center;
+}
+
+.icono-vacio-mascotas {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-medio);
+    font-size: 22px;
+}
+
+.estado-vacio-mascotas h3 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.estado-vacio-mascotas p {
+    margin: 6px 0 15px;
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+/* FICHA */
+
+.cabecera-ficha-mascota {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-medio));
+    color: var(--blanco);
+}
+
+.avatar-ficha-mascota {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .17);
+    font-size: 28px;
+}
+
+.etiqueta-paciente {
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    opacity: .68;
+}
+
+.cabecera-ficha-mascota h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.cabecera-ficha-mascota p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    opacity: .78;
+}
+
+.btn-ver-turnos-ficha {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
+    padding: 9px 13px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .25);
+    color: var(--blanco);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-ver-turnos-ficha:hover {
+    background: rgba(255, 255, 255, .22);
+    color: var(--blanco);
+}
+
+.grilla-datos-ficha {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 10px;
+}
+
+.dato-ficha {
+    padding: 12px;
+    border-radius: 11px;
+    background: var(--fondo);
+}
+
+.dato-ficha span {
+    display: block;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+}
+
+.dato-ficha strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--texto-oscuro);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.cabecera-seccion-ficha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.etiqueta-cantidad {
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: var(--fondo);
+    color: var(--texto-gris);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.lista-historial-ficha,
+.lista-vacunas-ficha,
+.lista-turnos-ficha {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.registro-historial-ficha {
+    display: grid;
+    grid-template-columns: 115px 1fr;
+    gap: 13px;
+    padding: 12px 13px;
+    border: 1px solid var(--borde);
+    border-radius: 11px;
+}
+
+.fecha-registro-ficha strong {
+    display: block;
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.fecha-registro-ficha span {
+    display: block;
+    margin-top: 3px;
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.contenido-registro-ficha h3 {
+    margin: 0 0 5px;
+    color: var(--texto-oscuro);
+    font-size: 12.5px;
+    font-weight: 800;
+}
+
+.contenido-registro-ficha p {
+    margin: 3px 0 0;
+    color: var(--texto-gris);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.contenido-registro-ficha p strong {
+    color: var(--texto-oscuro);
+}
+
+.vacuna-ficha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 11px;
+}
+
+.icono-vacuna-ficha {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.vacuna-ficha h3 {
+    margin: 0;
+    color: var(--texto-oscuro);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.vacuna-ficha p {
+    margin: 3px 0 0;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+}
+
+.proxima-vacuna-ficha {
+    min-width: 82px;
+    padding: 6px 8px;
+    border-radius: 9px;
+    background: #f0fdf4;
+    color: #166534;
+    text-align: center;
+}
+
+.proxima-vacuna-ficha.vencida {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.proxima-vacuna-ficha span,
+.proxima-vacuna-ficha strong {
+    display: block;
+}
+
+.proxima-vacuna-ficha span {
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.proxima-vacuna-ficha strong {
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.propietario-destacado {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 11px;
+    background: var(--fondo);
+}
+
+.avatar-propietario-ficha {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.propietario-destacado strong,
+.propietario-destacado span {
+    display: block;
+}
+
+.propietario-destacado strong {
+    color: var(--texto-oscuro);
+    font-size: 12.5px;
+    font-weight: 800;
+}
+
+.propietario-destacado span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.dato-contacto-propietario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 2px;
+    color: var(--texto-gris);
+    font-size: 11.5px;
+}
+
+.dato-contacto-propietario i {
+    width: 20px;
+    color: var(--azul-medio);
+    text-align: center;
+}
+
+.nota-propietario-ficha {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 9px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.turno-ficha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.turno-ficha:hover {
+    background: var(--fondo);
+    color: inherit;
+}
+
+.fecha-turno-ficha {
+    width: 50px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.fecha-turno-ficha strong,
+.fecha-turno-ficha span,
+.turno-ficha .flex-grow-1 strong,
+.turno-ficha .flex-grow-1 span {
+    display: block;
+}
+
+.fecha-turno-ficha strong {
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.fecha-turno-ficha span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9px;
+}
+
+.turno-ficha .flex-grow-1 strong {
+    color: var(--texto-oscuro);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.turno-ficha .flex-grow-1 span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.turno-ficha > i {
+    color: var(--azul-medio);
+}
+
+.estado-vacio-seccion {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 11px;
+    background: var(--fondo);
+}
+
+.estado-vacio-seccion > i {
+    color: var(--azul-medio);
+    font-size: 18px;
+}
+
+.estado-vacio-seccion strong,
+.estado-vacio-seccion span {
+    display: block;
+}
+
+.estado-vacio-seccion strong {
+    color: var(--texto-oscuro);
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+.estado-vacio-seccion span {
+    margin-top: 3px;
+    color: var(--texto-gris);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.estado-vacio-pequeno {
+    padding: 11px;
+}
+
+
+/* =====================================================
+   ESTADO Y GESTIÓN DE MASCOTAS
+===================================================== */
+
+.fila-nombre-mascota {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.estado-fallecida-listado,
+.estado-ficha-mascota {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.estado-fallecida-listado {
+    padding: 4px 7px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 9px;
+}
+
+.estado-ficha-mascota {
+    width: fit-content;
+    margin-top: 8px;
+    padding: 5px 9px;
+    font-size: 10px;
+}
+
+.estado-ficha-mascota.activa {
+    background: rgba(220, 252, 231, .18);
+    color: #ecfdf5;
+}
+
+.estado-ficha-mascota.fallecida {
+    background: rgba(255, 255, 255, .14);
+    color: #e2e8f0;
+}
+
+.mascota-fallecida {
+    background: #fbfcfd;
+}
+
+.mascota-fallecida .avatar-paciente {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.cabecera-ficha-fallecida {
+    filter: saturate(.65);
+}
+
+.texto-estado-mascota.activa {
+    color: #15803d;
+}
+
+.texto-estado-mascota.fallecida {
+    color: #64748b;
+}
+
+.tarjeta-gestion-mascota {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.bloque-gestion-mascota label,
+.label-gestion-mascota {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--texto-oscuro);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.form-cambiar-propietario {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-cambiar-propietario .form-select {
+    border-color: var(--borde);
+    border-radius: 9px;
+    font-size: 11px;
+}
+
+.form-cambiar-propietario .form-select:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.btn-gestion-principal,
+.btn-fallecida-mascota,
+.btn-reactivar-mascota,
+.btn-eliminar-registro-mascota {
+    width: 100%;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.btn-gestion-principal {
+    border: none;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-gestion-principal:hover {
+    background: var(--azul-medio);
+}
+
+.btn-fallecida-mascota {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.btn-reactivar-mascota {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.btn-eliminar-registro-mascota {
+    border: 1px solid #fecaca;
+    background: #fff7f7;
+    color: #b91c1c;
+}
+
+.separador-gestion-mascota {
+    height: 1px;
+    margin: 15px 0;
+    background: var(--borde);
+}
+
+.ayuda-gestion-mascota {
+    margin: 7px 0 0;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+    line-height: 1.45;
+}
+
+.zona-peligro-mascota {
+    padding: 10px;
+    border-radius: 10px;
+    background: #fffafa;
+}

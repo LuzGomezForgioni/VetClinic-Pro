@@ -1,0 +1,450 @@
+/* =====================================================
+   HISTORIAL CLÍNICO GENERAL DEL VETERINARIO
+   VetClinic Pro
+===================================================== */
+
+
+/* =====================================================
+   ENCABEZADO
+===================================================== */
+
+.encabezado-historial-general {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.contador-historias {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 12px;
+}
+
+.contador-historias strong {
+    font-weight: 800;
+}
+
+.contador-historias span {
+    color: var(--texto-gris);
+}
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+.filtros-historial {
+    padding: 18px 20px;
+}
+
+.grilla-filtros-historial {
+    display: grid;
+    grid-template-columns: minmax(260px, 2fr) minmax(210px, 1.3fr) minmax(150px, 1fr) minmax(150px, 1fr);
+    gap: 12px;
+}
+
+.campo-filtro-historial label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--azul-oscuro);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.campo-filtro-historial .form-control,
+.campo-filtro-historial .form-select,
+.campo-filtro-historial .input-group-text {
+    min-height: 41px;
+    border-color: var(--borde);
+    font-size: 12px;
+}
+
+.campo-filtro-historial .input-group-text {
+    background: #f8fafc;
+    color: var(--azul-medio);
+}
+
+.campo-filtro-historial .form-control:focus,
+.campo-filtro-historial .form-select:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.acciones-filtros-historial {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.btn-buscar-historial,
+.btn-limpiar-historial {
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-buscar-historial {
+    border: 1px solid var(--azul-oscuro);
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-buscar-historial:hover {
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+}
+
+.btn-limpiar-historial {
+    border: 1px solid var(--borde);
+    background: #f8fafc;
+    color: var(--texto-gris);
+}
+
+.btn-limpiar-historial:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+
+/* =====================================================
+   LISTA DE CONSULTAS
+===================================================== */
+
+.lista-historial-general {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tarjeta-consulta-historial {
+    padding: 0;
+    overflow: hidden;
+}
+
+.cabecera-consulta-historial {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 16px 18px;
+}
+
+.fecha-consulta-historial {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dia-consulta {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.mes-anio-consulta {
+    color: var(--azul-oscuro);
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.hora-consulta {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.datos-principales-consulta {
+    min-width: 0;
+}
+
+.fila-nombre-consulta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nombre-mascota-historial {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.nombre-mascota-historial:hover {
+    color: var(--azul-medio);
+}
+
+.especie-raza-historial {
+    color: var(--texto-gris);
+    font-size: 10.5px;
+}
+
+.meta-consulta-historial {
+    display: flex;
+    align-items: center;
+    gap: 8px 14px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.meta-consulta-historial a,
+.meta-consulta-historial span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+    text-decoration: none;
+}
+
+.meta-consulta-historial a:hover {
+    color: var(--azul-medio);
+}
+
+.meta-consulta-historial i {
+    color: var(--azul-medio);
+}
+
+.btn-detalle-consulta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--borde);
+    border-radius: 9px;
+    background: var(--blanco);
+    color: var(--azul-oscuro);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-detalle-consulta:hover {
+    background: var(--azul-claro-bg);
+}
+
+.btn-detalle-consulta[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.btn-detalle-consulta i {
+    transition: transform .2s ease;
+}
+
+
+/* =====================================================
+   RESUMEN
+===================================================== */
+
+.resumen-consulta-historial {
+    display: grid;
+    grid-template-columns: minmax(180px, .8fr) minmax(280px, 1.5fr);
+    gap: 12px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--borde);
+    background: #fbfcfe;
+}
+
+.resumen-consulta-historial > div {
+    min-width: 0;
+}
+
+.etiqueta-resumen {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .35px;
+}
+
+.resumen-consulta-historial strong {
+    display: block;
+    color: var(--texto-oscuro);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.resumen-consulta-historial p {
+    margin: 0;
+    color: var(--texto-gris);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   DETALLE COMPLETO
+===================================================== */
+
+.detalle-consulta-completa {
+    padding: 16px 18px 18px;
+    border-top: 1px solid var(--borde);
+    background: var(--blanco);
+}
+
+.grilla-detalle-consulta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 9px;
+    margin-bottom: 12px;
+}
+
+.dato-detalle-consulta {
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: var(--fondo);
+}
+
+.dato-detalle-consulta span,
+.dato-detalle-consulta strong {
+    display: block;
+}
+
+.dato-detalle-consulta span {
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.dato-detalle-consulta strong {
+    margin-top: 3px;
+    color: var(--texto-oscuro);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.bloque-texto-consulta {
+    padding: 11px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.bloque-texto-consulta:last-of-type {
+    border-bottom: none;
+}
+
+.bloque-texto-consulta > span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--azul-oscuro);
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+.bloque-texto-consulta p {
+    margin: 0;
+    color: var(--texto-gris);
+    font-size: 11.5px;
+    line-height: 1.55;
+}
+
+.pie-detalle-consulta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.btn-ficha-desde-historial,
+.btn-propietario-desde-historial {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-ficha-desde-historial {
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-ficha-desde-historial:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+.btn-propietario-desde-historial {
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    color: var(--azul-oscuro);
+}
+
+.btn-propietario-desde-historial:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+
+/* =====================================================
+   ESTADO VACÍO
+===================================================== */
+
+.estado-vacio-historial {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 25px;
+}
+
+.icono-vacio-historial {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-medio);
+    font-size: 20px;
+}
+
+.estado-vacio-historial h3 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.estado-vacio-historial p {
+    margin: 4px 0 0;
+    color: var(--texto-gris);
+    font-size: 11px;
+    line-height: 1.5;
+}

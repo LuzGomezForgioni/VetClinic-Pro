@@ -33,6 +33,96 @@ if (!$mascota) {
     exit;
 }
 
+// ============================================================
+// CAMBIAR ESTADO DE LA MASCOTA
+// Solamente puede hacerlo su propietario
+// ============================================================
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    ($_POST['accion'] ?? '') === 'cambiar_estado'
+) {
+
+    $nuevoEstado =
+        ((int)($_POST['fallecido'] ?? 0) === 1)
+        ? 1
+        : 0;
+
+    try {
+
+        $conn->begin_transaction();
+
+        // Cambiar estado solamente si la mascota pertenece
+        // al propietario que inició sesión.
+        $stmt = $conn->prepare("
+            UPDATE mascotas
+            SET fallecido = ?
+            WHERE id_mascota = ?
+              AND id_propietario = ?
+        ");
+
+        $stmt->bind_param(
+            'iii',
+            $nuevoEstado,
+            $idMascota,
+            $idPropietario
+        );
+
+        $stmt->execute();
+        $stmt->close();
+
+
+        // Si se marca como fallecida,
+        // cancelar sus turnos futuros activos.
+        if ($nuevoEstado === 1) {
+
+            $stmt = $conn->prepare("
+                UPDATE turnos
+                SET estado = 'cancelado'
+                WHERE id_mascota = ?
+                  AND id_propietario = ?
+                  AND fecha_hora > NOW()
+                  AND estado IN ('pendiente', 'confirmado')
+            ");
+
+            $stmt->bind_param(
+                'ii',
+                $idMascota,
+                $idPropietario
+            );
+
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        $conn->commit();
+
+        $_SESSION['mensaje'] =
+            $nuevoEstado === 1
+            ? 'La mascota fue marcada como fallecida.'
+            : 'La mascota volvió a quedar marcada como activa.';
+
+        $_SESSION['tipo_mensaje'] = 'exito';
+    } catch (Throwable $e) {
+
+        try {
+            $conn->rollback();
+        } catch (Throwable $ignorado) {
+        }
+
+        $_SESSION['mensaje'] =
+            'No se pudo actualizar el estado de la mascota.';
+
+        $_SESSION['tipo_mensaje'] = 'error';
+    }
+
+    header(
+        'Location: editar_mascota.php?id=' . $idMascota
+    );
+
+    exit;
+}
+
 // ── Cargar especies y razas ──
 $especies = $conn->query("SELECT id_especie, nombre_especie FROM especies ORDER BY nombre_especie")->fetch_all(MYSQLI_ASSOC);
 $razas    = $conn->query("SELECT id_raza, id_especie, nombre_raza FROM razas ORDER BY nombre_raza")->fetch_all(MYSQLI_ASSOC);
@@ -116,6 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -147,10 +238,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="../propietarios/inicio_propietarios.php" class="item-menu"><i class="bi bi-grid"></i> Inicio</a>
                 <a href="inicio_mascota.php" class="item-menu activo"><i class="bi bi-heart-pulse"></i> Mis mascotas</a>
                 <a href="../turnos/inicio_turnos.php" class="item-menu"><i class="bi bi-calendar-check"></i> Mis turnos</a>
-                <a href="#" class="item-menu"><i class="bi bi-journal-medical"></i> Historial clínico</a>
+                <a href="../propietarios/historial_clinico.php" class="item-menu">
+                    <i class="bi bi-journal-medical"></i>
+                    Historial clínico
+                </a>
                 <div class="seccion-nav">Más</div>
-                <a href="#" class="item-menu"><i class="bi bi-shield-plus"></i> Vacunaciones</a>
+                <a href="../propietarios/vacunaciones.php" class="item-menu">
+                    <i class="bi bi-shield-plus"></i>
+                    Vacunaciones
+                </a>
                 <a href="#" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
+                <div class="seccion-nav">
+                    Configuración
+                </div>
+
+                <a
+                    href="../propietarios/configuracion_propietario.php"
+                    class="item-menu">
+
+                    <i class="bi bi-gear"></i>
+                    Mi configuración
+
+                </a>
                 <div class="usuario-lateral">
                     <div class="avatar-usuario"><?= strtoupper(substr($_SESSION['usuario_nombre'], 0, 1)) ?></div>
                     <div>
@@ -291,6 +400,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <a href="inicio_mascota.php" class="btn-accion btn-volver">Cancelar</a>
                         </div>
                     </form>
+                </div>
+
+                <div class="tarjeta-formulario mt-4">
+
+                    <h5 class="mb-3">
+                        <i class="bi bi-heart-pulse"></i>
+                        Estado de la mascota
+                    </h5>
+
+                    <?php if ((int)$mascota['fallecido'] === 1): ?>
+
+                        <div class="alert alert-secondary">
+
+                            <i class="bi bi-heartbreak"></i>
+
+                            <strong>
+                                <?= htmlspecialchars($mascota['nombre']) ?>
+                            </strong>
+
+                            está marcada como fallecida.
+
+                        </div>
+
+                        <form
+                            method="POST"
+                            action="editar_mascota.php?id=<?= $idMascota ?>">
+
+                            <input
+                                type="hidden"
+                                name="accion"
+                                value="cambiar_estado">
+
+                            <input
+                                type="hidden"
+                                name="fallecido"
+                                value="0">
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-primary"
+                                onclick="return confirm(
+                    '¿Querés volver a marcar esta mascota como activa?'
+                );">
+
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                Marcar como activa
+
+                            </button>
+
+                        </form>
+
+                    <?php else: ?>
+
+                        <div class="alert alert-success">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Estado actual:
+                            <strong>Activa</strong>
+
+                        </div>
+
+                        <form
+                            method="POST"
+                            action="editar_mascota.php?id=<?= $idMascota ?>">
+
+                            <input
+                                type="hidden"
+                                name="accion"
+                                value="cambiar_estado">
+
+                            <input
+                                type="hidden"
+                                name="fallecido"
+                                value="1">
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm(
+                    '¿Confirmás que esta mascota ha fallecido? Sus datos clínicos se conservarán y sus turnos futuros serán cancelados.'
+                );">
+
+                                <i class="bi bi-heartbreak"></i>
+                                Marcar como fallecida
+
+                            </button>
+
+                        </form>
+
+                    <?php endif; ?>
+
                 </div>
 
             </div>

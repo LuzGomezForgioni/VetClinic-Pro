@@ -1,0 +1,680 @@
+/* =====================================================
+   PROPIETARIOS DEL VETERINARIO
+   VetClinic Pro
+===================================================== */
+
+
+/* =====================================================
+   LISTADO GENERAL
+===================================================== */
+
+.encabezado-propietarios {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.contador-propietarios {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tarjeta-buscador-propietarios {
+    padding: 18px 20px;
+}
+
+.etiqueta-buscador-propietarios {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    color: var(--azul-oscuro);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.etiqueta-buscador-propietarios i {
+    color: var(--azul-medio);
+}
+
+.fila-buscador-propietarios {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.fila-buscador-propietarios .form-control {
+    min-width: 240px;
+    min-height: 42px;
+    flex: 1;
+    border-color: var(--borde);
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.fila-buscador-propietarios .form-control:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.btn-buscar-propietario,
+.btn-limpiar-propietario {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 15px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-buscar-propietario {
+    border: 1px solid var(--azul-oscuro);
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-buscar-propietario:hover {
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+}
+
+.btn-limpiar-propietario {
+    border: 1px solid var(--borde);
+    background: #f8fafc;
+    color: var(--texto-gris);
+}
+
+.btn-limpiar-propietario:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.grilla-propietarios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 16px;
+}
+
+.tarjeta-propietario-veterinario {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 18px;
+    border: 1px solid var(--borde);
+    border-radius: 15px;
+    background: var(--blanco);
+}
+
+.cabecera-propietario-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-propietario-card {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.nombre-propietario-card {
+    color: var(--azul-oscuro);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.subtitulo-propietario-card {
+    margin-top: 3px;
+    color: var(--texto-gris);
+    font-size: 11px;
+}
+
+.datos-contacto-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 11px;
+    background: var(--fondo);
+}
+
+.datos-contacto-card div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--texto-gris);
+    font-size: 11.5px;
+}
+
+.datos-contacto-card i {
+    width: 18px;
+    flex-shrink: 0;
+    color: var(--azul-medio);
+    text-align: center;
+}
+
+.datos-contacto-card span {
+    overflow-wrap: anywhere;
+}
+
+.btn-ver-propietario {
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 14px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-ver-propietario:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+.estado-vacio-propietarios {
+    padding: 42px 24px;
+    text-align: center;
+}
+
+.icono-vacio-propietarios {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-medio);
+    font-size: 22px;
+}
+
+.estado-vacio-propietarios h3 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.estado-vacio-propietarios p {
+    margin: 6px 0 15px;
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   FICHA DEL PROPIETARIO
+===================================================== */
+
+.cabecera-ficha-propietario {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-medio));
+    color: var(--blanco);
+}
+
+.avatar-ficha-propietario {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .17);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.etiqueta-propietario-ficha {
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    opacity: .68;
+}
+
+.cabecera-ficha-propietario h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.cabecera-ficha-propietario p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    opacity: .78;
+}
+
+.lista-datos-propietario {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dato-propietario-ficha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px;
+    border-radius: 10px;
+    background: var(--fondo);
+}
+
+.dato-propietario-ficha > i {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: var(--blanco);
+    color: var(--azul-medio);
+    border: 1px solid var(--borde);
+}
+
+.dato-propietario-ficha span,
+.dato-propietario-ficha strong {
+    display: block;
+}
+
+.dato-propietario-ficha span {
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.dato-propietario-ficha strong {
+    margin-top: 2px;
+    color: var(--texto-oscuro);
+    font-size: 11.5px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.cabecera-mascotas-propietario {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.cantidad-mascotas-propietario {
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: var(--fondo);
+    color: var(--texto-gris);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.grilla-mascotas-propietario {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+    gap: 12px;
+}
+
+.mascota-del-propietario {
+    padding: 14px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    background: var(--blanco);
+}
+
+.cabecera-mascota-propietario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icono-mascota-propietario {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.cabecera-mascota-propietario h3 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.cabecera-mascota-propietario p {
+    margin: 2px 0 0;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+}
+
+.datos-mascota-propietario {
+    display: flex;
+    align-items: center;
+    gap: 8px 12px;
+    flex-wrap: wrap;
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid var(--borde);
+}
+
+.datos-mascota-propietario span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+}
+
+.datos-mascota-propietario i {
+    color: var(--azul-medio);
+}
+
+.resumen-mascota-propietario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.resumen-mascota-propietario div {
+    padding: 8px;
+    border-radius: 9px;
+    background: var(--fondo);
+    text-align: center;
+}
+
+.resumen-mascota-propietario strong {
+    display: block;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.resumen-mascota-propietario span {
+    display: block;
+    margin-top: 1px;
+    color: var(--texto-gris);
+    font-size: 9px;
+}
+
+.proximo-turno-mascota-propietario {
+    margin-top: 9px;
+    padding: 8px;
+    border-radius: 9px;
+    background: #f0f9ff;
+    color: var(--azul-oscuro);
+    font-size: 9.5px;
+}
+
+.proximo-turno-mascota-propietario i {
+    margin-right: 4px;
+    color: var(--azul-medio);
+}
+
+.btn-ver-mascota-propietario {
+    min-height: 37px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-ver-mascota-propietario:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+.lista-turnos-propietario {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.turno-propietario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.turno-propietario:hover {
+    background: var(--fondo);
+    color: inherit;
+}
+
+.fecha-turno-propietario {
+    width: 49px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.fecha-turno-propietario strong,
+.fecha-turno-propietario span,
+.turno-propietario .flex-grow-1 strong,
+.turno-propietario .flex-grow-1 span {
+    display: block;
+}
+
+.fecha-turno-propietario strong {
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.fecha-turno-propietario span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9px;
+}
+
+.turno-propietario .flex-grow-1 strong {
+    color: var(--texto-oscuro);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.turno-propietario .flex-grow-1 span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.turno-propietario > i {
+    color: var(--azul-medio);
+}
+
+.estado-vacio-propietario-pequeno {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--fondo);
+}
+
+.estado-vacio-propietario-pequeno > i {
+    color: var(--azul-medio);
+    font-size: 17px;
+}
+
+.estado-vacio-propietario-pequeno strong,
+.estado-vacio-propietario-pequeno span {
+    display: block;
+}
+
+.estado-vacio-propietario-pequeno strong {
+    color: var(--texto-oscuro);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.estado-vacio-propietario-pequeno span {
+    margin-top: 2px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+    line-height: 1.4;
+}
+
+
+/* =====================================================
+   NOTAS INTERNAS Y ESTADO DE MASCOTAS
+===================================================== */
+
+.texto-ayuda-notas {
+    margin: -3px 0 10px;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+    line-height: 1.45;
+}
+
+.form-nota-propietario {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-nota-propietario .form-control {
+    resize: vertical;
+    min-height: 82px;
+    border-color: var(--borde);
+    border-radius: 9px;
+    font-size: 11px;
+}
+
+.form-nota-propietario .form-control:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.btn-guardar-nota {
+    min-height: 37px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 9px;
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.lista-notas-propietario {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.nota-interna-propietario {
+    padding: 10px;
+    border: 1px solid var(--borde);
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.nota-interna-propietario p {
+    margin: 0;
+    color: var(--texto-oscuro);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+.meta-nota-propietario {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 7px;
+    color: var(--texto-gris);
+    font-size: 8.5px;
+}
+
+.sin-notas-propietario {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 9px;
+    background: var(--fondo);
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.mascota-fallecida-propietario {
+    background: #fbfcfd;
+}
+
+.fila-nombre-mascota-propietario {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.estado-fallecida-propietario {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 6px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 8px;
+    font-weight: 700;
+}

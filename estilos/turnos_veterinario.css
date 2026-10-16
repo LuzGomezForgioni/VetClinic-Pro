@@ -1,0 +1,400 @@
+/* =========================================================
+   TURNOS DEL VETERINARIO
+   Estilos específicos de veterinarios/turnos_veterinario.php
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   Encabezado de la agenda
+--------------------------------------------------------- */
+
+.encabezado-turnos-pagina {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.resumen-agenda {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mini-resumen-turnos {
+    min-width: 92px;
+    padding: 9px 13px;
+    border-radius: 12px;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mini-resumen-etiqueta {
+    font-size: 11px;
+    color: var(--texto-gris);
+    font-weight: 600;
+}
+
+.mini-resumen-turnos strong {
+    font-size: 15px;
+    color: var(--azul-oscuro);
+}
+
+
+/* ---------------------------------------------------------
+   Filtros
+--------------------------------------------------------- */
+
+.filtros-turnos {
+    padding: 20px 22px;
+}
+
+.filtros-turnos .form-label {
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+}
+
+.filtros-turnos .form-control,
+.filtros-turnos .form-select {
+    min-height: 42px;
+    border-radius: 10px;
+    border: 1px solid var(--borde);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    color: var(--texto-oscuro);
+    box-shadow: none;
+}
+
+.filtros-turnos .form-control:focus,
+.filtros-turnos .form-select:focus {
+    border-color: var(--azul-claro);
+    box-shadow: 0 0 0 3px rgba(124, 179, 252, .16);
+}
+
+.btn-buscar-turnos,
+.btn-limpiar-turnos {
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-buscar-turnos {
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-buscar-turnos:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+.btn-limpiar-turnos {
+    background: #f8fafc;
+    border-color: var(--borde);
+    color: var(--texto-oscuro);
+}
+
+.btn-limpiar-turnos:hover {
+    background: var(--azul-claro-bg);
+    border-color: var(--azul-claro);
+    color: var(--azul-oscuro);
+}
+
+
+/* ---------------------------------------------------------
+   Secciones de agenda
+--------------------------------------------------------- */
+
+.seccion-agenda {
+    padding: 20px 22px;
+}
+
+.cabecera-agenda {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.contador-turnos {
+    padding: 5px 11px;
+    border-radius: 20px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.lista-agenda {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* ---------------------------------------------------------
+   Tarjeta de cada turno
+--------------------------------------------------------- */
+
+.turno-agenda {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 15px;
+    border-radius: 13px;
+    border: 1px solid var(--borde);
+    background: #fbfdff;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.turno-agenda:hover {
+    background: var(--blanco);
+    border-color: #cfd8e6;
+    box-shadow: 0 5px 16px rgba(17, 24, 39, .05);
+}
+
+.fecha-hora-turno {
+    width: 78px;
+    min-height: 58px;
+    padding: 8px 7px;
+    border-radius: 11px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.hora-principal-turno,
+.fecha-principal-turno {
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.texto-hora-turno,
+.hora-secundaria-turno {
+    margin-top: 4px;
+    font-size: 10px;
+    color: var(--azul-medio);
+    font-weight: 700;
+}
+
+.datos-turno {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+
+.fila-principal-turno {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.nombre-turno {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--texto-oscuro);
+}
+
+.nombre-turno i {
+    color: var(--azul-medio);
+}
+
+.meta-turno {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    color: var(--texto-gris);
+    font-size: 11.5px;
+}
+
+.meta-turno span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-turno i {
+    color: var(--azul-medio);
+}
+
+
+/* ---------------------------------------------------------
+   Estados
+--------------------------------------------------------- */
+
+.estado-realizado {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.estado-cancelado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* ---------------------------------------------------------
+   Acciones
+--------------------------------------------------------- */
+
+.acciones-turno {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-turno {
+    min-height: 34px;
+    padding: 7px 11px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-turno-secundario {
+    background: var(--blanco);
+    border-color: var(--azul-claro);
+    color: var(--azul-oscuro);
+}
+
+.btn-turno-secundario:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.btn-turno-principal {
+    background: var(--azul-oscuro);
+    border-color: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-turno-principal:hover {
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+    color: var(--blanco);
+}
+
+
+/* ---------------------------------------------------------
+   Estado vacío
+--------------------------------------------------------- */
+
+.estado-vacio-turnos {
+    min-height: 92px;
+    padding: 18px 16px;
+    border-radius: 12px;
+    border: 1px dashed #d8e0ea;
+    background: #fafcff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    text-align: left;
+}
+
+.icono-vacio-turnos {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-medio);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+}
+
+.titulo-vacio-turnos {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--azul-oscuro);
+}
+
+.texto-vacio-turnos {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--texto-gris);
+}
+
+
+/* ---------------------------------------------------------
+   Modal de mascota
+--------------------------------------------------------- */
+
+.modal-content {
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(17, 24, 39, .14);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--borde);
+    background: #fbfdff;
+}
+
+.modal-title {
+    color: var(--azul-oscuro);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.modal-title i {
+    color: var(--azul-medio);
+    margin-right: 6px;
+}
+
+.modal-body {
+    color: var(--texto-oscuro);
+    font-size: 13px;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--borde);
+    background: #fbfdff;
+}

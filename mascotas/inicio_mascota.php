@@ -32,6 +32,7 @@ $sql = "
         m.peso_kg,
         m.color,
         m.castrado,
+        m.fallecido,
         m.fecha_nacimiento,
         e.nombre_especie,
         r.nombre_raza
@@ -67,6 +68,7 @@ function emojiEspecie(?string $esp): string
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -105,16 +107,32 @@ function emojiEspecie(?string $esp): string
                 <a href="../turnos/inicio_turnos.php" class="item-menu">
                     <i class="bi bi-calendar-check"></i> Mis turnos
                 </a>
-                <a href="#" class="item-menu">
-                    <i class="bi bi-journal-medical"></i> Historial clínico
+                <a href="../propietarios/historial_clinico.php" class="item-menu">
+                    <i class="bi bi-journal-medical"></i>
+                    Historial clínico
                 </a>
                 <div class="seccion-nav">Más</div>
-                <a href="#" class="item-menu">
-                    <i class="bi bi-shield-plus"></i> Vacunaciones
+                <a href="../propietarios/vacunaciones.php" class="item-menu">
+                    <i class="bi bi-shield-plus"></i>
+                    Vacunaciones
                 </a>
                 <a href="#" class="item-menu">
                     <i class="bi bi-chat-dots"></i> Mensajes
                 </a>
+
+                <div class="seccion-nav">
+                    Configuración
+                </div>
+
+                <a
+                    href="../propietarios/configuracion_propietario.php"
+                    class="item-menu">
+
+                    <i class="bi bi-gear"></i>
+                    Mi configuración
+
+                </a>
+
 
                 <div class="usuario-lateral">
                     <div class="avatar-usuario">
@@ -140,6 +158,14 @@ function emojiEspecie(?string $esp): string
                     <div class="d-flex gap-2 align-items-center">
                         <a href="alta_mascota.php" class="btn-abm-principal">
                             <i class="bi bi-plus-lg"></i> Agregar mascota
+                        </a>
+                        <a
+                            href="../propietarios/configuracion_propietario.php"
+                            class="icono-barra"
+                            title="Mi configuración">
+
+                            <i class="bi bi-gear"></i>
+
                         </a>
                         <a href="../index.php" class="icono-barra" title="Cerrar sesión">
                             <i class="bi bi-box-arrow-right"></i>
@@ -176,6 +202,16 @@ function emojiEspecie(?string $esp): string
                                         <div class="emoji-mascota"><?= emojiEspecie($m['nombre_especie']) ?></div>
                                         <div class="flex-grow-1">
                                             <div class="nombre-mascota-card"><?= htmlspecialchars($m['nombre']) ?></div>
+                                            <?php if ((int)$m['fallecido'] === 1): ?>
+
+                                                <span class="badge bg-secondary mt-1">
+
+                                                    <i class="bi bi-heartbreak"></i>
+                                                    Fallecida
+
+                                                </span>
+
+                                            <?php endif; ?>
                                             <div class="especie-raza">
                                                 <?= htmlspecialchars($m['nombre_especie'] ?? '—') ?>
                                                 <?= $m['nombre_raza'] ? ' · ' . htmlspecialchars($m['nombre_raza']) : '' ?>

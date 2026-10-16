@@ -1,0 +1,554 @@
+:root {
+    --azul:#171c58;
+    --azul2:#242b78;
+    --fondo:#f5f7fb;
+    --borde:#e5e8f0;
+    --texto:#23263a;
+    --suave:#697083;
+}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--fondo);color:var(--texto)}
+.admin-shell{min-height:100vh}
+.admin-sidebar{background:var(--azul);color:#fff;min-height:100vh;padding:24px 18px;position:sticky;top:0}
+.admin-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;margin-bottom:28px}.admin-brand img{width:42px;height:42px;object-fit:contain}
+.admin-section{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.6;margin:20px 10px 8px}
+.admin-link{display:flex;align-items:center;gap:10px;color:#d9dcf3;text-decoration:none;padding:11px 12px;border-radius:10px;margin-bottom:4px;font-size:14px}.admin-link:hover,.admin-link.activo{background:rgba(255,255,255,.11);color:#fff}
+.admin-main{padding:28px}
+.admin-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.card-admin{background:#fff;border:1px solid var(--borde);border-radius:18px;padding:20px;box-shadow:0 8px 28px rgba(25,31,90,.05)}
+.metric{font-size:2rem;font-weight:800;color:var(--azul)}
+.texto-suave{color:var(--suave)}
+.badge-estado{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}.activa{background:#e5f7ed;color:#147347}.atrasada{background:#fff3cf;color:#8b6500}.suspendida{background:#fde7e7;color:#a92f2f}.cancelada{background:#eceef2;color:#545968}.pendiente_pago{background:#e7efff;color:#2e57a2}
+.btn-admin{background:var(--azul);color:#fff;border:0;border-radius:10px;padding:10px 15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:7px}.btn-admin:hover{background:var(--azul2);color:#fff}
+.table thead th{font-size:12px;color:var(--suave);font-weight:700;border-bottom-color:var(--borde)}
+.table td{vertical-align:middle}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}.login-card{width:100%;max-width:480px;background:#fff;border:1px solid var(--borde);border-radius:22px;padding:32px;box-shadow:0 20px 50px rgba(25,31,90,.08)}
+.form-control,.form-select{min-height:46px;border-radius:10px;border-color:#d9dce7}
+@media(max-width:991px){.admin-sidebar{min-height:auto;position:static}.admin-main{padding:18px}}
+
+
+/* ================================================================
+   SUPERADMIN — SUSCRIPCIONES
+================================================================ */
+
+.sus-admin-header {
+    margin-bottom: 26px;
+    padding: 2px 2px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.sus-admin-kicker {
+    width: fit-content;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #5963bd;
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.sus-admin-header h1 {
+    margin: 0;
+    color: #171c45;
+    font-size: 2.05rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -.035em;
+}
+
+.sus-admin-header p {
+    max-width: 720px;
+    margin: 9px 0 0;
+    color: #767d91;
+    font-size: .86rem;
+    line-height: 1.6;
+}
+
+.sus-admin-header-badge {
+    min-width: 165px;
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #e3e6ef;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(25, 31, 90, .04);
+}
+
+.sus-admin-header-badge > span {
+    color: #1c2257;
+    font-size: 1.55rem;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.sus-admin-header-badge small {
+    max-width: 90px;
+    color: #8a90a2;
+    font-size: .64rem;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.sus-admin-metrica {
+    min-height: 128px;
+    padding: 19px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff;
+    border: 1px solid #e5e8f0;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(25, 31, 90, .04);
+}
+
+.sus-admin-metrica-icono {
+    width: 43px;
+    min-width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    font-size: 1.05rem;
+}
+
+.sus-admin-metrica-icono.activa {
+    color: #16704a;
+    background: #e8f7ef;
+}
+
+.sus-admin-metrica-icono.proximo {
+    color: #4855b4;
+    background: #edf0ff;
+}
+
+.sus-admin-metrica-icono.atrasada {
+    color: #946b00;
+    background: #fff4d4;
+}
+
+.sus-admin-metrica-icono.suspendida {
+    color: #a43b3b;
+    background: #fdeaea;
+}
+
+.sus-admin-metrica > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-metrica small {
+    color: #777e92;
+    font-size: .69rem;
+    font-weight: 700;
+}
+
+.sus-admin-metrica strong {
+    margin-top: 3px;
+    color: #1c2250;
+    font-size: 1.8rem;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.sus-admin-metrica span {
+    margin-top: 5px;
+    color: #9a9faf;
+    font-size: .62rem;
+    line-height: 1.4;
+}
+
+.sus-admin-alerta {
+    margin-bottom: 20px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    color: #564718;
+    background: #fff9e8;
+    border: 1px solid #eee0ad;
+    border-radius: 15px;
+}
+
+.sus-admin-alerta-icono {
+    width: 37px;
+    min-width: 37px;
+    height: 37px;
+    display: grid;
+    place-items: center;
+    color: #8a6c12;
+    background: #fff2c8;
+    border-radius: 11px;
+}
+
+.sus-admin-alerta strong {
+    color: #594a1b;
+    font-size: .79rem;
+}
+
+.sus-admin-alerta p {
+    margin: 3px 0 0;
+    color: #776b40;
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+.sus-admin-panel {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e3e6ef;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(25, 31, 90, .045);
+}
+
+.sus-admin-panel-head {
+    padding: 21px 22px 17px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #eef0f5;
+}
+
+.sus-admin-panel-head h2 {
+    margin: 0;
+    color: #24294d;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.sus-admin-panel-head p {
+    margin: 5px 0 0;
+    color: #8a90a3;
+    font-size: .7rem;
+}
+
+.sus-admin-resultado {
+    padding: 8px 11px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    color: #293066;
+    background: #f1f3fb;
+    border-radius: 10px;
+    font-size: .78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.sus-admin-resultado span {
+    color: #8d92a5;
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+.sus-admin-filtros {
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    background: #fbfcfe;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.sus-admin-filtro {
+    min-height: 35px;
+    padding: 0 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #666d81;
+    background: #fff;
+    border: 1px solid #e2e5ed;
+    border-radius: 10px;
+    font-size: .67rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: .16s ease;
+}
+
+.sus-admin-filtro:hover {
+    color: #303768;
+    border-color: #cfd4e4;
+    background: #f8f9fd;
+}
+
+.sus-admin-filtro span {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    display: inline-grid;
+    place-items: center;
+    color: #878da0;
+    background: #f2f3f7;
+    border-radius: 999px;
+    font-size: .59rem;
+}
+
+.sus-admin-filtro.activo {
+    color: #fff;
+    background: #1a1f5e;
+    border-color: #1a1f5e;
+    box-shadow: 0 6px 15px rgba(26, 31, 94, .14);
+}
+
+.sus-admin-filtro.activo span {
+    color: #dfe2ff;
+    background: rgba(255, 255, 255, .13);
+}
+
+.sus-admin-tabla {
+    min-width: 1020px;
+}
+
+.sus-admin-tabla thead th {
+    padding: 13px 17px;
+    color: #858b9d;
+    background: #fafbfc;
+    border-bottom: 1px solid #e9ebf1;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+}
+
+.sus-admin-tabla tbody td {
+    padding: 15px 17px;
+    border-bottom: 1px solid #f0f1f5;
+}
+
+.sus-admin-tabla tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.sus-admin-tabla tbody tr {
+    transition: background .14s ease;
+}
+
+.sus-admin-tabla tbody tr:hover {
+    background: #fafbfe;
+}
+
+.sus-admin-profesional {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.sus-admin-avatar {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #1a1f5e, #626bca);
+    border-radius: 12px;
+    font-size: .68rem;
+    font-weight: 800;
+    box-shadow: 0 6px 14px rgba(26, 31, 94, .13);
+}
+
+.sus-admin-profesional > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-profesional strong {
+    color: #2b304d;
+    font-size: .77rem;
+    font-weight: 800;
+}
+
+.sus-admin-profesional span {
+    margin-top: 2px;
+    color: #6f768a;
+    font-size: .61rem;
+    font-weight: 700;
+}
+
+.sus-admin-profesional small {
+    margin-top: 2px;
+    max-width: 220px;
+    overflow: hidden;
+    color: #9a9faf;
+    font-size: .59rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sus-admin-plan {
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-plan strong {
+    color: #42475f;
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+.sus-admin-plan span {
+    margin-top: 3px;
+    color: #9ca1b0;
+    font-size: .59rem;
+}
+
+.sus-admin-fecha {
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-fecha strong {
+    color: #3d425c;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.sus-admin-fecha span {
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .58rem;
+    font-weight: 750;
+}
+
+.sus-admin-fecha span.correcto {
+    color: #25805a;
+}
+
+.sus-admin-fecha span.proximo {
+    color: #5660bd;
+}
+
+.sus-admin-fecha span.alerta {
+    color: #9a7000;
+}
+
+.sus-admin-fecha span.critico {
+    color: #b24040;
+}
+
+.sus-admin-fecha span.pendiente {
+    color: #4163a5;
+}
+
+.sus-admin-fecha span.neutral {
+    color: #9a9faf;
+}
+
+.sus-admin-importe {
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-importe strong {
+    color: #242a51;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.sus-admin-importe span {
+    color: #9ca1b0;
+    font-size: .57rem;
+}
+
+.sus-admin-accion {
+    min-height: 34px;
+    padding: 0 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #343b78;
+    background: #f3f4fb;
+    border: 1px solid #e0e3f0;
+    border-radius: 9px;
+    font-size: .63rem;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: .15s ease;
+}
+
+.sus-admin-accion:hover {
+    color: #fff;
+    background: #1a1f5e;
+    border-color: #1a1f5e;
+}
+
+.sus-admin-vacio {
+    padding: 58px 20px;
+    text-align: center;
+}
+
+.sus-admin-vacio > div {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 13px;
+    display: grid;
+    place-items: center;
+    color: #7d84a1;
+    background: #f0f2f8;
+    border-radius: 16px;
+    font-size: 1.25rem;
+}
+
+.sus-admin-vacio h3 {
+    margin: 0;
+    color: #3d425c;
+    font-size: .9rem;
+    font-weight: 800;
+}
+
+.sus-admin-vacio p {
+    margin: 7px 0 18px;
+    color: #969baa;
+    font-size: .7rem;
+}
+
+.sus-admin-nota {
+    margin-top: 18px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #545b70;
+    background: #f8f9fc;
+    border: 1px solid #e6e9f0;
+    border-radius: 14px;
+}
+
+.sus-admin-nota > i {
+    margin-top: 1px;
+    color: #5660ba;
+    font-size: 1rem;
+}
+
+.sus-admin-nota div {
+    display: flex;
+    flex-direction: column;
+}
+
+.sus-admin-nota strong {
+    color: #464c68;
+    font-size: .7rem;
+}
+
+.sus-admin-nota span {
+    margin-top: 3px;
+    color: #858b9e;
+    font-size: .64rem;
+    line-height: 1.5;
+}

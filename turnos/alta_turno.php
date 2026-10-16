@@ -1,3 +1,4 @@
+```php
 <?php
 // ============================================================
 // VetClinic Pro — Alta Turno
@@ -6,34 +7,17 @@
 
 session_start();
 
-date_default_timezone_set('America/Argentina/Buenos_Aires');
-
-if (
-    empty($_SESSION['logueado']) ||
-    $_SESSION['tipo_usuario'] !== 'propietario'
-) {
+if (empty($_SESSION['logueado']) || $_SESSION['tipo_usuario'] !== 'propietario') {
     header('Location: ../index.php');
     exit;
 }
 
 require_once '../config/conexion.php';
+require_once '../config/suscripciones.php';
+actualizarTodasSuscripciones($conn);
 
-$idPropietario = (int) $_SESSION['usuario_id'];
-
+$idPropietario = (int)$_SESSION['usuario_id'];
 $errores = [];
-
-
-// ============================================================
-// FECHA Y HORA ACTUAL DEL SERVIDOR
-// ============================================================
-
-$fechaActualServidor = date('Y-m-d');
-
-$horaActualServidor = (int) date('H');
-
-$minutosActualesServidor =
-    ($horaActualServidor * 60) +
-    (int) date('i');
 
 
 // ============================================================
@@ -41,25 +25,17 @@ $minutosActualesServidor =
 // ============================================================
 
 $stmt = $conn->prepare("
-    SELECT
-        id_mascota,
-        nombre
+    SELECT id_mascota, nombre
     FROM mascotas
     WHERE id_propietario = ?
+      AND COALESCE(fallecido, 0) = 0
     ORDER BY nombre ASC
 ");
 
-$stmt->bind_param(
-    'i',
-    $idPropietario
-);
-
+$stmt->bind_param('i', $idPropietario);
 $stmt->execute();
 
-$mascotas =
-    $stmt
-    ->get_result()
-    ->fetch_all(MYSQLI_ASSOC);
+$mascotas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $stmt->close();
 
@@ -70,17 +46,19 @@ $stmt->close();
 
 $resultadoVeterinarios = $conn->query("
     SELECT
-        id_veterinario,
-        nombre,
-        apellido,
-        especialidad
-    FROM veterinarios
-    WHERE activo = 1
-    ORDER BY apellido ASC, nombre ASC
+        v.id_veterinario,
+        v.nombre,
+        v.apellido,
+        v.especialidad
+    FROM veterinarios v
+    INNER JOIN suscripciones s
+        ON s.id_veterinario = v.id_veterinario
+    WHERE v.activo = 1
+      AND s.estado IN ('activa', 'atrasada')
+    ORDER BY v.apellido ASC, v.nombre ASC
 ");
 
-$veterinarios =
-    $resultadoVeterinarios
+$veterinarios = $resultadoVeterinarios
     ? $resultadoVeterinarios->fetch_all(MYSQLI_ASSOC)
     : [];
 
@@ -99,61 +77,29 @@ $stmt = $conn->prepare("
         hora_hasta
     FROM horarios_atencion
     WHERE activo = 1
-    ORDER BY
-        id_veterinario,
-        dia_semana,
-        hora_desde
+    ORDER BY id_veterinario, dia_semana, hora_desde
 ");
 
 $stmt->execute();
 
-$resultadoHorarios =
-    $stmt->get_result();
+$resultadoHorarios = $stmt->get_result();
 
-while (
-    $fila =
-    $resultadoHorarios->fetch_assoc()
-) {
+while ($fila = $resultadoHorarios->fetch_assoc()) {
 
-    $idVet =
-        (int) $fila['id_veterinario'];
+    $idVet = (int)$fila['id_veterinario'];
+    $dia = (int)$fila['dia_semana'];
 
-    $dia =
-        (int) $fila['dia_semana'];
-
-
-    if (
-        !isset(
-            $horariosVeterinarios[$idVet]
-        )
-    ) {
+    if (!isset($horariosVeterinarios[$idVet])) {
         $horariosVeterinarios[$idVet] = [];
     }
 
-
-    if (
-        !isset(
-            $horariosVeterinarios[$idVet][$dia]
-        )
-    ) {
+    if (!isset($horariosVeterinarios[$idVet][$dia])) {
         $horariosVeterinarios[$idVet][$dia] = [];
     }
 
-
     $horariosVeterinarios[$idVet][$dia][] = [
-        'desde' =>
-        substr(
-            $fila['hora_desde'],
-            0,
-            5
-        ),
-
-        'hasta' =>
-        substr(
-            $fila['hora_hasta'],
-            0,
-            5
-        )
+        'desde' => substr($fila['hora_desde'], 0, 5),
+        'hasta' => substr($fila['hora_hasta'], 0, 5)
     ];
 }
 
@@ -162,6 +108,10 @@ $stmt->close();
 
 // ============================================================
 // TURNOS YA OCUPADOS
+// ============================================================
+// Se cargan los turnos futuros para no mostrar horarios
+// que ya fueron reservados.
+//
 // Los turnos cancelados NO bloquean el horario.
 // ============================================================
 
@@ -178,56 +128,31 @@ $stmt = $conn->prepare("
 
 $stmt->execute();
 
-$resultadoTurnos =
-    $stmt->get_result();
+$resultadoTurnos = $stmt->get_result();
 
-while (
-    $fila =
-    $resultadoTurnos->fetch_assoc()
-) {
+while ($fila = $resultadoTurnos->fetch_assoc()) {
 
-    $idVet =
-        (int) $fila['id_veterinario'];
+    $idVet = (int)$fila['id_veterinario'];
 
+    $fecha = date(
+        'Y-m-d',
+        strtotime($fila['fecha_hora'])
+    );
 
-    $fecha =
-        date(
-            'Y-m-d',
-            strtotime(
-                $fila['fecha_hora']
-            )
-        );
+    $hora = date(
+        'H:i',
+        strtotime($fila['fecha_hora'])
+    );
 
-
-    $hora =
-        date(
-            'H:i',
-            strtotime(
-                $fila['fecha_hora']
-            )
-        );
-
-
-    if (
-        !isset(
-            $turnosOcupados[$idVet]
-        )
-    ) {
+    if (!isset($turnosOcupados[$idVet])) {
         $turnosOcupados[$idVet] = [];
     }
 
-
-    if (
-        !isset(
-            $turnosOcupados[$idVet][$fecha]
-        )
-    ) {
+    if (!isset($turnosOcupados[$idVet][$fecha])) {
         $turnosOcupados[$idVet][$fecha] = [];
     }
 
-
-    $turnosOcupados[$idVet][$fecha][] =
-        $hora;
+    $turnosOcupados[$idVet][$fecha][] = $hora;
 }
 
 $stmt->close();
@@ -237,82 +162,36 @@ $stmt->close();
 // PROCESAR FORMULARIO
 // ============================================================
 
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $idMascota =
-        (int) (
-            $_POST['id_mascota']
-            ?? 0
-        );
+    $idMascota     = (int)($_POST['id_mascota'] ?? 0);
+    $idVeterinario = (int)($_POST['id_veterinario'] ?? 0);
 
-
-    $idVeterinario =
-        (int) (
-            $_POST['id_veterinario']
-            ?? 0
-        );
-
-
-    $fechaTurno =
-        trim(
-            $_POST['fecha_turno']
-                ?? ''
-        );
-
-
-    $horaTurno =
-        trim(
-            $_POST['hora_turno']
-                ?? ''
-        );
-
+    $fechaTurno = trim($_POST['fecha_turno'] ?? '');
+    $horaTurno  = trim($_POST['hora_turno'] ?? '');
 
     $fechaHora = '';
 
-
-    if (
-        $fechaTurno !== '' &&
-        $horaTurno !== ''
-    ) {
-
-        $fechaHora =
-            $fechaTurno .
-            ' ' .
-            $horaTurno .
-            ':00';
+    if ($fechaTurno !== '' && $horaTurno !== '') {
+        $fechaHora = $fechaTurno . ' ' . $horaTurno . ':00';
     }
 
-
-    $motivo =
-        trim(
-            $_POST['motivo']
-                ?? ''
-        );
-
-
-    $observaciones =
-        trim(
-            $_POST['observaciones']
-                ?? ''
-        );
-
+    $motivo        = trim($_POST['motivo'] ?? '');
+    $observaciones = trim($_POST['observaciones'] ?? '');
 
 
     // ========================================================
-    // VALIDAR MASCOTA
+    // VALIDAR MASCOTA Y PERTENENCIA
     // ========================================================
 
     if ($idMascota <= 0) {
 
-        $errores[] =
-            'Seleccioná una mascota.';
+        $errores[] = 'Seleccioná una mascota.';
+
     } else {
 
         $stmt = $conn->prepare("
-            SELECT
-                id_mascota
+            SELECT id_mascota
             FROM mascotas
             WHERE id_mascota = ?
               AND id_propietario = ?
@@ -327,39 +206,37 @@ if (
 
         $stmt->execute();
 
-        $mascotaValida =
-            $stmt
+        $mascotaValida = $stmt
             ->get_result()
             ->fetch_assoc();
 
         $stmt->close();
 
-
         if (!$mascotaValida) {
-
             $errores[] =
                 'La mascota seleccionada no pertenece al propietario logueado.';
         }
     }
 
 
-
     // ========================================================
-    // VALIDAR VETERINARIO
+    // VALIDAR VETERINARIO ACTIVO
     // ========================================================
 
     if ($idVeterinario <= 0) {
 
-        $errores[] =
-            'Seleccioná un veterinario.';
+        $errores[] = 'Seleccioná un veterinario.';
+
     } else {
 
         $stmt = $conn->prepare("
-            SELECT
-                id_veterinario
-            FROM veterinarios
-            WHERE id_veterinario = ?
-              AND activo = 1
+            SELECT v.id_veterinario
+            FROM veterinarios v
+            INNER JOIN suscripciones s
+                ON s.id_veterinario = v.id_veterinario
+            WHERE v.id_veterinario = ?
+              AND v.activo = 1
+              AND s.estado IN ('activa', 'atrasada')
             LIMIT 1
         ");
 
@@ -370,21 +247,17 @@ if (
 
         $stmt->execute();
 
-        $veterinarioValido =
-            $stmt
+        $veterinarioValido = $stmt
             ->get_result()
             ->fetch_assoc();
 
         $stmt->close();
 
-
         if (!$veterinarioValido) {
-
             $errores[] =
                 'El veterinario seleccionado no está disponible.';
         }
     }
-
 
 
     // ========================================================
@@ -393,27 +266,22 @@ if (
 
     $fechaObjeto = null;
 
-
     if ($fechaTurno === '') {
 
-        $errores[] =
-            'Seleccioná una fecha.';
+        $errores[] = 'Seleccioná una fecha.';
+
     } elseif ($horaTurno === '') {
 
-        $errores[] =
-            'Seleccioná un horario disponible.';
+        $errores[] = 'Seleccioná un horario disponible.';
+
     } else {
 
-        $fechaObjeto =
-            DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $fechaHora
-            );
+        $fechaObjeto = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            $fechaHora
+        );
 
-
-        $erroresFecha =
-            DateTime::getLastErrors();
-
+        $erroresFecha = DateTime::getLastErrors();
 
         if (
             !$fechaObjeto ||
@@ -428,15 +296,13 @@ if (
 
             $errores[] =
                 'La fecha y hora seleccionadas no son válidas.';
-        } elseif (
-            $fechaObjeto <= new DateTime()
-        ) {
+
+        } elseif ($fechaObjeto <= new DateTime()) {
 
             $errores[] =
-                'No se pueden solicitar turnos en horarios que ya pasaron.';
+                'No se pueden solicitar turnos en el pasado.';
         }
     }
-
 
 
     // ========================================================
@@ -447,28 +313,23 @@ if (
 
         $errores[] =
             'El motivo de la consulta es obligatorio.';
-    } elseif (
-        mb_strlen($motivo) > 200
-    ) {
+
+    } elseif (mb_strlen($motivo) > 200) {
 
         $errores[] =
             'El motivo no puede superar los 200 caracteres.';
     }
 
 
-
     // ========================================================
     // VALIDAR OBSERVACIONES
     // ========================================================
 
-    if (
-        mb_strlen($observaciones) > 65535
-    ) {
+    if (mb_strlen($observaciones) > 65535) {
 
         $errores[] =
             'Las observaciones son demasiado extensas.';
     }
-
 
 
     // ========================================================
@@ -480,29 +341,31 @@ if (
         $fechaObjeto instanceof DateTime
     ) {
 
-        $diaSemana =
-            (int) $fechaObjeto->format('N');
+        // 1 = lunes
+        // 2 = martes
+        // ...
+        // 7 = domingo
 
+        $diaSemana = (int)$fechaObjeto->format('N');
 
         $horarioValido = false;
 
-
         if (
             isset(
-                $horariosVeterinarios[$idVeterinario][$diaSemana]
+                $horariosVeterinarios[
+                    $idVeterinario
+                ][$diaSemana]
             )
         ) {
 
             foreach (
-                $horariosVeterinarios[$idVeterinario][$diaSemana] as $horario
+                $horariosVeterinarios[
+                    $idVeterinario
+                ][$diaSemana] as $horario
             ) {
 
-                $desde =
-                    $horario['desde'];
-
-                $hasta =
-                    $horario['hasta'];
-
+                $desde = $horario['desde'];
+                $hasta = $horario['hasta'];
 
                 if (
                     $horaTurno >= $desde &&
@@ -510,19 +373,16 @@ if (
                 ) {
 
                     $horarioValido = true;
-
                     break;
                 }
             }
         }
-
 
         if (!$horarioValido) {
 
             $errores[] =
                 'El veterinario no atiende en el día y horario seleccionados.';
         }
-
 
 
         // ====================================================
@@ -539,48 +399,25 @@ if (
         }
 
 
-
         // ====================================================
-        // VALIDAR QUE NO SEA UN HORARIO PASADO
-        // ====================================================
-
-        if (
-            empty($errores) &&
-            $fechaTurno === $fechaActualServidor
-        ) {
-
-            $minutosTurno =
-                ((int) $fechaObjeto->format('H') * 60) +
-                (int) $fechaObjeto->format('i');
-
-
-            if (
-                $minutosTurno <=
-                $minutosActualesServidor
-            ) {
-
-                $errores[] =
-                    'No podés seleccionar un horario que ya pasó.';
-            }
-        }
-
-
-
-        // ====================================================
-        // VALIDAR QUE NO ESTÉ OCUPADO
+        // VALIDAR QUE EL TURNO NO ESTÉ OCUPADO
         // ====================================================
 
         if (
             empty($errores) &&
             isset(
-                $turnosOcupados[$idVeterinario][$fechaTurno]
+                $turnosOcupados[
+                    $idVeterinario
+                ][$fechaTurno]
             )
         ) {
 
             if (
                 in_array(
                     $horaTurno,
-                    $turnosOcupados[$idVeterinario][$fechaTurno],
+                    $turnosOcupados[
+                        $idVeterinario
+                    ][$fechaTurno],
                     true
                 )
             ) {
@@ -592,18 +429,17 @@ if (
     }
 
 
-
     // ========================================================
-    // ÚLTIMA VERIFICACIÓN EN BASE DE DATOS
+    // ÚLTIMA VERIFICACIÓN DIRECTAMENTE EN LA BASE
+    // ========================================================
+    // Esto evita que dos personas puedan reservar el mismo
+    // horario si una de ellas abrió la página antes que la otra.
     // ========================================================
 
-    if (
-        empty($errores)
-    ) {
+    if (empty($errores)) {
 
         $stmt = $conn->prepare("
-            SELECT
-                id_turno
+            SELECT id_turno
             FROM turnos
             WHERE id_veterinario = ?
               AND fecha_hora = ?
@@ -619,13 +455,11 @@ if (
 
         $stmt->execute();
 
-        $turnoExistente =
-            $stmt
+        $turnoExistente = $stmt
             ->get_result()
             ->fetch_assoc();
 
         $stmt->close();
-
 
         if ($turnoExistente) {
 
@@ -635,39 +469,36 @@ if (
     }
 
 
-
     // ========================================================
     // GUARDAR TURNO
     // ========================================================
 
-    if (
-        empty($errores)
-    ) {
+    if (empty($errores)) {
 
         $observacionesFinal =
             $observaciones !== ''
-            ? $observaciones
-            : null;
+                ? $observaciones
+                : null;
 
+        // Los turnos nuevos quedan confirmados
+        // automáticamente porque el horario fue
+        // previamente habilitado por el veterinario.
 
-        $estadoInicial =
-            'confirmado';
-
+        $estadoInicial = 'confirmado';
 
         $stmt = $conn->prepare("
             INSERT INTO turnos
-            (
-                id_mascota,
-                id_veterinario,
-                id_propietario,
-                fecha_hora,
-                motivo,
-                estado,
-                observaciones
-            )
+                (
+                    id_mascota,
+                    id_veterinario,
+                    id_propietario,
+                    fecha_hora,
+                    motivo,
+                    estado,
+                    observaciones
+                )
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
-
 
         $stmt->bind_param(
             'iiissss',
@@ -680,13 +511,9 @@ if (
             $observacionesFinal
         );
 
-
-        if (
-            $stmt->execute()
-        ) {
+        if ($stmt->execute()) {
 
             $stmt->close();
-
 
             $_SESSION['mensaje'] =
                 '¡Turno confirmado con éxito! 📅';
@@ -694,17 +521,11 @@ if (
             $_SESSION['tipo_mensaje'] =
                 'exito';
 
-
-            header(
-                'Location: inicio_turnos.php'
-            );
-
+            header('Location: inicio_turnos.php');
             exit;
         }
 
-
         $stmt->close();
-
 
         $errores[] =
             'No se pudo registrar el turno. Intentá nuevamente.';
@@ -712,69 +533,58 @@ if (
 }
 
 ?>
-
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
 
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0"
+    />
 
-    <title>
-        Solicitar Turno · VetClinic Pro
-    </title>
-
+    <title>Solicitar Turno · VetClinic Pro</title>
 
     <link
         rel="icon"
         type="image/png"
-        href="../img/VetClinic Pro.png">
+        href="../img/VetClinic Pro.png"
+    >
 
-
-    <!-- Google Fonts -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
 
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
-        crossorigin>
+        crossorigin
+    />
 
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-
-    <!-- Bootstrap -->
+        rel="stylesheet"
+    />
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
-
-    <!-- Bootstrap Icons -->
+        rel="stylesheet"
+    />
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-        rel="stylesheet">
-
-
-    <!-- Estilos -->
+        rel="stylesheet"
+    />
 
     <link
         rel="stylesheet"
-        href="../estilos/inicio.css">
+        href="../estilos/inicio.css"
+    />
 
     <link
         rel="stylesheet"
-        href="../estilos/abm.css">
+        href="../estilos/abm.css"
+    />
 
 </head>
 
@@ -786,17 +596,21 @@ if (
         <div class="row g-0 min-vh-100">
 
 
-            <!-- PANEL LATERAL -->
+            <!-- ==================================================
+                 PANEL LATERAL
+            =================================================== -->
 
             <div class="col-12 col-lg-2 panel-lateral">
 
                 <a
                     href="../propietarios/inicio_propietarios.php"
-                    class="logo-lateral">
+                    class="logo-lateral"
+                >
 
                     <img
                         src="../img/VetClinic Pro.png"
-                        alt="Logo VetClinic Pro">
+                        alt="Logo VetClinic Pro"
+                    />
 
                     <div>
 
@@ -820,45 +634,37 @@ if (
 
                 <a
                     href="../propietarios/inicio_propietarios.php"
-                    class="item-menu">
-
+                    class="item-menu"
+                >
                     <i class="bi bi-grid"></i>
-
                     Inicio
-
                 </a>
 
 
                 <a
                     href="../mascotas/inicio_mascota.php"
-                    class="item-menu">
-
+                    class="item-menu"
+                >
                     <i class="bi bi-heart-pulse"></i>
-
                     Mis mascotas
-
                 </a>
 
 
                 <a
                     href="inicio_turnos.php"
-                    class="item-menu activo">
-
+                    class="item-menu activo"
+                >
                     <i class="bi bi-calendar-check"></i>
-
                     Mis turnos
-
                 </a>
 
 
                 <a
                     href="#"
-                    class="item-menu">
-
+                    class="item-menu"
+                >
                     <i class="bi bi-journal-medical"></i>
-
                     Historial clínico
-
                 </a>
 
 
@@ -869,25 +675,23 @@ if (
 
                 <a
                     href="#"
-                    class="item-menu">
-
+                    class="item-menu"
+                >
                     <i class="bi bi-shield-plus"></i>
-
                     Vacunaciones
-
                 </a>
 
 
                 <a
                     href="#"
-                    class="item-menu">
-
+                    class="item-menu"
+                >
                     <i class="bi bi-chat-dots"></i>
-
                     Mensajes
-
                 </a>
 
+
+                <!-- USUARIO -->
 
                 <div class="usuario-lateral">
 
@@ -905,22 +709,20 @@ if (
 
                     </div>
 
-
                     <div>
 
                         <div class="nombre-usuario">
 
                             <?= htmlspecialchars(
                                 $_SESSION['usuario_nombre']
-                                    . ' '
-                                    . (
-                                        $_SESSION['usuario_apellido']
-                                        ?? ''
-                                    )
+                                . ' '
+                                . (
+                                    $_SESSION['usuario_apellido']
+                                    ?? ''
+                                )
                             ) ?>
 
                         </div>
-
 
                         <div class="rol-usuario">
                             Propietario
@@ -933,10 +735,14 @@ if (
             </div>
 
 
-            <!-- ÁREA PRINCIPAL -->
+            <!-- ==================================================
+                 ÁREA PRINCIPAL
+            =================================================== -->
 
             <div class="col-12 col-lg-10 area-principal">
 
+
+                <!-- BARRA SUPERIOR -->
 
                 <div class="barra-superior">
 
@@ -955,7 +761,8 @@ if (
 
                     <a
                         href="inicio_turnos.php"
-                        class="btn-accion btn-volver">
+                        class="btn-accion btn-volver"
+                    >
 
                         <i class="bi bi-arrow-left"></i>
 
@@ -966,13 +773,16 @@ if (
                 </div>
 
 
-                <!-- ERRORES -->
+                <!-- ==================================================
+                     ERRORES PHP
+                =================================================== -->
 
                 <?php if (!empty($errores)): ?>
 
                     <div
                         class="alerta-operacion alerta-error"
-                        role="alert">
+                        role="alert"
+                    >
 
                         <i class="bi bi-exclamation-circle-fill"></i>
 
@@ -993,7 +803,9 @@ if (
                 <?php endif; ?>
 
 
-                <!-- SIN MASCOTAS -->
+                <!-- ==================================================
+                     SIN MASCOTAS
+                =================================================== -->
 
                 <?php if (empty($mascotas)): ?>
 
@@ -1014,7 +826,8 @@ if (
 
                         <a
                             href="../mascotas/alta_mascota.php"
-                            class="btn-abm-principal">
+                            class="btn-abm-principal"
+                        >
 
                             <i class="bi bi-plus-lg"></i>
 
@@ -1028,7 +841,9 @@ if (
                 <?php else: ?>
 
 
-                    <!-- FORMULARIO -->
+                    <!-- ==================================================
+                         FORMULARIO
+                    =================================================== -->
 
                     <div class="tarjeta-formulario">
 
@@ -1036,7 +851,9 @@ if (
                             action="alta_turno.php"
                             method="POST"
                             id="formAltaTurno"
-                            novalidate>
+                            novalidate
+                        >
+
 
                             <div class="row g-3">
 
@@ -1047,7 +864,8 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="id_mascota">
+                                        for="id_mascota"
+                                    >
 
                                         Mascota
 
@@ -1061,7 +879,9 @@ if (
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-heart-pulse"></i>
+
                                         </span>
 
 
@@ -1069,7 +889,8 @@ if (
                                             class="form-control"
                                             id="id_mascota"
                                             name="id_mascota"
-                                            required>
+                                            required
+                                        >
 
                                             <option value="">
                                                 Seleccioná una mascota...
@@ -1079,14 +900,15 @@ if (
                                             <?php foreach ($mascotas as $m): ?>
 
                                                 <option
-                                                    value="<?= (int) $m['id_mascota'] ?>"
+                                                    value="<?= (int)$m['id_mascota'] ?>"
                                                     <?= (
                                                         ($_POST['id_mascota'] ?? '')
                                                         == $m['id_mascota']
                                                     )
                                                         ? 'selected'
                                                         : ''
-                                                    ?>>
+                                                    ?>
+                                                >
 
                                                     <?= htmlspecialchars(
                                                         $m['nombre']
@@ -1100,9 +922,11 @@ if (
 
                                     </div>
 
+
                                     <div
                                         class="error-campo"
-                                        id="errorMascota"></div>
+                                        id="errorMascota"
+                                    ></div>
 
                                 </div>
 
@@ -1113,7 +937,8 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="id_veterinario">
+                                        for="id_veterinario"
+                                    >
 
                                         Veterinario
 
@@ -1127,7 +952,9 @@ if (
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-person-badge"></i>
+
                                         </span>
 
 
@@ -1135,7 +962,8 @@ if (
                                             class="form-control"
                                             id="id_veterinario"
                                             name="id_veterinario"
-                                            required>
+                                            required
+                                        >
 
                                             <option value="">
                                                 Seleccioná un veterinario...
@@ -1145,23 +973,26 @@ if (
                                             <?php foreach ($veterinarios as $v): ?>
 
                                                 <option
-                                                    value="<?= (int) $v['id_veterinario'] ?>"
+                                                    value="<?= (int)$v['id_veterinario'] ?>"
                                                     <?= (
                                                         ($_POST['id_veterinario'] ?? '')
                                                         == $v['id_veterinario']
                                                     )
                                                         ? 'selected'
                                                         : ''
-                                                    ?>>
+                                                    ?>
+                                                >
 
                                                     Dr./Dra.
+
                                                     <?= htmlspecialchars(
                                                         trim(
                                                             $v['nombre']
-                                                                . ' '
-                                                                . $v['apellido']
+                                                            . ' '
+                                                            . $v['apellido']
                                                         )
                                                     ) ?>
+
 
                                                     <?php if ($v['especialidad']): ?>
 
@@ -1181,9 +1012,11 @@ if (
 
                                     </div>
 
+
                                     <div
                                         class="error-campo"
-                                        id="errorVeterinario"></div>
+                                        id="errorVeterinario"
+                                    ></div>
 
                                 </div>
 
@@ -1194,7 +1027,8 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="fecha_turno">
+                                        for="fecha_turno"
+                                    >
 
                                         Fecha
 
@@ -1208,7 +1042,9 @@ if (
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-calendar3"></i>
+
                                         </span>
 
 
@@ -1217,18 +1053,20 @@ if (
                                             class="form-control"
                                             id="fecha_turno"
                                             name="fecha_turno"
-                                            min="<?= $fechaActualServidor ?>"
+                                            min="<?= date('Y-m-d') ?>"
                                             value="<?= htmlspecialchars(
-                                                        $_POST['fecha_turno']
-                                                            ?? ''
-                                                    ) ?>"
-                                            required>
+                                                $_POST['fecha_turno'] ?? ''
+                                            ) ?>"
+                                            required
+                                        />
 
                                     </div>
 
+
                                     <div
                                         class="error-campo"
-                                        id="errorFecha"></div>
+                                        id="errorFecha"
+                                    ></div>
 
                                 </div>
 
@@ -1239,7 +1077,8 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="hora_turno">
+                                        for="hora_turno"
+                                    >
 
                                         Horario disponible
 
@@ -1253,7 +1092,9 @@ if (
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-clock"></i>
+
                                         </span>
 
 
@@ -1262,7 +1103,8 @@ if (
                                             id="hora_turno"
                                             name="hora_turno"
                                             required
-                                            disabled>
+                                            disabled
+                                        >
 
                                             <option value="">
                                                 Primero seleccioná veterinario y fecha...
@@ -1275,17 +1117,17 @@ if (
 
                                     <div
                                         class="form-text"
-                                        id="ayudaHorario">
-
+                                        id="ayudaHorario"
+                                    >
                                         Los turnos tienen una duración de
                                         30 minutos.
-
                                     </div>
 
 
                                     <div
                                         class="error-campo"
-                                        id="errorHora"></div>
+                                        id="errorHora"
+                                    ></div>
 
                                 </div>
 
@@ -1296,7 +1138,8 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="motivo">
+                                        for="motivo"
+                                    >
 
                                         Motivo
 
@@ -1310,7 +1153,9 @@ if (
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-chat-left-text"></i>
+
                                         </span>
 
 
@@ -1322,10 +1167,10 @@ if (
                                             maxlength="200"
                                             placeholder="Ej: Control general, vacunación..."
                                             value="<?= htmlspecialchars(
-                                                        $_POST['motivo']
-                                                            ?? ''
-                                                    ) ?>"
-                                            required>
+                                                $_POST['motivo'] ?? ''
+                                            ) ?>"
+                                            required
+                                        />
 
                                     </div>
 
@@ -1337,7 +1182,8 @@ if (
 
                                     <div
                                         class="error-campo"
-                                        id="errorMotivo"></div>
+                                        id="errorMotivo"
+                                    ></div>
 
                                 </div>
 
@@ -1348,17 +1194,18 @@ if (
 
                                     <label
                                         class="form-label"
-                                        for="observaciones">
-
+                                        for="observaciones"
+                                    >
                                         Observaciones
-
                                     </label>
 
 
                                     <div class="input-group">
 
                                         <span class="input-group-text">
+
                                             <i class="bi bi-card-text"></i>
+
                                         </span>
 
 
@@ -1367,10 +1214,10 @@ if (
                                             id="observaciones"
                                             name="observaciones"
                                             rows="4"
-                                            placeholder="Información adicional para la consulta..."><?= htmlspecialchars(
-                                                                                                        $_POST['observaciones']
-                                                                                                            ?? ''
-                                                                                                    ) ?></textarea>
+                                            placeholder="Información adicional para la consulta..."
+                                        ><?= htmlspecialchars(
+                                            $_POST['observaciones'] ?? ''
+                                        ) ?></textarea>
 
                                     </div>
 
@@ -1379,28 +1226,36 @@ if (
                             </div>
 
 
+                            <!-- ==================================================
+                                 INFORMACIÓN
+                            =================================================== -->
+
                             <div class="nota-info mt-4">
 
                                 <i class="bi bi-info-circle-fill"></i>
 
                                 <p>
-
                                     Tu turno quedará
                                     <strong>confirmado</strong>
                                     automáticamente porque el horario fue
                                     previamente habilitado por el veterinario.
-
                                 </p>
 
                             </div>
 
 
+                            <!-- ==================================================
+                                 BOTONES
+                            =================================================== -->
+
                             <div
-                                class="d-flex gap-3 mt-4 pt-3 acciones-formulario">
+                                class="d-flex gap-3 mt-4 pt-3 acciones-formulario"
+                            >
 
                                 <button
                                     type="submit"
-                                    class="btn-abm-principal">
+                                    class="btn-abm-principal"
+                                >
 
                                     <i class="bi bi-calendar-plus"></i>
 
@@ -1411,13 +1266,13 @@ if (
 
                                 <a
                                     href="inicio_turnos.php"
-                                    class="btn-accion btn-volver">
-
+                                    class="btn-accion btn-volver"
+                                >
                                     Cancelar
-
                                 </a>
 
                             </div>
+
 
                         </form>
 
@@ -1432,785 +1287,641 @@ if (
     </div>
 
 
-    <!-- BOOTSTRAP -->
+    <!-- ============================================================
+         BOOTSTRAP
+    ============================================================= -->
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+
+    <!-- ============================================================
+         JAVASCRIPT DEL FORMULARIO
+    ============================================================= -->
 
     <script>
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
 
-                const form =
-                    document.getElementById(
-                        'formAltaTurno'
-                    );
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const form = document.getElementById('formAltaTurno');
+
+            if (!form) {
+                return;
+            }
 
 
-                if (!form) {
+            // ========================================================
+            // DATOS GENERADOS POR PHP
+            // ========================================================
+
+            const horariosVeterinarios =
+                <?= json_encode(
+                    $horariosVeterinarios,
+                    JSON_UNESCAPED_UNICODE |
+                    JSON_UNESCAPED_SLASHES
+                ) ?>;
+
+
+            const turnosOcupados =
+                <?= json_encode(
+                    $turnosOcupados,
+                    JSON_UNESCAPED_UNICODE |
+                    JSON_UNESCAPED_SLASHES
+                ) ?>;
+
+
+            // ========================================================
+            // ELEMENTOS DEL FORMULARIO
+            // ========================================================
+
+            const mascota =
+                document.getElementById('id_mascota');
+
+            const veterinario =
+                document.getElementById('id_veterinario');
+
+            const fecha =
+                document.getElementById('fecha_turno');
+
+            const hora =
+                document.getElementById('hora_turno');
+
+            const motivo =
+                document.getElementById('motivo');
+
+
+            // ========================================================
+            // MOSTRAR ERROR
+            // ========================================================
+
+            function mostrarError(id, mensaje) {
+
+                const div =
+                    document.getElementById(id);
+
+                if (!div) {
+                    return;
+                }
+
+                div.textContent = mensaje;
+
+                div.style.display =
+                    mensaje ? 'block' : 'none';
+            }
+
+
+            // ========================================================
+            // CONVERTIR HORA A MINUTOS
+            // ========================================================
+
+            function horaAMinutos(horaTexto) {
+
+                const partes =
+                    horaTexto.split(':');
+
+                return (
+                    parseInt(partes[0], 10) * 60
+                    +
+                    parseInt(partes[1], 10)
+                );
+            }
+
+
+            // ========================================================
+            // CONVERTIR MINUTOS A HORA
+            // ========================================================
+
+            function minutosAHora(minutos) {
+
+                const horas =
+                    Math.floor(minutos / 60);
+
+                const minutosRestantes =
+                    minutos % 60;
+
+                return (
+                    String(horas).padStart(2, '0')
+                    +
+                    ':'
+                    +
+                    String(minutosRestantes).padStart(2, '0')
+                );
+            }
+
+
+            // ========================================================
+            // OBTENER DÍA DE LA SEMANA
+            // ========================================================
+            // JavaScript:
+            // 0 = domingo
+            // 1 = lunes
+            // ...
+            // 6 = sábado
+            //
+            // Nuestra base:
+            // 1 = lunes
+            // ...
+            // 7 = domingo
+            // ========================================================
+
+            function obtenerDiaSemana(fechaTexto) {
+
+                const fechaObjeto =
+                    new Date(fechaTexto + 'T00:00:00');
+
+                const diaJS =
+                    fechaObjeto.getDay();
+
+                if (diaJS === 0) {
+                    return 7;
+                }
+
+                return diaJS;
+            }
+
+
+            // ========================================================
+            // CARGAR HORARIOS DISPONIBLES
+            // ========================================================
+
+            function cargarHorarios() {
+
+                hora.innerHTML = '';
+
+                hora.disabled = true;
+
+
+                if (
+                    !veterinario.value ||
+                    !fecha.value
+                ) {
+
+                    const opcion =
+                        document.createElement('option');
+
+                    opcion.value = '';
+
+                    opcion.textContent =
+                        'Primero seleccioná veterinario y fecha...';
+
+                    hora.appendChild(opcion);
+
                     return;
                 }
 
 
-                // ========================================================
-                // DATOS GENERADOS POR PHP
-                // ========================================================
+                const idVet =
+                    veterinario.value;
 
-                const horariosVeterinarios =
-                    <?= json_encode(
-                        $horariosVeterinarios,
-                        JSON_UNESCAPED_UNICODE |
-                            JSON_UNESCAPED_SLASHES
-                    ) ?>;
+                const fechaSeleccionada =
+                    fecha.value;
 
-
-                const turnosOcupados =
-                    <?= json_encode(
-                        $turnosOcupados,
-                        JSON_UNESCAPED_UNICODE |
-                            JSON_UNESCAPED_SLASHES
-                    ) ?>;
-
-
-                // ========================================================
-                // FECHA Y HORA DEL SERVIDOR
-                // ========================================================
-
-                const fechaActualServidor =
-                    <?= json_encode(
-                        $fechaActualServidor
-                    ) ?>;
-
-
-                const minutosActualesServidor =
-                    <?= (int) $minutosActualesServidor ?>;
-
-
-                const horaSeleccionadaAnterior =
-                    <?= json_encode(
-                        $_POST['hora_turno']
-                            ?? ''
-                    ) ?>;
-
-
-                // ========================================================
-                // ELEMENTOS
-                // ========================================================
-
-                const mascota =
-                    document.getElementById(
-                        'id_mascota'
+                const diaSemana =
+                    obtenerDiaSemana(
+                        fechaSeleccionada
                     );
 
 
-                const veterinario =
-                    document.getElementById(
-                        'id_veterinario'
-                    );
+                // ====================================================
+                // VERIFICAR SI EXISTE HORARIO
+                // ====================================================
 
-
-                const fecha =
-                    document.getElementById(
-                        'fecha_turno'
-                    );
-
-
-                const hora =
-                    document.getElementById(
-                        'hora_turno'
-                    );
-
-
-                const motivo =
-                    document.getElementById(
-                        'motivo'
-                    );
-
-
-                // ========================================================
-                // MOSTRAR ERROR
-                // ========================================================
-
-                function mostrarError(
-                    id,
-                    mensaje
+                if (
+                    !horariosVeterinarios[idVet] ||
+                    !horariosVeterinarios[idVet][diaSemana]
                 ) {
 
-                    const div =
-                        document.getElementById(id);
+                    const opcion =
+                        document.createElement('option');
+
+                    opcion.value = '';
+
+                    opcion.textContent =
+                        'No hay horarios disponibles para ese día.';
+
+                    hora.appendChild(opcion);
+
+                    return;
+                }
 
 
-                    if (!div) {
-                        return;
+                // ====================================================
+                // OBTENER HORARIOS OCUPADOS
+                // ====================================================
+
+                let ocupados = [];
+
+                if (
+                    turnosOcupados[idVet] &&
+                    turnosOcupados[idVet][fechaSeleccionada]
+                ) {
+
+                    ocupados =
+                        turnosOcupados[
+                            idVet
+                        ][fechaSeleccionada];
+                }
+
+
+                // ====================================================
+                // GENERAR TURNOS DE 30 MINUTOS
+                // ====================================================
+
+                let cantidadHorarios = 0;
+
+
+                horariosVeterinarios[
+                    idVet
+                ][diaSemana].forEach(function (horario) {
+
+                    const desde =
+                        horaAMinutos(
+                            horario.desde
+                        );
+
+                    const hasta =
+                        horaAMinutos(
+                            horario.hasta
+                        );
+
+
+                    for (
+                        let minutos = desde;
+                        minutos < hasta;
+                        minutos += 30
+                    ) {
+
+                        const horaDisponible =
+                            minutosAHora(minutos);
+
+
+                        // ==========================================
+                        // SI YA ESTÁ OCUPADO, NO SE MUESTRA
+                        // ==========================================
+
+                        if (
+                            ocupados.includes(
+                                horaDisponible
+                            )
+                        ) {
+                            continue;
+                        }
+
+
+                        const opcion =
+                            document.createElement('option');
+
+                        opcion.value =
+                            horaDisponible;
+
+                        opcion.textContent =
+                            horaDisponible;
+
+
+                        // Si hubo un error PHP y se vuelve a
+                        // cargar el formulario, conservar la hora.
+
+                        <?php if (!empty($_POST['hora_turno'])): ?>
+
+                            if (
+                                horaDisponible ===
+                                <?= json_encode($_POST['hora_turno']) ?>
+                            ) {
+
+                                opcion.selected = true;
+                            }
+
+                        <?php endif; ?>
+
+
+                        hora.appendChild(opcion);
+
+                        cantidadHorarios++;
                     }
 
-
-                    div.textContent =
-                        mensaje;
+                });
 
 
-                    div.style.display =
-                        mensaje ?
-                        'block' :
-                        'none';
+                // ====================================================
+                // RESULTADO
+                // ====================================================
+
+                if (cantidadHorarios === 0) {
+
+                    hora.innerHTML = '';
+
+                    const opcion =
+                        document.createElement('option');
+
+                    opcion.value = '';
+
+                    opcion.textContent =
+                        'No hay horarios disponibles para ese día.';
+
+                    hora.appendChild(opcion);
+
+                    hora.disabled = true;
+
+                    return;
                 }
 
 
-                // ========================================================
-                // HORA → MINUTOS
-                // ========================================================
+                // Agregar opción inicial
 
-                function horaAMinutos(
-                    horaTexto
-                ) {
+                const opcionInicial =
+                    document.createElement('option');
 
-                    const partes =
-                        horaTexto.split(':');
+                opcionInicial.value = '';
+
+                opcionInicial.textContent =
+                    'Seleccioná un horario...';
+
+                hora.insertBefore(
+                    opcionInicial,
+                    hora.firstChild
+                );
 
 
-                    return (
-                            parseInt(
-                                partes[0],
-                                10
-                            ) * 60
-                        ) +
-                        parseInt(
-                            partes[1],
-                            10
-                        );
+                // Si no había hora seleccionada,
+                // mostrar la opción inicial.
+
+                if (!hora.value) {
+                    opcionInicial.selected = true;
                 }
 
 
-                // ========================================================
-                // MINUTOS → HORA
-                // ========================================================
-
-                function minutosAHora(
-                    minutos
-                ) {
-
-                    const horas =
-                        Math.floor(
-                            minutos / 60
-                        );
+                hora.disabled = false;
 
 
-                    const minutosRestantes =
-                        minutos % 60;
+                mostrarError(
+                    'errorHora',
+                    ''
+                );
+            }
 
 
-                    return (
-                        String(horas).padStart(
-                            2,
-                            '0'
-                        ) +
-                        ':' +
-                        String(
-                            minutosRestantes
-                        ).padStart(
-                            2,
-                            '0'
-                        )
+            // ========================================================
+            // CAMBIAR VETERINARIO
+            // ========================================================
+
+            veterinario.addEventListener(
+                'change',
+                function () {
+
+                    hora.innerHTML = '';
+
+                    hora.disabled = true;
+
+                    const opcion =
+                        document.createElement('option');
+
+                    opcion.value = '';
+
+                    opcion.textContent =
+                        'Primero seleccioná fecha...';
+
+                    hora.appendChild(opcion);
+
+
+                    mostrarError(
+                        'errorVeterinario',
+                        ''
                     );
-                }
+
+                    mostrarError(
+                        'errorHora',
+                        ''
+                    );
 
 
-                // ========================================================
-                // OBTENER DÍA DE LA SEMANA
-                // ========================================================
-
-                function obtenerDiaSemana(
-                    fechaTexto
-                ) {
-
-                    const fechaObjeto =
-                        new Date(
-                            fechaTexto +
-                            'T00:00:00'
-                        );
-
-
-                    const diaJS =
-                        fechaObjeto.getDay();
-
-
-                    if (diaJS === 0) {
-                        return 7;
+                    if (fecha.value) {
+                        cargarHorarios();
                     }
 
-
-                    return diaJS;
                 }
+            );
 
 
-                // ========================================================
-                // CARGAR HORARIOS
-                // ========================================================
+            // ========================================================
+            // CAMBIAR FECHA
+            // ========================================================
 
-                function cargarHorarios() {
+            fecha.addEventListener(
+                'change',
+                function () {
 
                     hora.innerHTML = '';
 
                     hora.disabled = true;
 
 
-                    // ----------------------------------------------------
-                    // VERIFICAR VETERINARIO Y FECHA
-                    // ----------------------------------------------------
-
-                    if (
-                        !veterinario.value ||
-                        !fecha.value
-                    ) {
-
-                        const opcion =
-                            document.createElement(
-                                'option'
-                            );
-
-
-                        opcion.value = '';
-
-                        opcion.textContent =
-                            'Primero seleccioná veterinario y fecha...';
-
-
-                        hora.appendChild(
-                            opcion
-                        );
-
-                        return;
-                    }
-
-
-                    const idVet =
-                        veterinario.value;
-
-
-                    const fechaSeleccionada =
-                        fecha.value;
-
-
-                    const diaSemana =
-                        obtenerDiaSemana(
-                            fechaSeleccionada
-                        );
-
-
-                    // ----------------------------------------------------
-                    // VERIFICAR SI EL VETERINARIO ATIENDE ESE DÍA
-                    // ----------------------------------------------------
-
-                    if (
-                        !horariosVeterinarios[idVet] ||
-                        !horariosVeterinarios[idVet][diaSemana]
-                    ) {
-
-                        const opcion =
-                            document.createElement(
-                                'option'
-                            );
-
-
-                        opcion.value = '';
-
-                        opcion.textContent =
-                            'El veterinario no atiende ese día.';
-
-
-                        hora.appendChild(
-                            opcion
-                        );
-
-                        return;
-                    }
-
-
-                    // ----------------------------------------------------
-                    // TURNOS OCUPADOS
-                    // ----------------------------------------------------
-
-                    let ocupados = [];
-
-
-                    if (
-                        turnosOcupados[idVet] &&
-                        turnosOcupados[idVet][fechaSeleccionada]
-                    ) {
-
-                        ocupados =
-                            turnosOcupados[idVet][fechaSeleccionada];
-                    }
-
-
-                    // ----------------------------------------------------
-                    // GENERAR HORARIOS DISPONIBLES
-                    // ----------------------------------------------------
-
-                    let cantidadHorarios = 0;
-
-
-                    horariosVeterinarios[idVet][diaSemana]
-                        .forEach(
-                            function(horario) {
-
-                                const desde =
-                                    horaAMinutos(
-                                        horario.desde
-                                    );
-
-
-                                const hasta =
-                                    horaAMinutos(
-                                        horario.hasta
-                                    );
-
-
-                                for (
-                                    let minutos = desde; minutos < hasta; minutos += 30
-                                ) {
-
-                                    const horaDisponible =
-                                        minutosAHora(
-                                            minutos
-                                        );
-
-
-                                    // ======================================
-                                    // SI LA FECHA ES HOY,
-                                    // OCULTAR HORARIOS QUE YA PASARON
-                                    // ======================================
-
-                                    if (
-                                        fechaSeleccionada ===
-                                        fechaActualServidor &&
-                                        minutos <=
-                                        minutosActualesServidor
-                                    ) {
-
-                                        continue;
-                                    }
-
-
-                                    // ======================================
-                                    // SI EL HORARIO ESTÁ OCUPADO
-                                    // ======================================
-
-                                    if (
-                                        ocupados.includes(
-                                            horaDisponible
-                                        )
-                                    ) {
-
-                                        continue;
-                                    }
-
-
-                                    // ======================================
-                                    // CREAR OPCIÓN
-                                    // ======================================
-
-                                    const opcion =
-                                        document.createElement(
-                                            'option'
-                                        );
-
-
-                                    opcion.value =
-                                        horaDisponible;
-
-
-                                    opcion.textContent =
-                                        horaDisponible;
-
-
-                                    // ======================================
-                                    // MANTENER HORA SELECCIONADA
-                                    // DESPUÉS DE UN ERROR DEL FORMULARIO
-                                    // ======================================
-
-                                    if (
-                                        horaDisponible ===
-                                        horaSeleccionadaAnterior
-                                    ) {
-
-                                        opcion.selected =
-                                            true;
-                                    }
-
-
-                                    hora.appendChild(
-                                        opcion
-                                    );
-
-
-                                    cantidadHorarios++;
-                                }
-
-                            }
-                        );
-
-
-                    // ----------------------------------------------------
-                    // NO QUEDAN HORARIOS
-                    // ----------------------------------------------------
-
-                    if (
-                        cantidadHorarios === 0
-                    ) {
-
-                        hora.innerHTML = '';
-
-
-                        const opcion =
-                            document.createElement(
-                                'option'
-                            );
-
-
-                        opcion.value = '';
-
-
-                        if (
-                            fechaSeleccionada ===
-                            fechaActualServidor
-                        ) {
-
-                            opcion.textContent =
-                                'No quedan horarios disponibles para hoy.';
-
-                        } else {
-
-                            opcion.textContent =
-                                'No hay horarios disponibles para ese día.';
-                        }
-
-
-                        hora.appendChild(
-                            opcion
-                        );
-
-
-                        hora.disabled = true;
-
-                        return;
-                    }
-
-
-                    // ----------------------------------------------------
-                    // OPCIÓN INICIAL
-                    // ----------------------------------------------------
-
-                    const opcionInicial =
-                        document.createElement(
-                            'option'
-                        );
-
-
-                    opcionInicial.value = '';
-
-                    opcionInicial.textContent =
-                        'Seleccioná un horario...';
-
-
-                    hora.insertBefore(
-                        opcionInicial,
-                        hora.firstChild
+                    mostrarError(
+                        'errorFecha',
+                        ''
                     );
-
-
-                    if (
-                        !hora.value
-                    ) {
-
-                        opcionInicial.selected =
-                            true;
-                    }
-
-
-                    hora.disabled = false;
-
 
                     mostrarError(
                         'errorHora',
                         ''
                     );
+
+
+                    if (fecha.value) {
+
+                        cargarHorarios();
+                    }
+
                 }
+            );
 
 
-                // ========================================================
-                // CAMBIAR VETERINARIO
-                // ========================================================
+            // ========================================================
+            // VALIDACIÓN AL ENVIAR
+            // ========================================================
 
-                veterinario.addEventListener(
-                    'change',
-                    function() {
+            form.addEventListener(
+                'submit',
+                function (e) {
 
-                        hora.innerHTML = '';
-
-                        hora.disabled = true;
+                    let valido = true;
 
 
-                        const opcion =
-                            document.createElement(
-                                'option'
-                            );
+                    mostrarError(
+                        'errorMascota',
+                        ''
+                    );
+
+                    mostrarError(
+                        'errorVeterinario',
+                        ''
+                    );
+
+                    mostrarError(
+                        'errorFecha',
+                        ''
+                    );
+
+                    mostrarError(
+                        'errorHora',
+                        ''
+                    );
+
+                    mostrarError(
+                        'errorMotivo',
+                        ''
+                    );
 
 
-                        opcion.value = '';
+                    // ==============================================
+                    // MASCOTA
+                    // ==============================================
 
-                        opcion.textContent =
-                            'Primero seleccioná fecha...';
-
-
-                        hora.appendChild(
-                            opcion
-                        );
-
-
-                        mostrarError(
-                            'errorVeterinario',
-                            ''
-                        );
-
-
-                        mostrarError(
-                            'errorHora',
-                            ''
-                        );
-
-
-                        if (
-                            fecha.value
-                        ) {
-
-                            cargarHorarios();
-                        }
-
-                    }
-                );
-
-
-                // ========================================================
-                // CAMBIAR FECHA
-                // ========================================================
-
-                fecha.addEventListener(
-                    'change',
-                    function() {
-
-                        hora.innerHTML = '';
-
-                        hora.disabled = true;
-
-
-                        mostrarError(
-                            'errorFecha',
-                            ''
-                        );
-
-
-                        mostrarError(
-                            'errorHora',
-                            ''
-                        );
-
-
-                        if (
-                            fecha.value
-                        ) {
-
-                            cargarHorarios();
-                        }
-
-                    }
-                );
-
-
-                // ========================================================
-                // VALIDACIÓN AL ENVIAR
-                // ========================================================
-
-                form.addEventListener(
-                    'submit',
-                    function(e) {
-
-                        let valido = true;
-
+                    if (!mascota.value) {
 
                         mostrarError(
                             'errorMascota',
-                            ''
+                            'Seleccioná una mascota.'
                         );
+
+                        valido = false;
+                    }
+
+
+                    // ==============================================
+                    // VETERINARIO
+                    // ==============================================
+
+                    if (!veterinario.value) {
 
                         mostrarError(
                             'errorVeterinario',
-                            ''
+                            'Seleccioná un veterinario.'
                         );
+
+                        valido = false;
+                    }
+
+
+                    // ==============================================
+                    // FECHA
+                    // ==============================================
+
+                    if (!fecha.value) {
 
                         mostrarError(
                             'errorFecha',
-                            ''
+                            'Seleccioná una fecha.'
                         );
 
-                        mostrarError(
-                            'errorHora',
-                            ''
-                        );
+                        valido = false;
 
-                        mostrarError(
-                            'errorMotivo',
-                            ''
-                        );
+                    } else {
 
-
-                        // MASCOTA
-
-                        if (
-                            !mascota.value
-                        ) {
-
-                            mostrarError(
-                                'errorMascota',
-                                'Seleccioná una mascota.'
+                        const fechaSeleccionada =
+                            new Date(
+                                fecha.value + 'T00:00:00'
                             );
 
-                            valido = false;
-                        }
+                        const hoy =
+                            new Date();
 
+                        hoy.setHours(
+                            0,
+                            0,
+                            0,
+                            0
+                        );
 
-                        // VETERINARIO
 
                         if (
-                            !veterinario.value
-                        ) {
-
-                            mostrarError(
-                                'errorVeterinario',
-                                'Seleccioná un veterinario.'
-                            );
-
-                            valido = false;
-                        }
-
-
-                        // FECHA
-
-                        if (
-                            !fecha.value
+                            fechaSeleccionada < hoy
                         ) {
 
                             mostrarError(
                                 'errorFecha',
-                                'Seleccioná una fecha.'
-                            );
-
-                            valido = false;
-
-                        } else {
-
-                            const fechaSeleccionada =
-                                new Date(
-                                    fecha.value +
-                                    'T00:00:00'
-                                );
-
-
-                            const hoy =
-                                new Date(
-                                    fechaActualServidor +
-                                    'T00:00:00'
-                                );
-
-
-                            if (
-                                fechaSeleccionada < hoy
-                            ) {
-
-                                mostrarError(
-                                    'errorFecha',
-                                    'La fecha debe ser igual o posterior a hoy.'
-                                );
-
-                                valido = false;
-                            }
-                        }
-
-
-                        // HORARIO
-
-                        if (
-                            !hora.value ||
-                            hora.disabled
-                        ) {
-
-                            mostrarError(
-                                'errorHora',
-                                'Seleccioná un horario disponible.'
+                                'La fecha debe ser igual o posterior a hoy.'
                             );
 
                             valido = false;
                         }
-
-
-                        // MOTIVO
-
-                        if (
-                            !motivo.value.trim()
-                        ) {
-
-                            mostrarError(
-                                'errorMotivo',
-                                'El motivo de la consulta es obligatorio.'
-                            );
-
-                            valido = false;
-
-                        } else if (
-                            motivo.value
-                            .trim()
-                            .length > 200
-                        ) {
-
-                            mostrarError(
-                                'errorMotivo',
-                                'El motivo no puede superar los 200 caracteres.'
-                            );
-
-                            valido = false;
-                        }
-
-
-                        if (
-                            !valido
-                        ) {
-
-                            e.preventDefault();
-                        }
-
                     }
-                );
 
 
-                // ========================================================
-                // CARGAR HORARIOS SI YA HABÍA DATOS
-                // ========================================================
+                    // ==============================================
+                    // HORA
+                    // ==============================================
 
-                if (
-                    veterinario.value &&
-                    fecha.value
-                ) {
+                    if (
+                        !hora.value ||
+                        hora.disabled
+                    ) {
 
-                    cargarHorarios();
+                        mostrarError(
+                            'errorHora',
+                            'Seleccioná un horario disponible.'
+                        );
+
+                        valido = false;
+                    }
+
+
+                    // ==============================================
+                    // MOTIVO
+                    // ==============================================
+
+                    if (
+                        !motivo.value.trim()
+                    ) {
+
+                        mostrarError(
+                            'errorMotivo',
+                            'El motivo de la consulta es obligatorio.'
+                        );
+
+                        valido = false;
+
+                    } else if (
+                        motivo.value.trim().length > 200
+                    ) {
+
+                        mostrarError(
+                            'errorMotivo',
+                            'El motivo no puede superar los 200 caracteres.'
+                        );
+
+                        valido = false;
+                    }
+
+
+                    // ==============================================
+                    // DETENER ENVÍO SI HAY ERRORES
+                    // ==============================================
+
+                    if (!valido) {
+
+                        e.preventDefault();
+                    }
+
                 }
+            );
 
+
+            // ========================================================
+            // CARGAR HORARIOS SI YA HABÍA DATOS
+            // ========================================================
+
+            if (
+                veterinario.value &&
+                fecha.value
+            ) {
+
+                cargarHorarios();
             }
-        );
+
+        });
+
     </script>
 
 </body>
 
 </html>
+```

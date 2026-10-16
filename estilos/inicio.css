@@ -715,3 +715,207 @@ body {
     color: var(--texto-gris);
     margin-top: 2px;
 }
+
+/* =========================================================
+   NOTIFICACIONES DEL INICIO
+========================================================= */
+
+.boton-notificaciones {
+    position: relative;
+    border: none;
+}
+
+.contador-notificaciones {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: #ef4444;
+    color: #ffffff;
+
+    border: 2px solid #ffffff;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.menu-notificaciones {
+    width: min(370px, calc(100vw - 30px));
+
+    padding: 0;
+
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    box-shadow: 0 10px 30px rgba(17, 24, 39, .12);
+}
+
+.encabezado-notificaciones {
+    padding: 14px 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    border-bottom: 1px solid var(--borde);
+}
+
+.encabezado-notificaciones strong {
+    color: var(--azul-oscuro);
+    font-size: 14px;
+}
+
+.subtitulo-notificaciones {
+    margin-top: 2px;
+
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.leer-todas {
+    color: var(--azul-medio);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    text-align: right;
+}
+
+.leer-todas:hover {
+    color: var(--azul-oscuro);
+}
+
+.item-notificacion {
+    padding: 13px 15px;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+
+    color: var(--texto-oscuro);
+    text-decoration: none;
+
+    border-bottom: 1px solid var(--borde);
+
+    white-space: normal;
+}
+
+.item-notificacion:last-child {
+    border-bottom: none;
+}
+
+.item-notificacion:hover {
+    background: var(--fondo);
+    color: var(--texto-oscuro);
+}
+
+.item-notificacion.no-leida {
+    background: #f4f8ff;
+}
+
+.icono-notificacion {
+    width: 37px;
+    height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+
+    font-size: 16px;
+}
+
+.contenido-notificacion {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.mensaje-notificacion {
+    color: var(--texto-oscuro);
+
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.fecha-notificacion {
+    margin-top: 4px;
+
+    color: var(--texto-gris);
+    font-size: 10px;
+}
+
+.punto-notificacion {
+    width: 8px;
+    height: 8px;
+
+    margin-top: 5px;
+
+    border-radius: 50%;
+
+    background: var(--azul-claro);
+
+    flex-shrink: 0;
+}
+
+.sin-notificaciones {
+    padding: 28px 20px;
+
+    color: var(--texto-gris);
+
+    font-size: 12px;
+    text-align: center;
+}
+
+.sin-notificaciones i {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--azul-medio);
+    font-size: 23px;
+}
+
+
+/* Enlace dentro de los recordatorios */
+
+.enlace-recordatorio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    margin-top: 5px;
+
+    color: var(--azul-oscuro);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.enlace-recordatorio:hover {
+    color: var(--azul-medio);
+}

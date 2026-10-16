@@ -1,0 +1,301 @@
+/* ============================================================
+   CONFIGURACIÓN DEL VETERINARIO
+   VetClinic Pro
+   ============================================================ */
+
+.cabecera-configuracion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radio-card);
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-medio));
+    color: var(--blanco);
+}
+
+.avatar-configuracion {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .18);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.etiqueta-configuracion {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    opacity: .7;
+}
+
+.cabecera-configuracion h1 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.cabecera-configuracion p {
+    margin: 4px 0 0;
+    font-size: 11px;
+    opacity: .8;
+}
+
+.tarjeta-configuracion,
+.tarjeta-opcion-config {
+    padding: 20px;
+}
+
+.cabecera-seccion-config {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.cabecera-seccion-config p,
+.texto-seccion-config {
+    margin: 0;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+.texto-seccion-config {
+    margin-bottom: 16px;
+}
+
+.badge-datos-protegidos {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 9px;
+    border-radius: 20px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 9.5px;
+    font-weight: 700;
+}
+
+.grilla-datos-perfil {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.dato-perfil-config {
+    position: relative;
+    min-width: 0;
+    padding: 12px 38px 12px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 11px;
+    background: var(--fondo);
+}
+
+.dato-perfil-ancho {
+    grid-column: 1 / -1;
+}
+
+.dato-perfil-config span,
+.dato-perfil-config strong {
+    display: block;
+}
+
+.dato-perfil-config span {
+    color: var(--texto-gris);
+    font-size: 9.5px;
+}
+
+.dato-perfil-config strong {
+    margin-top: 3px;
+    color: var(--texto-oscuro);
+    font-size: 11.5px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.dato-perfil-config > i {
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    transform: translateY(-50%);
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+.nota-email-config {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: var(--texto-gris);
+    font-size: 9.5px;
+    line-height: 1.5;
+}
+
+.nota-email-config i {
+    margin-top: 1px;
+    color: var(--azul-medio);
+}
+
+.tarjeta-configuracion .form-label {
+    margin-bottom: 6px;
+    color: var(--azul-oscuro);
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.tarjeta-configuracion .form-control,
+.tarjeta-configuracion .input-group-text {
+    min-height: 40px;
+    border-color: var(--borde);
+    font-size: 11.5px;
+}
+
+.tarjeta-configuracion .input-group-text {
+    background: #f8fafc;
+    color: var(--azul-medio);
+}
+
+.tarjeta-configuracion .form-control:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(73, 146, 181, .12);
+}
+
+.input-contacto-config {
+    max-width: 440px;
+}
+
+.campo-password-config {
+    margin-bottom: 13px;
+}
+
+.acciones-configuracion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.btn-config-principal,
+.btn-config-secundario {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border-radius: 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-config-principal {
+    border: 1px solid var(--azul-oscuro);
+    background: var(--azul-oscuro);
+    color: var(--blanco);
+}
+
+.btn-config-principal:hover {
+    border-color: var(--azul-medio);
+    background: var(--azul-medio);
+}
+
+.btn-config-secundario {
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    color: var(--azul-oscuro);
+}
+
+.btn-config-secundario:hover {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+}
+
+.tarjeta-opcion-config {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.icono-opcion-config {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    font-size: 18px;
+}
+
+.contenido-opcion-config h2 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.contenido-opcion-config p {
+    margin: 5px 0 12px;
+    color: var(--texto-gris);
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+.alerta-config {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+.alerta-config i {
+    margin-top: 1px;
+    font-size: 14px;
+}
+
+.alerta-config-exito {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.alerta-config-error {
+    border: 1px solid #fecdd3;
+    background: #fff1f2;
+    color: #9f1239;
+}
+
+@media (max-width: 700px) {
+    .grilla-datos-perfil {
+        grid-template-columns: 1fr;
+    }
+
+    .dato-perfil-ancho {
+        grid-column: auto;
+    }
+
+    .cabecera-configuracion {
+        align-items: flex-start;
+    }
+}

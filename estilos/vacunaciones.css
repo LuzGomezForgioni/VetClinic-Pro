@@ -1,0 +1,491 @@
+/* =========================================================
+   VACUNACIONES - PROPIETARIO
+   Complementa inicio.css
+========================================================= */
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.encabezado-vacunaciones {
+    margin-bottom: 20px;
+}
+
+.encabezado-vacunaciones h1 {
+    margin: 0;
+    color: var(--azul-oscuro);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.encabezado-vacunaciones p {
+    margin: 5px 0 0;
+    color: var(--texto-gris);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SELECTOR DE MASCOTAS
+========================================================= */
+
+.titulo-selector-vacunas {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 16px;
+}
+
+.texto-ayuda-selector {
+    margin: 0;
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+.cantidad-mascotas {
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/*
+   Una sola fila.
+   Si hay muchas mascotas aparece desplazamiento horizontal.
+*/
+
+.lista-selector-mascotas {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(190px, 220px);
+    gap: 12px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+}
+
+
+/* Tarjeta de mascota */
+
+.tarjeta-selector-mascota {
+    position: relative;
+    min-height: 96px;
+    padding: 14px;
+
+    border-radius: 14px;
+    border: 1.5px solid var(--borde);
+
+    background: var(--fondo);
+    color: var(--texto-oscuro);
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    transition:
+        border-color .15s,
+        background .15s,
+        transform .15s;
+}
+
+.tarjeta-selector-mascota:hover {
+    border-color: var(--azul-claro);
+    background: var(--azul-claro-bg);
+    color: var(--texto-oscuro);
+    transform: translateY(-2px);
+}
+
+
+/* Seleccionada */
+
+.tarjeta-selector-mascota.activa {
+    background: linear-gradient(
+        135deg,
+        var(--azul-oscuro),
+        var(--azul-medio)
+    );
+
+    border-color: transparent;
+    color: var(--blanco);
+}
+
+
+/* Icono mascota */
+
+.icono-selector-mascota {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 13px;
+    background: var(--blanco);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 26px;
+
+    flex-shrink: 0;
+}
+
+.tarjeta-selector-mascota.activa .icono-selector-mascota {
+    background: rgba(255, 255, 255, .16);
+}
+
+
+/* Datos */
+
+.datos-selector-mascota {
+    min-width: 0;
+}
+
+.nombre-selector-mascota {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.detalle-selector-mascota {
+    margin-top: 3px;
+    color: var(--texto-gris);
+    font-size: 11px;
+}
+
+.raza-selector-mascota {
+    margin-top: 2px;
+
+    color: var(--texto-gris);
+    font-size: 11px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tarjeta-selector-mascota.activa .detalle-selector-mascota,
+.tarjeta-selector-mascota.activa .raza-selector-mascota {
+    color: rgba(255, 255, 255, .75);
+}
+
+.marca-seleccionada {
+    position: absolute;
+    right: 9px;
+    top: 8px;
+
+    color: var(--blanco);
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MASCOTA SELECCIONADA
+========================================================= */
+
+.mascota-vacunacion-seleccionada {
+    padding: 18px 22px;
+}
+
+.cabecera-mascota-vacunacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.mascota-vacunacion-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.avatar-vacunacion-mascota {
+    width: 62px;
+    height: 62px;
+
+    border-radius: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--azul-claro-bg);
+
+    font-size: 32px;
+
+    flex-shrink: 0;
+}
+
+.etiqueta-vacunacion {
+    color: var(--texto-gris);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.mascota-vacunacion-info h2 {
+    margin: 1px 0 3px;
+
+    color: var(--azul-oscuro);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.detalle-mascota-vacunacion {
+    color: var(--texto-gris);
+    font-size: 12px;
+}
+
+
+/* Contador */
+
+.contador-vacunas {
+    min-width: 145px;
+    padding: 10px 15px;
+
+    background: var(--azul-claro-bg);
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+.numero-vacunas {
+    color: var(--azul-oscuro);
+
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.texto-contador {
+    margin-top: 4px;
+
+    color: var(--texto-gris);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.icono-rojo-vacunas {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* =========================================================
+   LISTA DE VACUNAS
+========================================================= */
+
+.contenedor-vacunaciones {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.vacuna-detalle {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    padding: 18px 20px;
+}
+
+
+/* Icono principal */
+
+.icono-vacuna-detalle {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+
+    flex-shrink: 0;
+}
+
+.icono-vacuna-detalle.estado-ok {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.icono-vacuna-detalle.estado-alerta {
+    background: #fef9c3;
+    color: #713f12;
+}
+
+.icono-vacuna-detalle.estado-vencida {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.icono-vacuna-detalle.estado-sin-fecha {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+/* Información */
+
+.contenido-vacuna {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.cabecera-vacuna {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-bottom: 14px;
+}
+
+.nombre-vacuna-detalle {
+    color: var(--azul-oscuro);
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.fecha-aplicacion {
+    margin-top: 4px;
+
+    color: var(--texto-gris);
+    font-size: 11px;
+}
+
+.fecha-aplicacion i {
+    margin-right: 4px;
+    color: var(--azul-medio);
+}
+
+
+/* =========================================================
+   DATOS DE LA VACUNA
+========================================================= */
+
+.datos-vacuna {
+    display: grid;
+
+    grid-template-columns:
+        minmax(170px, .7fr)
+        minmax(220px, 1.3fr);
+
+    gap: 10px;
+}
+
+.dato-vacuna {
+    padding: 12px 14px;
+
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    border-radius: 11px;
+}
+
+.titulo-dato-vacuna {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 5px;
+
+    color: var(--azul-oscuro);
+
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+}
+
+.titulo-dato-vacuna i {
+    color: var(--azul-medio);
+    font-size: 13px;
+}
+
+.valor-dato-vacuna {
+    color: var(--texto-oscuro);
+
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    white-space: nowrap;
+}
+
+.estado-sin-fecha {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   VACÍO
+========================================================= */
+
+.estado-vacio-vacunacion {
+    padding: 45px 25px;
+    text-align: center;
+}
+
+.icono-vacio-vacunacion {
+    width: 62px;
+    height: 62px;
+
+    margin: 0 auto 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: var(--azul-claro-bg);
+    color: var(--azul-oscuro);
+
+    font-size: 27px;
+}
+
+.estado-vacio-vacunacion h3 {
+    margin-bottom: 7px;
+
+    color: var(--azul-oscuro);
+
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.estado-vacio-vacunacion p {
+    max-width: 450px;
+
+    margin: 0 auto 18px;
+
+    color: var(--texto-gris);
+    font-size: 13px;
+}

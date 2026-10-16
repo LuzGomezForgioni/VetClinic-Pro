@@ -3,91 +3,501 @@
 session_start();
 
 include("config/conexion.php");
+require_once "config/suscripciones.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-    $email    = trim($_POST["email"] ?? '');
-    $password = $_POST["password"] ?? '';
+// ============================================================
+// CONTRASEÑAS
+// ============================================================
 
-    // ============================================================
-    // 1. BUSCAR SI EL EMAIL PERTENECE A UN PROPIETARIO
-    // ============================================================
+function passwordCorrecta(string $passwordIngresada, string $passwordGuardada): bool
+{
+    $infoHash = password_get_info($passwordGuardada);
+    $usaHash = !empty($infoHash['algo']);
 
-    $stmt = $conn->prepare("SELECT * FROM propietarios WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
+    if ($usaHash) {
+        return password_verify($passwordIngresada, $passwordGuardada);
+    }
 
-    $resultado = $stmt->get_result();
+    // Compatibilidad temporal con cuentas antiguas en texto plano.
+    return hash_equals($passwordGuardada, $passwordIngresada);
+}
 
-    if ($resultado->num_rows > 0) {
+function passwordUsaHash(string $passwordGuardada): bool
+{
+    $infoHash = password_get_info($passwordGuardada);
+    return !empty($infoHash['algo']);
+}
 
-        $propietario = $resultado->fetch_assoc();
+// ============================================================
+// RECORDARME
+// ============================================================
+// Nunca se guarda la contraseña en una cookie.
+// Se usa un token aleatorio; en la base se guarda solamente su hash.
 
-        // Verificar contraseña
-        if ($password == $propietario["password"]) {
+function conexionSegura(): bool
+{
+    return
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+        (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+}
 
-            // Guardar sesión
-            $_SESSION["logueado"]         = true;
-            $_SESSION["tipo_usuario"]     = "propietario";
-            $_SESSION["usuario_id"]       = $propietario["id_propietario"];
-            $_SESSION["usuario_nombre"]   = $propietario["nombre"];
-            $_SESSION["usuario_apellido"] = $propietario["apellido"];
-            $_SESSION["usuario_email"]    = $propietario["email"];
+function guardarCookieRecordarme(string $selector, string $token, int $expira): void
+{
+    setcookie(
+        'vetclinic_recordarme',
+        $selector . ':' . $token,
+        [
+            'expires' => $expira,
+            'path' => '/',
+            'secure' => conexionSegura(),
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]
+    );
+}
 
-            // Ir al inicio del propietario
-            header("Location: propietarios/inicio_propietarios.php");
-            exit();
-        } else {
+function borrarCookieRecordarme(): void
+{
+    setcookie(
+        'vetclinic_recordarme',
+        '',
+        [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => conexionSegura(),
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]
+    );
+}
 
-            // Email existe pero contraseña incorrecta
-            header("Location: index.php?error=password");
-            exit();
+function eliminarSesionRecordadaActual(mysqli $conn): void
+{
+    $cookie = $_COOKIE['vetclinic_recordarme'] ?? '';
+
+    if ($cookie !== '' && str_contains($cookie, ':')) {
+        [$selector] = explode(':', $cookie, 2);
+
+        if (preg_match('/^[a-f0-9]{16}$/', $selector)) {
+            $stmt = $conn->prepare("
+                DELETE FROM sesiones_recordadas
+                WHERE selector = ?
+            ");
+            $stmt->bind_param('s', $selector);
+            $stmt->execute();
+            $stmt->close();
         }
     }
 
+    borrarCookieRecordarme();
+}
+
+function crearSesionRecordada(
+    mysqli $conn,
+    string $tipoUsuario,
+    int $idUsuario
+): void {
+    // Eliminar sesiones vencidas.
+    $conn->query("
+        DELETE FROM sesiones_recordadas
+        WHERE fecha_expiracion < NOW()
+    ");
+
+    $selector = bin2hex(random_bytes(8));
+    $token = bin2hex(random_bytes(32));
+    $tokenHash = hash('sha256', $token);
+
+    // 30 días.
+    $expira = time() + (60 * 60 * 24 * 30);
+    $fechaExpiracion = date('Y-m-d H:i:s', $expira);
+
+    $stmt = $conn->prepare("
+        INSERT INTO sesiones_recordadas
+            (
+                selector,
+                token_hash,
+                tipo_usuario,
+                id_usuario,
+                fecha_expiracion
+            )
+        VALUES (?, ?, ?, ?, ?)
+    ");
+
+    $stmt->bind_param(
+        'sssis',
+        $selector,
+        $tokenHash,
+        $tipoUsuario,
+        $idUsuario,
+        $fechaExpiracion
+    );
+
+    $stmt->execute();
     $stmt->close();
 
+    guardarCookieRecordarme(
+        $selector,
+        $token,
+        $expira
+    );
+}
 
-    // ============================================================
-    // 2. SI NO ES PROPIETARIO, BUSCAR EN VETERINARIOS
-    // ============================================================
+function cargarSesionUsuario(
+    array $usuario,
+    string $tipoUsuario
+): void {
+    $_SESSION["logueado"] = true;
+    $_SESSION["tipo_usuario"] = $tipoUsuario;
 
-    $stmt = $conn->prepare("SELECT * FROM veterinarios WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
+    if ($tipoUsuario === 'propietario') {
+        $_SESSION["usuario_id"] = $usuario["id_propietario"];
+    } else {
+        $_SESSION["usuario_id"] = $usuario["id_veterinario"];
+    }
 
-    $resultado = $stmt->get_result();
+    $_SESSION["usuario_nombre"] = $usuario["nombre"];
+    $_SESSION["usuario_apellido"] = $usuario["apellido"];
+    $_SESSION["usuario_email"] = $usuario["email"];
 
-    if ($resultado->num_rows > 0) {
+    if ($tipoUsuario === 'veterinario') {
+        $_SESSION["usuario_sexo"] =
+            strtoupper(trim($usuario["sexo"] ?? ''));
+    }
+}
 
-        $veterinario = $resultado->fetch_assoc();
+function redirigirInicio(string $tipoUsuario): void
+{
+    global $conn;
 
-        // Verificar contraseña
-        if ($password == $veterinario["password"]) {
+    if ($tipoUsuario === 'propietario') {
+        header("Location: propietarios/inicio_propietarios.php");
+        exit();
+    }
 
-            $_SESSION["logueado"]         = true;
-            $_SESSION["tipo_usuario"]     = "veterinario";
-            $_SESSION["usuario_id"]       = $veterinario["id_veterinario"];
-            $_SESSION["usuario_nombre"]   = $veterinario["nombre"];
-            $_SESSION["usuario_apellido"] = $veterinario["apellido"];
-            $_SESSION["usuario_email"]    = $veterinario["email"];
-            $_SESSION["usuario_sexo"]     = strtoupper(trim($veterinario["sexo"] ?? ''));
+    $idVeterinario = (int) ($_SESSION['usuario_id'] ?? 0);
+    $suscripcion = $idVeterinario > 0
+        ? actualizarEstadoSuscripcion($conn, $idVeterinario)
+        : null;
 
-            header("Location: veterinarios/inicio_veterinario.php");
-            exit();
-        } else {
+    if (!suscripcionPermiteUso($suscripcion)) {
+        header("Location: suscripciones/mi_suscripcion.php");
+    } else {
+        header("Location: veterinarios/inicio_veterinario.php");
+    }
 
-            // Email existe pero contraseña incorrecta
-            header("Location: index.php?error=password");
-            exit();
+    exit();
+}
+
+// ============================================================
+// INICIO AUTOMÁTICO MEDIANTE "RECORDARME"
+// ============================================================
+
+if (
+    empty($_SESSION['logueado']) &&
+    $_SERVER['REQUEST_METHOD'] !== 'POST' &&
+    !isset($_GET['error']) &&
+    !empty($_COOKIE['vetclinic_recordarme'])
+) {
+    $cookie = (string) $_COOKIE['vetclinic_recordarme'];
+
+    if (str_contains($cookie, ':')) {
+
+        [$selector, $token] = explode(':', $cookie, 2);
+
+        if (
+            preg_match('/^[a-f0-9]{16}$/', $selector) &&
+            preg_match('/^[a-f0-9]{64}$/', $token)
+        ) {
+            $stmt = $conn->prepare("
+                SELECT
+                    selector,
+                    token_hash,
+                    tipo_usuario,
+                    id_usuario,
+                    fecha_expiracion
+                FROM sesiones_recordadas
+                WHERE selector = ?
+                  AND fecha_expiracion >= NOW()
+                LIMIT 1
+            ");
+
+            $stmt->bind_param('s', $selector);
+            $stmt->execute();
+            $sesionRecordada = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (
+                $sesionRecordada &&
+                hash_equals(
+                    $sesionRecordada['token_hash'],
+                    hash('sha256', $token)
+                )
+            ) {
+                $tipoUsuario =
+                    (string) $sesionRecordada['tipo_usuario'];
+
+                $idUsuario =
+                    (int) $sesionRecordada['id_usuario'];
+
+                if ($tipoUsuario === 'propietario') {
+
+                    $stmt = $conn->prepare("
+                        SELECT *
+                        FROM propietarios
+                        WHERE id_propietario = ?
+                        LIMIT 1
+                    ");
+
+                } else {
+
+                    $stmt = $conn->prepare("
+                        SELECT *
+                        FROM veterinarios
+                        WHERE id_veterinario = ?
+                        LIMIT 1
+                    ");
+                }
+
+                $stmt->bind_param('i', $idUsuario);
+                $stmt->execute();
+                $usuario = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($usuario) {
+
+                    cargarSesionUsuario(
+                        $usuario,
+                        $tipoUsuario
+                    );
+
+                    // Rotar el token al recuperar la sesión.
+                    $nuevoToken = bin2hex(random_bytes(32));
+                    $nuevoHash = hash('sha256', $nuevoToken);
+
+                    $nuevoVencimiento =
+                        time() + (60 * 60 * 24 * 30);
+
+                    $fechaExpiracion =
+                        date(
+                            'Y-m-d H:i:s',
+                            $nuevoVencimiento
+                        );
+
+                    $stmt = $conn->prepare("
+                        UPDATE sesiones_recordadas
+                        SET
+                            token_hash = ?,
+                            fecha_expiracion = ?
+                        WHERE selector = ?
+                    ");
+
+                    $stmt->bind_param(
+                        'sss',
+                        $nuevoHash,
+                        $fechaExpiracion,
+                        $selector
+                    );
+
+                    $stmt->execute();
+                    $stmt->close();
+
+                    guardarCookieRecordarme(
+                        $selector,
+                        $nuevoToken,
+                        $nuevoVencimiento
+                    );
+
+                    redirigirInicio($tipoUsuario);
+                }
+            }
         }
     }
 
-    $stmt->close();
+    // Cookie inválida o vencida.
+    eliminarSesionRecordadaActual($conn);
+}
 
+// Si ya hay sesión activa y se entra al login, ir al inicio.
+if (
+    !empty($_SESSION['logueado']) &&
+    $_SERVER['REQUEST_METHOD'] !== 'POST'
+) {
+    redirigirInicio(
+        (string) ($_SESSION['tipo_usuario'] ?? '')
+    );
+}
+
+// ============================================================
+// LOGIN NORMAL
+// ============================================================
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $email = trim($_POST["email"] ?? '');
+    $password = (string) ($_POST["password"] ?? '');
+    $recordarme = isset($_POST['recordarme']);
 
     // ============================================================
-    // 3. EL EMAIL NO EXISTE EN NINGUNA DE LAS DOS TABLAS
+    // 1. PROPIETARIO
+    // ============================================================
+
+    $stmt = $conn->prepare("
+        SELECT *
+        FROM propietarios
+        WHERE email = ?
+        LIMIT 1
+    ");
+
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $propietario = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($propietario) {
+
+        $passwordGuardada =
+            (string) $propietario["password"];
+
+        if (
+            !passwordCorrecta(
+                $password,
+                $passwordGuardada
+            )
+        ) {
+            header("Location: index.php?error=password");
+            exit();
+        }
+
+        // Migración automática de cuentas antiguas.
+        if (
+            !passwordUsaHash($passwordGuardada) ||
+            password_needs_rehash(
+                $passwordGuardada,
+                PASSWORD_DEFAULT
+            )
+        ) {
+            $nuevoHash =
+                password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
+
+            $stmt = $conn->prepare("
+                UPDATE propietarios
+                SET password = ?
+                WHERE id_propietario = ?
+            ");
+
+            $stmt->bind_param(
+                "si",
+                $nuevoHash,
+                $propietario["id_propietario"]
+            );
+
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        cargarSesionUsuario(
+            $propietario,
+            'propietario'
+        );
+
+        if ($recordarme) {
+            crearSesionRecordada(
+                $conn,
+                'propietario',
+                (int) $propietario["id_propietario"]
+            );
+        } else {
+            eliminarSesionRecordadaActual($conn);
+        }
+
+        redirigirInicio('propietario');
+    }
+
+    // ============================================================
+    // 2. VETERINARIO
+    // ============================================================
+
+    $stmt = $conn->prepare("
+        SELECT *
+        FROM veterinarios
+        WHERE email = ?
+        LIMIT 1
+    ");
+
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $veterinario = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($veterinario) {
+
+        $passwordGuardada =
+            (string) $veterinario["password"];
+
+        if (
+            !passwordCorrecta(
+                $password,
+                $passwordGuardada
+            )
+        ) {
+            header("Location: index.php?error=password");
+            exit();
+        }
+
+        if (
+            !passwordUsaHash($passwordGuardada) ||
+            password_needs_rehash(
+                $passwordGuardada,
+                PASSWORD_DEFAULT
+            )
+        ) {
+            $nuevoHash =
+                password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
+
+            $stmt = $conn->prepare("
+                UPDATE veterinarios
+                SET password = ?
+                WHERE id_veterinario = ?
+            ");
+
+            $stmt->bind_param(
+                "si",
+                $nuevoHash,
+                $veterinario["id_veterinario"]
+            );
+
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        cargarSesionUsuario(
+            $veterinario,
+            'veterinario'
+        );
+
+        if ($recordarme) {
+            crearSesionRecordada(
+                $conn,
+                'veterinario',
+                (int) $veterinario["id_veterinario"]
+            );
+        } else {
+            eliminarSesionRecordadaActual($conn);
+        }
+
+        redirigirInicio('veterinario');
+    }
+
+    // ============================================================
+    // 3. EMAIL NO ENCONTRADO
     // ============================================================
 
     header("Location: index.php?error=email");
@@ -95,7 +505,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -157,7 +566,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <!-- PANEL DERECHO -->
-            <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-center">
+            <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-start">
                 <div class="login-container">
                     <span class="portal-acceso">Portal de acceso</span>
                     <h2>Iniciar sesión</h2>
@@ -165,7 +574,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <form action="index.php" method="POST">
 
-                        <div class="mb-4">
+                        <div class="login-campo">
                             <label class="form-label" for="email">Correo electrónico</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
@@ -175,24 +584,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="form-text">Nunca compartiremos tu correo electrónico con nadie más.</div>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="login-campo">
                             <label class="form-label" for="password">Contraseña</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                 <input type="password" class="form-control" placeholder="••••••••"
                                     id="password" name="password" required>
-                                <span class="input-group-text border-start-0 bg-white">
+                                <span
+                                    class="input-group-text border-start-0 bg-white icono-ojo"
+                                    data-password-target="password"
+                                    role="button"
+                                    tabindex="0"
+                                    aria-label="Mostrar contraseña"
+                                    title="Mostrar contraseña">
                                     <i class="bi bi-eye"></i>
                                 </span>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center login-opciones">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox">
-                                <label class="form-check-label">Recordarme</label>
+                                <input class="form-check-input" type="checkbox" id="recordarme" name="recordarme" value="1">
+                                <label class="form-check-label" for="recordarme">Recordarme</label>
                             </div>
-                            <a href="#" class="custom-link">¿Olvidaste tu contraseña?</a>
+                            <a href="forgot_password.php" class="custom-link">¿Olvidaste tu contraseña?</a>
                         </div>
 
                         <button type="submit" class="btn btn-login">
@@ -200,6 +615,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <i class="bi bi-arrow-right ms-2"></i>
                         </button>
                     </form>
+
+                    <!-- Separador -->
+                    <div class="d-flex align-items-center gap-3 login-separador">
+                        <hr class="flex-grow-1 m-0">
+                        <span class="text-secondary small">o continuar con</span>
+                        <hr class="flex-grow-1 m-0">
+                    </div>
+
+                    <!-- Botón oficial de Google Identity Services -->
+                    <div id="google-signin-button" class="d-flex justify-content-center"></div>
+
+                    <!-- Aclaración para cuentas profesionales -->
+                    <div class="text-center login-aviso-veterinario">
+                        <p class="small text-secondary mb-0">
+                            Las cuentas nuevas creadas con Google son de propietario.
+                            <strong>¿Sos veterinario?</strong>
+                            <a class="custom-link" href="suscripciones/plan_profesional.php">Conocé el plan profesional y empezá ahora</a>.
+                        </p>
+                    </div>
 
                     <div class="registrarse">
                         ¿No tenés cuenta?
@@ -235,39 +669,128 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 });
             </script>
         <?php endif; ?>
+
+        <?php if ($_GET["error"] == "google_creacion"): ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo crear la cuenta',
+                    text: 'No pudimos completar el registro con Google. Intentá nuevamente.',
+                    confirmButtonColor: '#1a1f5e'
+                });
+            </script>
+        <?php endif; ?>
+
+        <?php if ($_GET["error"] == "google_invalido"): ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo iniciar con Google',
+                    text: 'La autenticación de Google no pudo validarse. Intentá nuevamente.',
+                    confirmButtonColor: '#1a1f5e'
+                });
+            </script>
+        <?php endif; ?>
     <?php endif; ?>
 
 
     <script>
-    // Obtener el campo de contraseña
-    const inputPassword = document.getElementById('password');
+        document.querySelectorAll('[data-password-target]').forEach(function (boton) {
 
-    // Obtener el ícono del ojo
-    const iconoOjo = document.querySelector('.bi-eye');
+            function alternarPassword() {
 
-    // Al hacer clic en el ojo
-    iconoOjo.addEventListener('click', function () {
+                const targetId = boton.getAttribute('data-password-target');
+                const campo = document.getElementById(targetId);
+                const icono = boton.querySelector('i');
 
-        // Si la contraseña está oculta
-        if (inputPassword.type === 'password') {
+                if (!campo) return;
 
-            // Mostrar contraseña
-            inputPassword.type = 'text';
+                const mostrar = campo.type === 'password';
 
-            // Cambiar el ícono
-            this.classList.replace('bi-eye', 'bi-eye-slash');
+                campo.type = mostrar ? 'text' : 'password';
 
-        } else {
+                if (icono) {
+                    icono.classList.toggle('bi-eye', !mostrar);
+                    icono.classList.toggle('bi-eye-slash', mostrar);
+                }
 
-            // Ocultar contraseña
-            inputPassword.type = 'password';
+                boton.setAttribute(
+                    'aria-label',
+                    mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                );
 
-            // Cambiar el ícono
-            this.classList.replace('bi-eye-slash', 'bi-eye');
+                boton.setAttribute(
+                    'title',
+                    mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                );
+            }
+
+            boton.addEventListener('click', alternarPassword);
+
+            boton.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    alternarPassword();
+                }
+            });
+        });
+    </script>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        window.addEventListener('load', function () {
+
+            if (!window.google || !google.accounts || !google.accounts.id) {
+                return;
+            }
+
+            google.accounts.id.initialize({
+                client_id: '785496114191-s89mvrpaa4k9sntikpfrdvjmlbno07b1.apps.googleusercontent.com',
+                callback: manejarInicioGoogle
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById('google-signin-button'),
+                {
+                    theme: 'outline',
+                    size: 'large',
+                    shape: 'rectangular',
+                    text: 'continue_with',
+                    logo_alignment: 'left',
+                    width: 360
+                }
+            );
+        });
+
+        function manejarInicioGoogle(respuesta) {
+
+            if (!respuesta || !respuesta.credential) {
+                window.location.href = 'index.php?error=google_invalido';
+                return;
+            }
+
+            const formulario = document.createElement('form');
+            formulario.method = 'POST';
+            formulario.action = 'google_login.php';
+
+            const credential = document.createElement('input');
+            credential.type = 'hidden';
+            credential.name = 'credential';
+            credential.value = respuesta.credential;
+            formulario.appendChild(credential);
+
+            const recordarme = document.createElement('input');
+            recordarme.type = 'hidden';
+            recordarme.name = 'recordarme';
+            recordarme.value = document.getElementById('recordarme')?.checked ? '1' : '0';
+            formulario.appendChild(recordarme);
+
+            document.body.appendChild(formulario);
+            formulario.submit();
         }
-    });
-</script>
+    </script>
 
 </body>
-
 </html>

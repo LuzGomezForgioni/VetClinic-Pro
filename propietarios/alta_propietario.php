@@ -1,52 +1,63 @@
 <?php
+
 include("../config/conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $nombre = $_POST["nombre"];
-    $apellido = $_POST["apellido"];
-    $email = $_POST["email"];
-    $telefono = $_POST["telefono"];
-    $password = $_POST["password"];
-    $confirmar = $_POST["confirmar"];
+    $nombre = trim($_POST["nombre"] ?? '');
+    $apellido = trim($_POST["apellido"] ?? '');
+    $email = trim($_POST["email"] ?? '');
+    $telefono = trim($_POST["telefono"] ?? '');
+    $password = (string) ($_POST["password"] ?? '');
+    $confirmar = (string) ($_POST["confirmar"] ?? '');
 
     // Validar contraseñas
-    if ($password != $confirmar) {
+    if ($password !== $confirmar) {
         header("Location: alta_propietario.php?error=password");
         exit();
     }
 
-    $sql = "INSERT INTO propietarios
-            (nombre, apellido, email, telefono, password)
-            VALUES
-            ('$nombre', '$apellido', '$email', '$telefono', '$password')";
+    // La contraseña nunca se guarda en texto plano.
+    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
     try {
 
-        if ($conn->query($sql) === TRUE) {
+        $stmt = $conn->prepare("
+            INSERT INTO propietarios
+                (nombre, apellido, email, telefono, password)
+            VALUES (?, ?, ?, ?, ?)
+        ");
 
+        $stmt->bind_param(
+            "sssss",
+            $nombre,
+            $apellido,
+            $email,
+            $telefono,
+            $passwordHash
+        );
+
+        if ($stmt->execute()) {
+            $stmt->close();
             header("Location: alta_propietario.php?registro=ok");
             exit();
-
         }
 
+        $stmt->close();
+        header("Location: alta_propietario.php?error=bd");
+        exit();
     } catch (mysqli_sql_exception $e) {
 
         if ($e->getCode() == 1062) {
-
             header("Location: alta_propietario.php?error=email");
             exit();
-
-        } else {
-
-            header("Location: alta_propietario.php?error=bd");
-            exit();
-
         }
-    }
 
-    $conn->close();
+        header("Location: alta_propietario.php?error=bd");
+        exit();
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -130,12 +141,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <!-- PANEL DERECHO -->
-            <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-center">
+            <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-start">
                 <div class="registro-container">
 
                     <!-- Encabezado -->
-                    <span class="portal-acceso">Crear cuenta</span>
-                    <h2>Registrarse</h2>
+                    <div class="encabezado-registro">
+                        <span class="portal-acceso">Crear cuenta</span>
+                        <h2>Registrarse</h2>
+                    </div>
                     <p class="subtitulo">Completá tus datos para comenzar a usar VetClinic Pro.</p>
 
                     <!-- FORMULARIO -->
@@ -165,30 +178,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         </div>
 
-                        <!-- Email -->
-                        <div class="mb-3">
-                            <label class="form-label" for="email">Correo electrónico</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-envelope"></i>
-                                </span>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    placeholder="correo@ejemplo.com" required />
+                        <div class="row g-3 mb-3">
+                            <!-- Email -->
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="email">Correo electrónico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        placeholder="correo@ejemplo.com" required />
+                                </div>
+                                <div class="form-text">Nunca compartiremos tu correo con nadie más.</div>
                             </div>
-                            <div class="form-text">Nunca compartiremos tu correo con nadie más.</div>
+
+                            <!-- Teléfono -->
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="telefono">Teléfono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono"
+                                        placeholder="351-555-0000" />
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Teléfono -->
-                        <div class="mb-3">
-                            <label class="form-label" for="telefono">Teléfono</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-telephone"></i>
-                                </span>
-                                <input type="tel" class="form-control" id="telefono" name="telefono"
-                                    placeholder="351-555-0000" />
-                            </div>
-                        </div>
 
                         <!-- Contraseña y Confirmar -->
                         <div class="row g-3 mb-3">
@@ -200,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         placeholder="••••••••" required />
-                                    <span class="input-group-text icono-ojo">
+                                    <span class="input-group-text icono-ojo" data-password-target="password" role="button" tabindex="0" aria-label="Mostrar contraseña" title="Mostrar contraseña">
                                         <i class="bi bi-eye"></i>
                                     </span>
                                 </div>
@@ -213,7 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </span>
                                     <input type="password" class="form-control" id="confirmar" name="confirmar"
                                         placeholder="••••••••" required />
-                                    <span class="input-group-text icono-ojo">
+                                    <span class="input-group-text icono-ojo" data-password-target="confirmar" role="button" tabindex="0" aria-label="Mostrar contraseña" title="Mostrar contraseña">
                                         <i class="bi bi-eye"></i>
                                     </span>
                                 </div>
@@ -253,56 +269,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Modal para registro exitoso -->
-<?php if (isset($_GET["registro"]) && $_GET["registro"] == "ok") { ?>
-<script>
-Swal.fire({
-    icon: 'success',
-    title: '¡Registro exitoso!',
-    text: 'Tu cuenta fue creada correctamente.',
-    confirmButtonColor: '#1a1f5e'
-}).then(() => {
-    window.location.href = "inicio_propietarios.php";
-});
-</script>
-<?php } ?>
+    <?php if (isset($_GET["registro"]) && $_GET["registro"] == "ok") { ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro exitoso!',
+                text: 'Tu cuenta fue creada correctamente.',
+                confirmButtonColor: '#1a1f5e'
+            }).then(() => {
+                window.location.href = "inicio_propietarios.php";
+            });
+        </script>
+    <?php } ?>
 
-<!-- Modal para error de contraseña -->
-<?php if (isset($_GET["error"]) && $_GET["error"] == "password") { ?>
-<script>
-Swal.fire({
-    icon: 'error',
-    title: 'Contraseñas diferentes',
-    text: 'Las contraseñas no coinciden.',
-    confirmButtonColor: '#d33'
-});
-</script>
-<?php } ?>
+    <!-- Modal para error de contraseña -->
+    <?php if (isset($_GET["error"]) && $_GET["error"] == "password") { ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseñas diferentes',
+                text: 'Las contraseñas no coinciden.',
+                confirmButtonColor: '#d33'
+            });
+        </script>
+    <?php } ?>
 
-<!-- Modal para error de base de datos -->
-<?php if (isset($_GET["error"]) && $_GET["error"] == "bd") { ?>
-<script>
-Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: 'No se pudo registrar el propietario.',
-    confirmButtonColor: '#d33'
-});
-</script>
-<?php } ?>
+    <!-- Modal para error de base de datos -->
+    <?php if (isset($_GET["error"]) && $_GET["error"] == "bd") { ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo registrar el propietario.',
+                confirmButtonColor: '#d33'
+            });
+        </script>
+    <?php } ?>
 
-<!-- Modal para cuenta registrada -->
-<?php if (isset($_GET["error"]) && $_GET["error"] == "email"): ?>
+    <!-- Modal para cuenta registrada -->
+    <?php if (isset($_GET["error"]) && $_GET["error"] == "email"): ?>
 
-<script>
-Swal.fire({
-    icon: 'warning',
-    title: 'Correo ya registrado',
-    text: 'Ya existe una cuenta registrada con ese correo electrónico.',
-    confirmButtonColor: '#1a1f5e'
-});
-</script>
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Correo ya registrado',
+                text: 'Ya existe una cuenta registrada con ese correo electrónico.',
+                confirmButtonColor: '#1a1f5e'
+            });
+        </script>
 
-<?php endif; ?>
+    <?php endif; ?>
+
+
+    <script>
+        document.querySelectorAll('[data-password-target]').forEach(function(boton) {
+
+            function alternarPassword() {
+
+                const targetId = boton.getAttribute('data-password-target');
+                const campo = document.getElementById(targetId);
+                const icono = boton.querySelector('i');
+
+                if (!campo) return;
+
+                const mostrar = campo.type === 'password';
+
+                campo.type = mostrar ? 'text' : 'password';
+
+                if (icono) {
+                    icono.classList.toggle('bi-eye', !mostrar);
+                    icono.classList.toggle('bi-eye-slash', mostrar);
+                }
+
+                boton.setAttribute(
+                    'aria-label',
+                    mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                );
+
+                boton.setAttribute(
+                    'title',
+                    mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                );
+            }
+
+            boton.addEventListener('click', alternarPassword);
+
+            boton.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    alternarPassword();
+                }
+            });
+        });
+    </script>
 
 </body>
+
 </html>
