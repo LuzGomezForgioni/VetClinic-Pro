@@ -808,3 +808,30 @@ select.form-control:focus {
 .registro-container .subtitulo {
   margin-bottom: 20px;
 }
+
+/* Estilos de componentes trasladados desde las vistas. */
+.vc-divisor-acciones { border-top: 1px solid var(--borde); }
+
+/* Formularios de cancelación/eliminación: la tarjeta conserva su diseño. */
+.acciones-mascota .form-accion-eliminar { flex: 1; display: flex; margin: 0; }
+.acciones-mascota .form-accion-eliminar .btn-accion { width: 100%; }
+.acciones-turno .form-accion-eliminar { display: inline-flex; margin: 0; }
+
+/* Búsqueda de razas en altas y ediciones; conserva el diseño del formulario. */
+.buscador-razas {
+    position: relative;
+    margin-bottom: 8px;
+}
+.buscador-razas > .bi {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--texto-gris, #6b7280);
+}
+.buscador-razas input { padding-left: 42px; }
+.item-menu-no-disponible, .accion-no-disponible, .icono-inactivo {
+    opacity: .55;
+    cursor: not-allowed;
+}

@@ -3,7 +3,6 @@
    Complementa a inicio.css
 ========================================================= */
 
-
 /* Encabezado */
 
 .encabezado-historial {
@@ -22,7 +21,6 @@
     color: var(--texto-gris);
     font-size: 13px;
 }
-
 
 /* =========================================================
    SELECTOR DE MASCOTAS
@@ -52,7 +50,6 @@
     white-space: nowrap;
 }
 
-
 /*
    Las tarjetas quedan siempre en una sola fila.
    Si existen muchas mascotas, se desplazan hacia
@@ -67,7 +64,6 @@
     overflow-x: auto;
     padding: 2px 2px 10px;
 }
-
 
 /* Tarjeta individual */
 
@@ -98,7 +94,6 @@
     transform: translateY(-2px);
 }
 
-
 /* Mascota actualmente seleccionada */
 
 .tarjeta-selector-mascota.activa {
@@ -111,7 +106,6 @@
     border-color: transparent;
     color: var(--blanco);
 }
-
 
 /* Icono */
 
@@ -132,7 +126,6 @@
 .tarjeta-selector-mascota.activa .icono-selector-mascota {
     background: rgba(255, 255, 255, .16);
 }
-
 
 /* Información */
 
@@ -167,7 +160,6 @@
     color: rgba(255, 255, 255, .75);
 }
 
-
 /* Tildecito de seleccionada */
 
 .marca-seleccionada {
@@ -178,7 +170,6 @@
     color: var(--blanco);
     font-size: 14px;
 }
-
 
 /* =========================================================
    MASCOTA SELECCIONADA
@@ -235,7 +226,6 @@
     font-size: 12px;
 }
 
-
 /* Contador */
 
 .contador-consultas {
@@ -262,7 +252,6 @@
     font-weight: 600;
 }
 
-
 /* =========================================================
    CONSULTAS
 ========================================================= */
@@ -272,7 +261,6 @@
     flex-direction: column;
     gap: 12px;
 }
-
 
 /* Cada consulta */
 
@@ -286,7 +274,6 @@
 .consulta-clinica[open] {
     border-color: #c7d8ef;
 }
-
 
 /* Summary */
 
@@ -358,7 +345,6 @@
     color: var(--azul-medio);
 }
 
-
 /* Lado derecho */
 
 .lado-derecho-consulta {
@@ -389,7 +375,6 @@
 .consulta-clinica[open] .flecha-consulta {
     transform: rotate(180deg);
 }
-
 
 /* =========================================================
    CONTENIDO DE LA CONSULTA
@@ -449,7 +434,6 @@
     line-height: 1.5;
 }
 
-
 /* Pie */
 
 .pie-consulta {
@@ -470,7 +454,6 @@
 .pie-consulta strong {
     color: var(--texto-oscuro);
 }
-
 
 /* =========================================================
    SIN HISTORIAL / SIN MASCOTAS
@@ -514,3 +497,5 @@
     color: var(--texto-gris);
     font-size: 13px;
 }
+/* Estilos de componentes trasladados desde las vistas. */
+.vc-contador-notificaciones { background:var(--azul-claro);color:var(--azul-oscuro);font-size:10px; }

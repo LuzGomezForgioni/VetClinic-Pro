@@ -202,12 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../estilos/suscripciones.css">
 </head>
-
 <body class="sus-page">
-
 <nav class="plan-navbar">
     <div class="container plan-navbar-inner">
-
         <a href="plan_profesional.php" class="plan-marca">
             <img src="../img/VetClinic Pro.png" alt="VetClinic Pro">
             <div>
@@ -215,18 +212,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="plan-marca-subtitulo">Cuenta profesional</span>
             </div>
         </a>
-
         <a href="plan_profesional.php" class="sus-top-link">
             <i class="bi bi-arrow-left"></i>
             Volver al plan
         </a>
-
     </div>
 </nav>
-
 <main class="sus-registro-main">
     <div class="container">
-
         <div class="sus-stepper">
             <div class="sus-step activo">
                 <span>1</span>
@@ -235,9 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <small>Creá tu cuenta</small>
                 </div>
             </div>
-
             <div class="sus-step-linea"></div>
-
             <div class="sus-step">
                 <span>2</span>
                 <div>
@@ -246,22 +237,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         </div>
-
         <div class="row g-4 g-xl-5 align-items-start">
-
             <div class="col-lg-8">
-
                 <section class="sus-surface sus-registro-card">
-
                     <div class="sus-section-kicker">Alta profesional</div>
-
                     <h1>Creá tu cuenta de veterinario</h1>
-
                     <p class="sus-intro">
                         Completá tus datos profesionales. Después vas a pasar al checkout
                         de demostración para activar automáticamente tu suscripción.
                     </p>
-
                     <?php if ($errores): ?>
                         <div class="sus-error-box">
                             <div class="sus-error-icon">
@@ -275,14 +259,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
                     <?php endif; ?>
-
                     <form method="POST" class="row g-3 sus-form" id="formRegistroVeterinario">
-
                         <input
                             type="hidden"
                             name="csrf_token"
                             value="<?= htmlspecialchars($_SESSION['csrf_registro_vet']) ?>">
-
                         <div class="col-md-6">
                             <label class="form-label" for="nombre">
                                 Nombre <span>*</span>
@@ -299,7 +280,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: Juan">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="apellido">
                                 Apellido <span>*</span>
@@ -316,7 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: Pérez">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="matricula">
                                 Matrícula profesional <span>*</span>
@@ -332,7 +311,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: MP 12345">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="especialidad">
                                 Especialidad <span>*</span>
@@ -348,7 +326,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: Clínica general">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="telefono">Teléfono</label>
                             <div class="sus-input-wrap">
@@ -362,7 +339,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: 3534 123456">
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="localidad">Localidad</label>
                             <div class="sus-input-wrap">
@@ -375,7 +351,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Ej: Bell Ville">
                             </div>
                         </div>
-
                         <div class="col-md-8">
                             <label class="form-label" for="email">
                                 Correo electrónico <span>*</span>
@@ -393,7 +368,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="tu@email.com">
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <label class="form-label" for="sexo">
                                 Sexo <span>*</span>
@@ -404,13 +378,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="M" <?= $datos['sexo'] === 'M' ? 'selected' : '' ?>>Masculino</option>
                             </select>
                         </div>
-
                         <div class="col-12">
                             <div class="sus-form-divider">
                                 <span>Seguridad de la cuenta</span>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="password">
                                 Contraseña <span>*</span>
@@ -435,7 +407,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label" for="password2">
                                 Confirmar contraseña <span>*</span>
@@ -460,7 +431,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-12">
                             <div class="sus-terms">
                                 <input class="form-check-input" type="checkbox" id="terminos" required>
@@ -470,26 +440,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </label>
                             </div>
                         </div>
-
                         <div class="col-12">
                             <button class="plan-btn plan-btn-principal sus-submit" type="submit">
                                 Continuar al pago
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
-
                     </form>
-
                 </section>
-
             </div>
-
             <div class="col-lg-4">
-
                 <aside class="sus-sticky">
-
                     <div class="sus-plan-summary">
-
                         <div class="sus-plan-summary-top">
                             <div>
                                 <span>Tu plan</span>
@@ -499,22 +461,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <i class="bi bi-stars"></i>
                             </div>
                         </div>
-
                         <div class="sus-plan-price">
                             <?= formatoDinero((float) $plan['precio_mensual']) ?>
                             <small>/ mes</small>
                         </div>
-
                         <div class="sus-plan-feature">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>Acceso profesional completo</span>
                         </div>
-
                         <div class="sus-plan-feature">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>Activación automática al aprobarse el primer pago</span>
                         </div>
-
                         <div class="sus-plan-feature">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>
@@ -522,12 +480,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 días de tolerancia luego del vencimiento
                             </span>
                         </div>
-
                         <div class="sus-plan-feature">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>Sin permanencia</span>
                         </div>
-
                         <div class="sus-plan-summary-note">
                             <i class="bi bi-shield-check"></i>
                             <span>
@@ -535,9 +491,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 a tu cuenta de VetClinic Pro.
                             </span>
                         </div>
-
                     </div>
-
                     <div class="sus-help-card">
                         <i class="bi bi-info-circle"></i>
                         <div>
@@ -548,16 +502,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </span>
                         </div>
                     </div>
-
                 </aside>
-
             </div>
-
         </div>
-
     </div>
 </main>
-
 <script>
 document.querySelectorAll('.sus-eye').forEach(function (boton) {
     boton.addEventListener('click', function () {
@@ -574,7 +523,5 @@ document.querySelectorAll('.sus-eye').forEach(function (boton) {
         icono.className = mostrar ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 });
-</script>
-
-</body>
+</script></body>
 </html>

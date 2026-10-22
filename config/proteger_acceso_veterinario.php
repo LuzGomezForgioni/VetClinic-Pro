@@ -18,6 +18,17 @@ if ($idVetGuard <= 0) {
     exit;
 }
 
+// Bloquear sesiones ya iniciadas si la cuenta fue dada de baja por administración.
+$stmtGuard = $conn->prepare('SELECT activo FROM veterinarios WHERE id_veterinario = ? LIMIT 1');
+$stmtGuard->bind_param('i', $idVetGuard);
+$stmtGuard->execute();
+$usuarioGuard = $stmtGuard->get_result()->fetch_assoc();
+$stmtGuard->close();
+if (!$usuarioGuard || (int)$usuarioGuard['activo'] !== 1) {
+    header('Location: ../logout.php');
+    exit;
+}
+
 $suscripcionGuard = actualizarEstadoSuscripcion($conn, $idVetGuard);
 
 $archivoActualGuard = basename($_SERVER['PHP_SELF'] ?? '');

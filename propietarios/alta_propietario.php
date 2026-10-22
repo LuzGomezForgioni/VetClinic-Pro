@@ -1,4 +1,11 @@
 <?php
+session_start();
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
+
+
 
 include("../config/conexion.php");
 
@@ -11,10 +18,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = (string) ($_POST["password"] ?? '');
     $confirmar = (string) ($_POST["confirmar"] ?? '');
 
-    // Validar contraseñas
+    // Validaciones del servidor: no confiar solamente en los atributos HTML.
+    if ($nombre === '' || $apellido === '' || mb_strlen($nombre) > 80 || mb_strlen($apellido) > 80) {
+        header('Location: alta_propietario.php?error=datos');
+        exit;
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 120) {
+        header('Location: alta_propietario.php?error=datos');
+        exit;
+    }
+    if (mb_strlen($telefono) > 20 || ($telefono !== '' && !preg_match('/^[0-9+()\s.-]+$/', $telefono))) {
+        header('Location: alta_propietario.php?error=datos');
+        exit;
+    }
+    if (strlen($password) < 8 || strlen($password) > 255) {
+        header('Location: alta_propietario.php?error=datos');
+        exit;
+    }
     if ($password !== $confirmar) {
-        header("Location: alta_propietario.php?error=password");
-        exit();
+        header('Location: alta_propietario.php?error=password');
+        exit;
     }
 
     // La contraseña nunca se guarda en texto plano.
@@ -59,56 +82,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registrarse · VetClinic Pro</title>
     <link rel="icon" type="image/png" href="../img/VetClinic Pro.png">
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-
     <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-
     <link rel="stylesheet" href="../estilos/abm.css" />
 </head>
-
 <body>
     <div class="container-fluid min-vh-100">
         <div class="row min-vh-100">
-
             <!-- PANEL IZQUIERDO -->
             <div class="col-12 col-lg-6 panel-izquierdo d-flex flex-column">
                 <div class="logo">
                     <img src="../img/VetClinic Pro.png" alt="Logo" class="logo-img">
-
                     <div>
                         <h4>VetClinic Pro</h4>
                         <span>Sistema de Gestión Veterinaria</span>
                     </div>
                 </div>
-
                 <div class="contenido-principal d-flex flex-column justify-content-center">
                     <h1>Comenzá a cuidar a tu mascota con <span><i>tecnología.</i></span></h1>
                     <p>Creá tu cuenta y accedé al historial clínico, turnos y recordatorios de vacunas de tus animales
                         desde cualquier lugar.</p>
                 </div>
-
-
                 <div class="card mascota-card mb-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-
                             <div class="d-flex align-items-center">
                                 <div class="pet-icon me-3">🐶</div>
                                 <div>
@@ -122,8 +133,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                 </div>
-
-
                 <div class="beneficios mt-2">
                     <p>
                         <i class="bi bi-check-circle-fill me-2"></i>
@@ -139,21 +148,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </p>
                 </div>
             </div>
-
             <!-- PANEL DERECHO -->
             <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-start">
                 <div class="registro-container">
-
                     <!-- Encabezado -->
                     <div class="encabezado-registro">
                         <span class="portal-acceso">Crear cuenta</span>
                         <h2>Registrarse</h2>
                     </div>
                     <p class="subtitulo">Completá tus datos para comenzar a usar VetClinic Pro.</p>
-
                     <!-- FORMULARIO -->
-                    <!-- action="registro_process.php" method="POST" → se conecta con PHP después -->
                     <form action="" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                         <!-- Nombre y Apellido -->
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-sm-6">
@@ -162,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="nombre" name="nombre"
+                                    <input type="text" class="form-control" id="nombre" name="nombre" maxlength="80"
                                         placeholder="Tu nombre" required />
                                 </div>
                             </div>
@@ -172,12 +178,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="apellido" name="apellido"
+                                    <input type="text" class="form-control" id="apellido" name="apellido" maxlength="80"
                                         placeholder="Tu apellido" required />
                                 </div>
                             </div>
                         </div>
-
                         <div class="row g-3 mb-3">
                             <!-- Email -->
                             <div class="col-12 col-sm-6">
@@ -186,12 +191,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-envelope"></i>
                                     </span>
-                                    <input type="email" class="form-control" id="email" name="email"
+                                    <input type="email" class="form-control" id="email" name="email" maxlength="120"
                                         placeholder="correo@ejemplo.com" required />
                                 </div>
                                 <div class="form-text">Nunca compartiremos tu correo con nadie más.</div>
                             </div>
-
                             <!-- Teléfono -->
                             <div class="col-12 col-sm-6">
                                 <label class="form-label" for="telefono">Teléfono</label>
@@ -199,13 +203,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-telephone"></i>
                                     </span>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono"
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" maxlength="20"
                                         placeholder="351-555-0000" />
                                 </div>
                             </div>
                         </div>
-
-
                         <!-- Contraseña y Confirmar -->
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-sm-6">
@@ -214,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-lock"></i>
                                     </span>
-                                    <input type="password" class="form-control" id="password" name="password"
+                                    <input type="password" class="form-control" id="password" name="password" minlength="8"
                                         placeholder="••••••••" required />
                                     <span class="input-group-text icono-ojo" data-password-target="password" role="button" tabindex="0" aria-label="Mostrar contraseña" title="Mostrar contraseña">
                                         <i class="bi bi-eye"></i>
@@ -227,7 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <span class="input-group-text">
                                         <i class="bi bi-lock-fill"></i>
                                     </span>
-                                    <input type="password" class="form-control" id="confirmar" name="confirmar"
+                                    <input type="password" class="form-control" id="confirmar" name="confirmar" minlength="8"
                                         placeholder="••••••••" required />
                                     <span class="input-group-text icono-ojo" data-password-target="confirmar" role="button" tabindex="0" aria-label="Mostrar contraseña" title="Mostrar contraseña">
                                         <i class="bi bi-eye"></i>
@@ -235,40 +237,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
                         </div>
-
                         <!-- Términos y condiciones -->
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="terminos" name="terminos" required />
                             <label class="form-check-label" for="terminos">
-                                Acepto los
-                                <a href="#" class="custom-link">términos y condiciones</a>
-                                y la
-                                <a href="#" class="custom-link">política de privacidad</a>
+                                Confirmo que deseo crear mi cuenta y registrar los datos que ingresé para gestionar mis mascotas y turnos.
                             </label>
                         </div>
-
-                        <!-- Botón principal -->
+                        <p class="small text-muted">La documentación de términos y privacidad está pendiente de publicación antes del lanzamiento del sitio.</p>
+                                                <!-- Botón principal -->
                         <button type="submit" class="btn btn-registro">
                             Crear cuenta
                             <i class="bi bi-arrow-right ms-2"></i>
                         </button>
-
                     </form>
-
                     <!-- Link al login -->
                     <div class="volver-login">
                         ¿Ya tienes cuenta?
                         <a class="custom-link" href="../index.php">Iniciar sesión</a>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- Modal para registro exitoso -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    <!-- Modal para registro exitoso -->
     <?php if (isset($_GET["registro"]) && $_GET["registro"] == "ok") { ?>
         <script>
             Swal.fire({
@@ -277,11 +269,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 text: 'Tu cuenta fue creada correctamente.',
                 confirmButtonColor: '#1a1f5e'
             }).then(() => {
-                window.location.href = "inicio_propietarios.php";
+                window.location.href = "../index.php";
             });
-        </script>
-    <?php } ?>
-
+        </script>    <?php } ?>
+    <?php if (($_GET['error'] ?? '') === 'datos'): ?>
+        <script>
+            Swal.fire({ icon: 'error', title: 'Datos inválidos', text: 'Revisá el nombre, apellido, correo, teléfono y contraseña (mínimo 8 caracteres).' });
+        </script>    <?php endif; ?>
     <!-- Modal para error de contraseña -->
     <?php if (isset($_GET["error"]) && $_GET["error"] == "password") { ?>
         <script>
@@ -291,9 +285,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 text: 'Las contraseñas no coinciden.',
                 confirmButtonColor: '#d33'
             });
-        </script>
-    <?php } ?>
-
+        </script>    <?php } ?>
     <!-- Modal para error de base de datos -->
     <?php if (isset($_GET["error"]) && $_GET["error"] == "bd") { ?>
         <script>
@@ -303,12 +295,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 text: 'No se pudo registrar el propietario.',
                 confirmButtonColor: '#d33'
             });
-        </script>
-    <?php } ?>
-
+        </script>    <?php } ?>
     <!-- Modal para cuenta registrada -->
     <?php if (isset($_GET["error"]) && $_GET["error"] == "email"): ?>
-
         <script>
             Swal.fire({
                 icon: 'warning',
@@ -316,11 +305,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 text: 'Ya existe una cuenta registrada con ese correo electrónico.',
                 confirmButtonColor: '#1a1f5e'
             });
-        </script>
-
-    <?php endif; ?>
-
-
+        </script>    <?php endif; ?>
     <script>
         document.querySelectorAll('[data-password-target]').forEach(function(boton) {
 
@@ -361,8 +346,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             });
         });
-    </script>
-
-</body>
-
+    </script></body>
 </html>

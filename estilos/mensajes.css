@@ -1,0 +1,122 @@
+/* Mensajería: reutiliza la identidad de VetClinic Pro. */
+.mensajes-panel {
+    display: grid;
+    grid-template-columns: minmax(245px, 310px) minmax(0, 1fr);
+    min-height: 590px;
+    max-height: 760px;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(26, 31, 94, .05);
+    overflow: hidden;
+}
+.mensajes-listado {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 22px 14px;
+    border-right: 1px solid var(--borde);
+}
+.mensajes-listado h2 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 7px 18px;
+}
+.mensajes-listado h2 i { color: var(--azul-medio); margin-right: 5px; }
+.mensajes-busqueda, .mensajes-listado .form-select { border-color: var(--borde); border-radius: 10px; }
+.mensajes-etiqueta { margin: 17px 4px 6px; font-size: 12px; font-weight: 700; color: #627086; }
+.mensajes-contactos { overflow-y: auto; flex: 1; margin-top: 18px; }
+.mensajes-contacto {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    color: #1d2939;
+    text-decoration: none;
+}
+.mensajes-contacto:hover, .mensajes-contacto.seleccionado { color: var(--azul-oscuro); background: #eef5ff; }
+.mensajes-contacto[hidden] { display: none; }
+.mensajes-avatar {
+    background: #e8f1ff;
+    color: var(--azul-oscuro);
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 19px;
+}
+.mensajes-contacto-texto { flex: 1; min-width: 0; }
+.mensajes-contacto-texto strong, .mensajes-contacto-texto small { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mensajes-contacto-texto strong { font-size: 13px; }
+.mensajes-contacto-texto small { color: #6b7280; font-size: 11px; margin-top: 4px; }
+.mensajes-pendientes, .contador-mensajes-nav {
+    border-radius: 18px;
+    background: var(--azul-medio);
+    padding: 3px 8px;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+.contador-mensajes-nav { margin-left: auto; }
+.mensajes-sin-contactos { color: #717d8d; padding: 14px; font-size: 13px; }
+.mensajes-chat { min-height: 0; display: flex; flex-direction: column; background: #fbfcff; }
+.mensajes-chat-encabezado { display: flex; align-items: center; gap: 12px; padding: 19px 22px; border-bottom: 1px solid var(--borde); background: white; }
+.mensajes-chat-encabezado h2 { font-weight: 800; font-size: 16px; margin: 0 0 3px; }
+.mensajes-chat-encabezado small { color: #667085; font-size: 11px; }
+.mensajes-historial { padding: 24px; overflow-y: auto; flex: 1; min-height: 240px; display: flex; flex-direction: column; gap: 12px; }
+.mensaje-burbuja { align-self: flex-start; max-width: min(80%, 550px); padding: 12px 16px 9px; background: #fff; border: 1px solid #e6e9f1; border-radius: 15px 15px 15px 5px; box-shadow: 0 1px 3px rgba(26, 31, 94, .04); }
+.mensaje-burbuja.propio { align-self: flex-end; color: #fff; background: var(--azul-oscuro); border-color: var(--azul-oscuro); border-radius: 15px 15px 5px 15px; }
+.mensaje-contenido { font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mensaje-burbuja time { display: block; color: #8790a0; text-align: right; margin-top: 6px; font-size: 10px; }
+.mensaje-burbuja.propio time { color: #bac6ed; }
+.mensajes-redactar { padding: 17px; display: flex; gap: 12px; align-items: flex-end; background: white; border-top: 1px solid var(--borde); }
+.mensajes-redactar textarea { resize: vertical; max-height: 160px; border-radius: 10px; font-size: 13px; }
+.mensajes-redactar textarea:focus { border-color: var(--azul-medio); box-shadow: 0 0 0 3px rgba(73, 146, 181, .13); }
+.mensajes-enviar { background: var(--azul-oscuro); border-color: var(--azul-oscuro); border-radius: 10px; font-weight: 700; padding: 11px 16px; flex-shrink: 0; }
+.mensajes-enviar:hover { background: #343d90; border-color: #343d90; }
+.mensajes-bienvenida { margin: auto; padding: 35px 25px; text-align: center; max-width: 450px; }
+.mensajes-bienvenida > i { display: inline-flex; justify-content: center; align-items: center; width: 80px; height: 80px; border-radius: 23px; background: #eef3ff; color: var(--azul-oscuro); font-size: 34px; margin-bottom: 20px; }
+.mensajes-bienvenida h2 { font-weight: 800; font-size: 20px; }
+.mensajes-bienvenida p, .mensajes-vacio { color: #68768a; font-size: 13px; }
+.mensajes-explicacion { margin-top: 20px; }
+.mensajes-vacio { margin: auto; text-align: center; }
+.mensajes-volver-nuevos, .mensajes-anteriores { font-size: 12px; text-align: center; text-decoration: none; padding: 10px; color: var(--azul-oscuro); }
+.mensajes-aviso { display: flex; gap: 8px; font-size: 12px; color: #6b7280; margin: 17px 0 5px; }
+@media (max-width: 850px) {
+    .mensajes-panel { grid-template-columns: 1fr; max-height: none; }
+    .mensajes-listado { border-right: 0; border-bottom: 1px solid var(--borde); max-height: 300px; }
+    .mensajes-chat { min-height: 460px; }
+    .mensajes-historial { max-height: 460px; }
+    .mensajes-redactar { gap: 8px; padding: 10px; }
+    .mensajes-redactar .mensajes-enviar { padding: 10px; }
+}
+
+/* Adjuntos y avisos: mantienen los colores existentes de VetClinic Pro. */
+.mensajes-compositor { flex: 1; min-width: 0; }
+.mensajes-adjuntar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.mensajes-adjuntar-boton { font-size: 12px; color: var(--azul-oscuro); font-weight: 700; cursor: pointer; padding: 5px 9px; border: 1px solid var(--borde); border-radius: 8px; background: #f8faff; }
+.mensajes-adjuntar-boton:hover { background: #eef5ff; }
+.mensajes-adjuntar input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.mensajes-adjuntar input[type="file"]:focus-visible + .mensajes-archivo-seleccionado { outline: 2px solid var(--azul-medio); }
+.mensajes-archivo-seleccionado { font-size: 12px; color: #344054; overflow-wrap: anywhere; }
+.mensajes-quitar-adjunto { font-size: 12px; padding: 2px 5px; }
+.mensajes-ayuda { color: #667085; font-size: 11px; }
+.mensaje-adjunto { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 8px; }
+.mensaje-adjunto-enlace { color: var(--azul-oscuro); text-decoration: none; font-weight: 600; font-size: 12px; word-break: break-word; }
+.mensaje-adjunto-enlace:hover { text-decoration: underline; }
+.mensaje-adjunto-enlace small { font-weight: 400; }
+.mensaje-burbuja.propio .mensaje-adjunto-enlace { color: #e5f0ff; }
+.mensaje-imagen { display: block; width: auto; max-width: 100%; max-height: 270px; height: auto; object-fit: contain; border-radius: 9px; background: #edf1f6; }
+.mensajes-opciones-aviso { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+.mensajes-opciones-aviso .btn { font-size: 12px; border-radius: 9px; }
+.mensajes-notificacion-toast { position: fixed; right: 22px; bottom: 22px; z-index: 1200; width: min(350px, calc(100vw - 44px)); background: #fff; color: #1d2939; padding: 14px 18px; border-radius: 12px; box-shadow: 0 12px 34px rgba(20, 27, 68, .18); border: 1px solid var(--borde, #dce2ea); font-size: 13px; }
+.mensajes-notificacion-toast a { color: var(--azul-oscuro, #1a1f5e); font-weight: 700; }
+.mensajes-notificacion-toast button { float: right; border: none; background: transparent; padding: 0; font-size: 19px; }
+.contador-mensajes-dinamico { margin-left: auto; padding: 2px 7px; border-radius: 12px; font-size: 11px; background: #4992b5; color: white; font-weight: 700; }
+@media (max-width: 850px) { .mensajes-redactar { align-items: center; } .mensaje-imagen { max-height: 220px; } }
+
+.mensajes-quitar-adjunto[hidden] { display: none; }

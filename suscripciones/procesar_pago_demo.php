@@ -2,6 +2,7 @@
 session_start();
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
 require_once '../config/suscripciones.php';
 
 if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'veterinario') {
@@ -13,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: mi_suscripcion.php');
     exit;
 }
+
+exigirCsrf();
 
 $idVeterinario = (int) $_SESSION['usuario_id'];
 $suscripcionActual = actualizarEstadoSuscripcion($conn, $idVeterinario);

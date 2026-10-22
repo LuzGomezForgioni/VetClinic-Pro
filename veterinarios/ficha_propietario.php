@@ -18,6 +18,10 @@ if (
 
 include("../config/conexion.php");
 require_once '../config/proteger_acceso_veterinario.php';
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
 
 // ======================================================
 // DATOS DEL VETERINARIO
@@ -70,12 +74,14 @@ if (!$propietario) {
     exit;
 }
 
-
 // ======================================================
 // NOTAS INTERNAS DEL PROPIETARIO
 // ======================================================
 
 $id_veterinario_actual = (int) ($_SESSION['usuario_id'] ?? 0);
+require_once __DIR__ . '/../config/mensajeria.php';
+$puede_contactar_propietario = mensajeContactoPermitido($conn, 'veterinario', $id_veterinario_actual, $id_propietario);
+
 $mensaje_nota = $_SESSION['mensaje_nota_propietario'] ?? '';
 $tipo_mensaje_nota = $_SESSION['tipo_mensaje_nota_propietario'] ?? '';
 unset($_SESSION['mensaje_nota_propietario'], $_SESSION['tipo_mensaje_nota_propietario']);
@@ -273,277 +279,189 @@ function sexoMascotaPropietario(?string $sexo): string
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-
     <title>
         <?= htmlspecialchars(
             $propietario['nombre'] . ' ' . $propietario['apellido']
         ) ?> · VetClinic Pro
     </title>
-
     <link
         rel="icon"
         type="image/png"
         href="../img/VetClinic Pro.png">
-
     <!-- Google Fonts -->
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com">
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
     <!-- Bootstrap -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
-
     <!-- Bootstrap Icons -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet">
-
     <!-- CSS general -->
     <link
         rel="stylesheet"
         href="../estilos/inicio.css">
-
     <!-- CSS específico -->
     <link
         rel="stylesheet"
         href="../estilos/propietarios_veterinario.css">
-
 </head>
-
 <body>
-
 <div class="container-fluid p-0">
-
     <div class="row g-0 min-vh-100">
-
         <!-- ================================================== -->
         <!-- BARRA LATERAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a
                 href="inicio_veterinario.php"
                 class="logo-lateral">
-
                 <img
                     src="../img/VetClinic Pro.png"
                     alt="Logo VetClinic Pro">
-
                 <div>
-
                     <div class="nombre-sistema">
                         VetClinic Pro
                     </div>
-
                     <div class="subtitulo-sistema">
                         Portal del veterinario
                     </div>
-
                 </div>
-
             </a>
-
             <div class="seccion-nav">
                 Principal
             </div>
-
             <a
                 href="inicio_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-grid"></i>
                 Inicio
-
             </a>
-
             <a
                 href="turnos_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-calendar-check"></i>
                 Turnos
-
             </a>
-
             <a
                 href="mascotas_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-heart-pulse"></i>
                 Mascotas
-
             </a>
-
             <a
-                href="#"
+                href="historiales_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-journal-medical"></i>
                 Historial clínico
-
             </a>
-
             <div class="seccion-nav">
                 Gestión
             </div>
-
             <a
                 href="propietarios_veterinario.php"
                 class="item-menu activo">
-
                 <i class="bi bi-people"></i>
                 Propietarios
-
             </a>
-
             <a
-                href="#"
+                href="vacunaciones_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-shield-plus"></i>
                 Vacunaciones
-
             </a>
-
-            <a
-                href="#"
-                class="item-menu">
-
-                <i class="bi bi-chat-dots"></i>
-                Mensajes
-
-            </a>
-
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
+                Mensajes</a>
             <div class="seccion-nav">
                 Configuración
             </div>
-
-            <a
+            <a href="configuracion_veterinario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
+                <a
                 href="horarios_atencion.php"
                 class="item-menu">
-
                 <i class="bi bi-clock"></i>
                 Horarios de atención
-
             </a>
-
             <a href="../suscripciones/mi_suscripcion.php" class="item-menu">
                 <i class="bi bi-credit-card-2-front"></i> Mi suscripción
             </a>
-
             <div class="usuario-lateral">
-
                 <div class="avatar-usuario">
-
                     <?= strtoupper(
                         substr($nombre, 0, 1) .
                         substr($apellido, 0, 1)
                     ) ?>
-
                 </div>
-
                 <div>
-
                     <div class="nombre-usuario">
-
                         <?= htmlspecialchars(
                             $nombre . ' ' . $apellido
                         ) ?>
-
                     </div>
-
                     <div class="rol-usuario">
                         Veterinario
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
         <!-- ================================================== -->
         <!-- ÁREA PRINCIPAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-10 area-principal">
-
             <div class="barra-superior">
-
                 <div>
-
                     <p class="titulo-pagina">
                         Ficha del propietario
                     </p>
-
                     <p class="fecha-hoy">
                         Datos de contacto y mascotas registradas.
                     </p>
-
                 </div>
-
                 <div class="d-flex gap-2">
-
                     <a
                         href="propietarios_veterinario.php"
                         class="icono-barra"
                         title="Volver a propietarios">
-
                         <i class="bi bi-arrow-left"></i>
-
                     </a>
-
                     <a
                         href="../logout.php"
                         class="icono-barra"
                         title="Cerrar sesión">
-
                         <i class="bi bi-box-arrow-right"></i>
-
                     </a>
-
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- CABECERA -->
             <!-- ================================================== -->
-
             <?php if ($mensaje_nota !== ''): ?>
                 <div class="alert alert-<?= htmlspecialchars($tipo_mensaje_nota) ?> alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($mensaje_nota) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-
             <section class="cabecera-ficha-propietario mb-4">
-
                 <div class="avatar-ficha-propietario">
-
                     <?= strtoupper(
                         substr(
                             $propietario['nombre'],
@@ -556,175 +474,121 @@ function sexoMascotaPropietario(?string $sexo): string
                             1
                         )
                     ) ?>
-
                 </div>
-
                 <div class="flex-grow-1">
-
                     <div class="etiqueta-propietario-ficha">
                         Propietario
                     </div>
-
                     <h1>
-
                         <?= htmlspecialchars(
                             $propietario['nombre'] .
                             ' ' .
                             $propietario['apellido']
                         ) ?>
-
                     </h1>
-
                     <p>
-
                         <?= count($mascotas) ?>
-
                         <?= count($mascotas) === 1
                             ? 'mascota registrada'
                             : 'mascotas registradas'
                         ?>
-
                     </p>
-
                 </div>
-
             </section>
-
+            <?php if ($puede_contactar_propietario): ?>
+                <div class="mb-3">
+                    <a href="mensajes.php?contacto=<?= $id_propietario ?>" class="btn btn-primary">
+                        <i class="bi bi-chat-dots"></i> Enviar mensaje al propietario
+                    </a>
+                </div>
+            <?php endif; ?>
             <div class="row g-4">
-
                 <div class="col-12 col-xl-4">
-
                     <!-- ========================================== -->
                     <!-- DATOS DEL PROPIETARIO -->
                     <!-- ========================================== -->
-
                     <section class="tarjeta mb-4">
-
                         <div class="titulo-tarjeta">
-
                             <i class="bi bi-person-vcard"></i>
                             Datos del propietario
-
                         </div>
-
                         <div class="lista-datos-propietario">
-
                             <div class="dato-propietario-ficha">
-
                                 <i class="bi bi-envelope"></i>
-
                                 <div>
-
                                     <span>
                                         Email
                                     </span>
-
                                     <strong>
-
                                         <?= htmlspecialchars(
                                             $propietario['email']
                                                 ?: 'No registrado'
                                         ) ?>
-
                                     </strong>
-
                                 </div>
-
                             </div>
-
                             <div class="dato-propietario-ficha">
-
                                 <i class="bi bi-telephone"></i>
-
                                 <div>
-
                                     <span>
                                         Teléfono
                                     </span>
-
                                     <strong>
-
                                         <?= htmlspecialchars(
                                             $propietario['telefono']
                                                 ?: 'No registrado'
                                         ) ?>
-
                                     </strong>
-
                                 </div>
-
                             </div>
-
                             <div class="dato-propietario-ficha">
-
                                 <i class="bi bi-calendar3"></i>
-
                                 <div>
-
                                     <span>
                                         Registrado desde
                                     </span>
-
                                     <strong>
-
                                         <?= date(
                                             'd/m/Y',
                                             strtotime(
                                                 $propietario['fecha_registro']
                                             )
                                         ) ?>
-
                                     </strong>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </section>
-
                     <!-- ========================================== -->
                     <!-- NOTAS INTERNAS -->
                     <!-- ========================================== -->
-
                     <section class="tarjeta tarjeta-notas-propietario mb-4">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-sticky"></i>
                             Notas internas
                         </div>
-
                         <p class="texto-ayuda-notas">
                             Solo son visibles dentro del portal del veterinario. No modifican la cuenta del propietario.
                         </p>
-
                         <form method="POST" class="form-nota-propietario">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                             <input type="hidden" name="accion" value="agregar_nota">
-
                             <textarea
                                 name="comentario"
                                 class="form-control"
                                 rows="3"
                                 maxlength="2000"
                                 placeholder="Ej.: Prefiere turnos por la mañana..."
-                                required></textarea>
-
-                            <button type="submit" class="btn-guardar-nota">
+                                required></textarea>                            <button type="submit" class="btn-guardar-nota">
                                 <i class="bi bi-plus-circle"></i>
                                 Agregar nota
                             </button>
                         </form>
-
                         <?php if (!empty($notas_propietario)): ?>
-
                             <div class="lista-notas-propietario">
-
                                 <?php foreach ($notas_propietario as $nota): ?>
-
                                     <article class="nota-interna-propietario">
                                         <p><?= nl2br(htmlspecialchars($nota['comentario'])) ?></p>
-
                                         <div class="meta-nota-propietario">
                                             <span>
                                                 <?= htmlspecialchars(
@@ -736,334 +600,205 @@ function sexoMascotaPropietario(?string $sexo): string
                                             <span><?= date('d/m/Y H:i', strtotime($nota['fecha'])) ?></span>
                                         </div>
                                     </article>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
                             <div class="sin-notas-propietario">
                                 Todavía no hay notas internas para este propietario.
                             </div>
                         <?php endif; ?>
-
                     </section>
-
                     <!-- ========================================== -->
                     <!-- PRÓXIMOS TURNOS -->
                     <!-- ========================================== -->
-
                     <section class="tarjeta">
-
                         <div class="titulo-tarjeta">
-
                             <i class="bi bi-calendar-check"></i>
                             Próximos turnos
-
                         </div>
-
                         <?php if (!empty($proximos_turnos)): ?>
-
                             <div class="lista-turnos-propietario">
-
                                 <?php foreach ($proximos_turnos as $turno): ?>
-
                                     <a
                                         href="historial_clinico.php?id_turno=<?= (int) $turno['id_turno'] ?>"
                                         class="turno-propietario">
-
                                         <div class="fecha-turno-propietario">
-
                                             <strong>
-
                                                 <?= date(
                                                     'd/m',
                                                     strtotime(
                                                         $turno['fecha_hora']
                                                     )
                                                 ) ?>
-
                                             </strong>
-
                                             <span>
-
                                                 <?= date(
                                                     'H:i',
                                                     strtotime(
                                                         $turno['fecha_hora']
                                                     )
                                                 ) ?> hs
-
                                             </span>
-
                                         </div>
-
                                         <div class="flex-grow-1">
-
                                             <strong>
-
                                                 <?= htmlspecialchars(
                                                     $turno['nombre_mascota']
                                                 ) ?>
-
                                             </strong>
-
                                             <span>
-
                                                 <?= htmlspecialchars(
                                                     $turno['motivo']
                                                 ) ?>
-
                                             </span>
-
                                         </div>
-
                                         <i class="bi bi-chevron-right"></i>
-
                                     </a>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
-
                             <div class="estado-vacio-propietario-pequeno">
-
                                 <i class="bi bi-calendar-x"></i>
-
                                 <div>
-
                                     <strong>
                                         Sin próximos turnos
                                     </strong>
-
                                     <span>
                                         No hay turnos futuros para este propietario.
                                     </span>
-
                                 </div>
-
                             </div>
-
                         <?php endif; ?>
-
                     </section>
-
                 </div>
-
                 <div class="col-12 col-xl-8">
-
                     <!-- ========================================== -->
                     <!-- MASCOTAS -->
                     <!-- ========================================== -->
-
                     <section class="tarjeta">
-
                         <div class="cabecera-mascotas-propietario">
-
                             <div class="titulo-tarjeta mb-0">
-
                                 <i class="bi bi-heart-pulse"></i>
                                 Sus mascotas
-
                             </div>
-
                             <span class="cantidad-mascotas-propietario">
-
                                 <?= count($mascotas) ?>
-
                                 <?= count($mascotas) === 1
                                     ? 'mascota'
                                     : 'mascotas'
                                 ?>
-
                             </span>
-
                         </div>
-
                         <?php if (!empty($mascotas)): ?>
-
                             <div class="grilla-mascotas-propietario">
-
                                 <?php foreach ($mascotas as $mascota): ?>
-
                                     <article class="mascota-del-propietario <?= (int) $mascota['fallecido'] === 1 ? 'mascota-fallecida-propietario' : '' ?>">
-
                                         <div class="cabecera-mascota-propietario">
-
                                             <div class="icono-mascota-propietario">
-
                                                 <i class="bi bi-heart-pulse"></i>
-
                                             </div>
-
                                             <div class="flex-grow-1">
-
                                                 <div class="fila-nombre-mascota-propietario">
                                                     <h3>
                                                         <?= htmlspecialchars($mascota['nombre']) ?>
                                                     </h3>
-
                                                     <?php if ((int) $mascota['fallecido'] === 1): ?>
                                                         <span class="estado-fallecida-propietario">Fallecida</span>
                                                     <?php endif; ?>
                                                 </div>
-
                                                 <p>
-
                                                     <?= htmlspecialchars(
                                                         $mascota['nombre_especie']
                                                             ?? 'Especie no registrada'
                                                     ) ?>
-
                                                     <?php if (!empty($mascota['nombre_raza'])): ?>
-
                                                         ·
-
                                                         <?= htmlspecialchars(
                                                             $mascota['nombre_raza']
                                                         ) ?>
-
                                                     <?php endif; ?>
-
                                                 </p>
-
                                             </div>
-
                                         </div>
-
                                         <div class="datos-mascota-propietario">
-
                                             <span>
-
                                                 <i class="bi bi-gender-ambiguous"></i>
-
                                                 <?= htmlspecialchars(
                                                     sexoMascotaPropietario(
                                                         $mascota['sexo']
                                                     )
                                                 ) ?>
-
                                             </span>
-
                                             <span>
-
                                                 <i class="bi bi-calendar3"></i>
-
                                                 <?= htmlspecialchars(
                                                     edadMascotaPropietario(
                                                         $mascota['fecha_nacimiento']
                                                     )
                                                 ) ?>
-
                                             </span>
-
                                         </div>
-
                                         <div class="resumen-mascota-propietario">
-
                                             <div>
-
                                                 <strong>
                                                     <?= (int) $mascota['cantidad_consultas'] ?>
                                                 </strong>
-
                                                 <span>
                                                     Consultas
                                                 </span>
-
                                             </div>
-
                                             <div>
-
                                                 <strong>
                                                     <?= (int) $mascota['cantidad_vacunas'] ?>
                                                 </strong>
-
                                                 <span>
                                                     Vacunas
                                                 </span>
-
                                             </div>
-
                                         </div>
-
                                         <?php if (!empty($mascota['proximo_turno'])): ?>
-
                                             <div class="proximo-turno-mascota-propietario">
-
                                                 <i class="bi bi-calendar-check"></i>
-
                                                 Próximo turno:
-
                                                 <strong>
-
                                                     <?= date(
                                                         'd/m/Y H:i',
                                                         strtotime(
                                                             $mascota['proximo_turno']
                                                         )
                                                     ) ?>
-
                                                 </strong>
-
                                             </div>
-
                                         <?php endif; ?>
-
                                         <a
                                             href="ficha_mascota.php?id_mascota=<?= (int) $mascota['id_mascota'] ?>"
                                             class="btn-ver-mascota-propietario">
-
                                             Ver ficha de la mascota
-
                                             <i class="bi bi-arrow-right"></i>
-
                                         </a>
-
                                     </article>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
-
                             <div class="estado-vacio-propietario-pequeno">
-
                                 <i class="bi bi-heart-pulse"></i>
-
                                 <div>
-
                                     <strong>
                                         Sin mascotas registradas
                                     </strong>
-
                                     <span>
                                         Este propietario todavía no tiene mascotas asociadas.
                                     </span>
-
                                 </div>
-
                             </div>
-
                         <?php endif; ?>
-
                     </section>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
 </html>

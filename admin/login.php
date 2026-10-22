@@ -1,5 +1,11 @@
 <?php
 session_start();
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
+
+
 require_once '../config/conexion.php';
 
 if (!empty($_SESSION['admin_logueado'])) {
@@ -32,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -43,16 +48,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../estilos/admin.css">
 </head>
-
 <body>
     <div class="login-wrap">
         <div class="login-card">
-            <div class="text-center mb-4"><img src="../img/VetClinic Pro.png" alt="Logo" style="width:70px">
+            <div class="text-center mb-4"><img src="../img/VetClinic Pro.png" alt="Logo" class="admin-logo-acceso" >
                 <h1 class="h3 fw-bold mt-3">Administración General</h1>
                 <p class="texto-suave">VetClinic Pro</p>
             </div>
             <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
             <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                 <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
                 <div class="mb-4"><label class="form-label">Contraseña</label><input type="password" name="password" class="form-control" required></div><button class="btn-admin w-100 justify-content-center">Ingresar</button>
             </form>
@@ -60,5 +65,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </body>
-
 </html>

@@ -26,7 +26,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--fondo);color:va
 .form-control,.form-select{min-height:46px;border-radius:10px;border-color:#d9dce7}
 @media(max-width:991px){.admin-sidebar{min-height:auto;position:static}.admin-main{padding:18px}}
 
-
 /* ================================================================
    SUPERADMIN — SUSCRIPCIONES
 ================================================================ */
@@ -552,3 +551,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--fondo);color:va
     font-size: .64rem;
     line-height: 1.5;
 }
+
+/* Estilos de componentes trasladados desde las vistas. */
+.admin-subtitulo-rol { font-weight:500;opacity:.7; }
+.admin-nombre-usuario { opacity:.75; }
+.admin-logo-acceso { width:70px; }
+.admin-plan-ancho { max-width:650px; }

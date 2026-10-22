@@ -5,15 +5,23 @@
 // ============================================================
 session_start();
 
-if (empty($_SESSION['logueado'])) {
+if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'propietario') {
     header('Location: ../index.php');
     exit;
 }
 
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    header('Allow: POST');
+    exit('Método no permitido.');
+}
+exigirCsrf();
 
 $idPropietario = (int)$_SESSION['usuario_id'];
-$idTurno = (int)($_GET['id'] ?? 0);
+$idTurno = (int)($_POST['id'] ?? 0);
 
 if ($idTurno === 0) {
     header('Location: inicio_turnos.php');
@@ -48,18 +56,24 @@ if ($estado === 'realizado' || $estado === 'cancelado') {
     exit;
 }
 
-// ── Eliminar usando id_turno + id_propietario ─────────────
+// ── Cancelar conservando el registro y su historial ─────────────
 $stmt = $conn->prepare("
-    DELETE FROM turnos
+    UPDATE turnos
+    SET estado = 'cancelado'
     WHERE id_turno = ? AND id_propietario = ?
+      AND estado IN ('pendiente', 'confirmado')
 ");
 $stmt->bind_param('ii', $idTurno, $idPropietario);
-$stmt->execute();
-$eliminado = $stmt->affected_rows > 0;
+try {
+    $stmt->execute();
+    $eliminado = $stmt->affected_rows > 0;
+} catch (mysqli_sql_exception $e) {
+    $eliminado = false;
+}
 $stmt->close();
 
 if ($eliminado) {
-    $_SESSION['mensaje'] = 'El turno fue cancelado/eliminado correctamente.';
+    $_SESSION['mensaje'] = 'El turno fue cancelado correctamente.';
     $_SESSION['tipo_mensaje'] = 'exito';
 } else {
     $_SESSION['mensaje'] = 'No se pudo cancelar el turno.';

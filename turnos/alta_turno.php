@@ -1,4 +1,3 @@
-```php
 <?php
 // ============================================================
 // VetClinic Pro — Alta Turno
@@ -13,12 +12,16 @@ if (empty($_SESSION['logueado']) || $_SESSION['tipo_usuario'] !== 'propietario')
 }
 
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
 require_once '../config/suscripciones.php';
 actualizarTodasSuscripciones($conn);
 
 $idPropietario = (int)$_SESSION['usuario_id'];
 $errores = [];
-
 
 // ============================================================
 // MASCOTAS DEL PROPIETARIO
@@ -38,7 +41,6 @@ $stmt->execute();
 $mascotas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $stmt->close();
-
 
 // ============================================================
 // VETERINARIOS ACTIVOS
@@ -61,7 +63,6 @@ $resultadoVeterinarios = $conn->query("
 $veterinarios = $resultadoVeterinarios
     ? $resultadoVeterinarios->fetch_all(MYSQLI_ASSOC)
     : [];
-
 
 // ============================================================
 // HORARIOS CONFIGURADOS POR LOS VETERINARIOS
@@ -104,7 +105,6 @@ while ($fila = $resultadoHorarios->fetch_assoc()) {
 }
 
 $stmt->close();
-
 
 // ============================================================
 // TURNOS YA OCUPADOS
@@ -157,7 +157,6 @@ while ($fila = $resultadoTurnos->fetch_assoc()) {
 
 $stmt->close();
 
-
 // ============================================================
 // PROCESAR FORMULARIO
 // ============================================================
@@ -178,7 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $motivo        = trim($_POST['motivo'] ?? '');
     $observaciones = trim($_POST['observaciones'] ?? '');
-
 
     // ========================================================
     // VALIDAR MASCOTA Y PERTENENCIA
@@ -217,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'La mascota seleccionada no pertenece al propietario logueado.';
         }
     }
-
 
     // ========================================================
     // VALIDAR VETERINARIO ACTIVO
@@ -258,7 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'El veterinario seleccionado no está disponible.';
         }
     }
-
 
     // ========================================================
     // VALIDAR FECHA Y HORA
@@ -304,7 +300,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
     // ========================================================
     // VALIDAR MOTIVO
     // ========================================================
@@ -320,7 +315,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'El motivo no puede superar los 200 caracteres.';
     }
 
-
     // ========================================================
     // VALIDAR OBSERVACIONES
     // ========================================================
@@ -330,7 +324,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] =
             'Las observaciones son demasiado extensas.';
     }
-
 
     // ========================================================
     // VALIDAR HORARIO DEL VETERINARIO
@@ -384,7 +377,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'El veterinario no atiende en el día y horario seleccionados.';
         }
 
-
         // ====================================================
         // VALIDAR INTERVALOS DE 30 MINUTOS
         // ====================================================
@@ -397,7 +389,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errores[] =
                 'Los turnos deben comenzar en intervalos de 30 minutos.';
         }
-
 
         // ====================================================
         // VALIDAR QUE EL TURNO NO ESTÉ OCUPADO
@@ -427,7 +418,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
 
     // ========================================================
     // ÚLTIMA VERIFICACIÓN DIRECTAMENTE EN LA BASE
@@ -467,7 +457,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'Ese horario acaba de ser ocupado. Seleccioná otro.';
         }
     }
-
 
     // ========================================================
     // GUARDAR TURNO
@@ -535,103 +524,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8" />
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     />
-
     <title>Solicitar Turno · VetClinic Pro</title>
-
     <link
         rel="icon"
         type="image/png"
         href="../img/VetClinic Pro.png"
     >
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin
     />
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     />
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     />
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet"
     />
-
     <link
         rel="stylesheet"
         href="../estilos/inicio.css"
     />
-
     <link
         rel="stylesheet"
         href="../estilos/abm.css"
     />
-
 </head>
-
-
 <body>
-
     <div class="container-fluid p-0">
-
         <div class="row g-0 min-vh-100">
-
-
             <!-- ==================================================
                  PANEL LATERAL
             =================================================== -->
-
             <div class="col-12 col-lg-2 panel-lateral">
-
                 <a
                     href="../propietarios/inicio_propietarios.php"
                     class="logo-lateral"
                 >
-
                     <img
                         src="../img/VetClinic Pro.png"
                         alt="Logo VetClinic Pro"
                     />
-
                     <div>
-
                         <div class="nombre-sistema">
                             VetClinic Pro
                         </div>
-
                         <div class="subtitulo-sistema">
                             Portal del propietario
                         </div>
-
                     </div>
-
                 </a>
-
-
                 <div class="seccion-nav">
                     Mi espacio
                 </div>
-
-
                 <a
                     href="../propietarios/inicio_propietarios.php"
                     class="item-menu"
@@ -639,8 +597,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="bi bi-grid"></i>
                     Inicio
                 </a>
-
-
                 <a
                     href="../mascotas/inicio_mascota.php"
                     class="item-menu"
@@ -648,8 +604,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="bi bi-heart-pulse"></i>
                     Mis mascotas
                 </a>
-
-
                 <a
                     href="inicio_turnos.php"
                     class="item-menu activo"
@@ -657,46 +611,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="bi bi-calendar-check"></i>
                     Mis turnos
                 </a>
-
-
                 <a
-                    href="#"
+                    href="../propietarios/historial_clinico.php"
                     class="item-menu"
                 >
                     <i class="bi bi-journal-medical"></i>
                     Historial clínico
                 </a>
-
-
                 <div class="seccion-nav">
                     Más
                 </div>
-
-
                 <a
-                    href="#"
+                    href="../propietarios/vacunaciones.php"
                     class="item-menu"
                 >
                     <i class="bi bi-shield-plus"></i>
                     Vacunaciones
                 </a>
-
-
-                <a
-                    href="#"
-                    class="item-menu"
-                >
-                    <i class="bi bi-chat-dots"></i>
-                    Mensajes
-                </a>
-
-
+                <a href="../propietarios/mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
+                    Mensajes</a>
                 <!-- USUARIO -->
-
+                <div class="seccion-nav">Configuración</div>
+                <a href="../propietarios/configuracion_propietario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
                 <div class="usuario-lateral">
-
                     <div class="avatar-usuario">
-
                         <?= htmlspecialchars(
                             strtoupper(
                                 mb_substr(
@@ -706,13 +646,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 )
                             )
                         ) ?>
-
                     </div>
-
                     <div>
-
                         <div class="nombre-usuario">
-
                             <?= htmlspecialchars(
                                 $_SESSION['usuario_nombre']
                                 . ' '
@@ -721,184 +657,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     ?? ''
                                 )
                             ) ?>
-
                         </div>
-
                         <div class="rol-usuario">
                             Propietario
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
             <!-- ==================================================
                  ÁREA PRINCIPAL
             =================================================== -->
-
             <div class="col-12 col-lg-10 area-principal">
-
-
                 <!-- BARRA SUPERIOR -->
-
                 <div class="barra-superior">
-
                     <div>
-
                         <p class="titulo-pagina">
                             Solicitar turno
                         </p>
-
                         <p class="fecha-hoy">
                             Completá los datos de la consulta
                         </p>
-
                     </div>
-
-
                     <a
                         href="inicio_turnos.php"
                         class="btn-accion btn-volver"
                     >
-
                         <i class="bi bi-arrow-left"></i>
-
                         Volver
-
                     </a>
-
                 </div>
-
-
                 <!-- ==================================================
                      ERRORES PHP
                 =================================================== -->
-
                 <?php if (!empty($errores)): ?>
-
                     <div
                         class="alerta-operacion alerta-error"
                         role="alert"
                     >
-
                         <i class="bi bi-exclamation-circle-fill"></i>
-
                         <div>
-
                             <?php foreach ($errores as $e): ?>
-
                                 <div>
                                     <?= htmlspecialchars($e) ?>
                                 </div>
-
                             <?php endforeach; ?>
-
                         </div>
-
                     </div>
-
                 <?php endif; ?>
-
-
                 <!-- ==================================================
                      SIN MASCOTAS
                 =================================================== -->
-
                 <?php if (empty($mascotas)): ?>
-
                     <div class="tarjeta estado-vacio">
-
                         <div class="emoji-vacio">
                             🐾
                         </div>
-
                         <h4>
                             Primero necesitás registrar una mascota
                         </h4>
-
                         <p>
                             Para solicitar un turno tenés que tener
                             al menos una mascota asociada a tu cuenta.
                         </p>
-
                         <a
                             href="../mascotas/alta_mascota.php"
                             class="btn-abm-principal"
                         >
-
                             <i class="bi bi-plus-lg"></i>
-
                             Agregar mascota
-
                         </a>
-
                     </div>
-
-
                 <?php else: ?>
-
-
                     <!-- ==================================================
                          FORMULARIO
                     =================================================== -->
-
                     <div class="tarjeta-formulario">
-
                         <form
                             action="alta_turno.php"
                             method="POST"
                             id="formAltaTurno"
                             novalidate
                         >
-
-
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="row g-3">
-
-
                                 <!-- MASCOTA -->
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         class="form-label"
                                         for="id_mascota"
                                     >
-
                                         Mascota
-
                                         <span class="campo-requerido">
                                             *
                                         </span>
-
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-heart-pulse"></i>
-
                                         </span>
-
-
                                         <select
                                             class="form-control"
                                             id="id_mascota"
                                             name="id_mascota"
                                             required
                                         >
-
                                             <option value="">
                                                 Seleccioná una mascota...
                                             </option>
-
-
                                             <?php foreach ($mascotas as $m): ?>
-
                                                 <option
                                                     value="<?= (int)$m['id_mascota'] ?>"
                                                     <?= (
@@ -909,69 +775,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         : ''
                                                     ?>
                                                 >
-
                                                     <?= htmlspecialchars(
                                                         $m['nombre']
                                                     ) ?>
-
                                                 </option>
-
                                             <?php endforeach; ?>
-
                                         </select>
-
                                     </div>
-
-
                                     <div
                                         class="error-campo"
                                         id="errorMascota"
                                     ></div>
-
                                 </div>
-
-
                                 <!-- VETERINARIO -->
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         class="form-label"
                                         for="id_veterinario"
                                     >
-
                                         Veterinario
-
                                         <span class="campo-requerido">
                                             *
                                         </span>
-
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-person-badge"></i>
-
                                         </span>
-
-
                                         <select
                                             class="form-control"
                                             id="id_veterinario"
                                             name="id_veterinario"
                                             required
                                         >
-
                                             <option value="">
                                                 Seleccioná un veterinario...
                                             </option>
-
-
                                             <?php foreach ($veterinarios as $v): ?>
-
                                                 <option
                                                     value="<?= (int)$v['id_veterinario'] ?>"
                                                     <?= (
@@ -982,9 +822,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         : ''
                                                     ?>
                                                 >
-
                                                     Dr./Dra.
-
                                                     <?= htmlspecialchars(
                                                         trim(
                                                             $v['nombre']
@@ -992,62 +830,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             . $v['apellido']
                                                         )
                                                     ) ?>
-
-
                                                     <?php if ($v['especialidad']): ?>
-
                                                         ·
-
                                                         <?= htmlspecialchars(
                                                             $v['especialidad']
                                                         ) ?>
-
                                                     <?php endif; ?>
-
                                                 </option>
-
                                             <?php endforeach; ?>
-
                                         </select>
-
                                     </div>
-
-
                                     <div
                                         class="error-campo"
                                         id="errorVeterinario"
                                     ></div>
-
                                 </div>
-
-
                                 <!-- FECHA -->
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         class="form-label"
                                         for="fecha_turno"
                                     >
-
                                         Fecha
-
                                         <span class="campo-requerido">
                                             *
                                         </span>
-
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-calendar3"></i>
-
                                         </span>
-
-
                                         <input
                                             type="date"
                                             class="form-control"
@@ -1059,45 +871,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             ) ?>"
                                             required
                                         />
-
                                     </div>
-
-
                                     <div
                                         class="error-campo"
                                         id="errorFecha"
                                     ></div>
-
                                 </div>
-
-
                                 <!-- HORARIO -->
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         class="form-label"
                                         for="hora_turno"
                                     >
-
                                         Horario disponible
-
                                         <span class="campo-requerido">
                                             *
                                         </span>
-
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-clock"></i>
-
                                         </span>
-
-
                                         <select
                                             class="form-control"
                                             id="hora_turno"
@@ -1105,16 +899,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             required
                                             disabled
                                         >
-
                                             <option value="">
                                                 Primero seleccioná veterinario y fecha...
                                             </option>
-
                                         </select>
-
                                     </div>
-
-
                                     <div
                                         class="form-text"
                                         id="ayudaHorario"
@@ -1122,43 +911,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         Los turnos tienen una duración de
                                         30 minutos.
                                     </div>
-
-
                                     <div
                                         class="error-campo"
                                         id="errorHora"
                                     ></div>
-
                                 </div>
-
-
                                 <!-- MOTIVO -->
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         class="form-label"
                                         for="motivo"
                                     >
-
                                         Motivo
-
                                         <span class="campo-requerido">
                                             *
                                         </span>
-
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-chat-left-text"></i>
-
                                         </span>
-
-
                                         <input
                                             type="text"
                                             class="form-control"
@@ -1171,44 +943,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             ) ?>"
                                             required
                                         />
-
                                     </div>
-
-
                                     <div class="form-text">
                                         Máximo 200 caracteres.
                                     </div>
-
-
                                     <div
                                         class="error-campo"
                                         id="errorMotivo"
                                     ></div>
-
                                 </div>
-
-
                                 <!-- OBSERVACIONES -->
-
                                 <div class="col-12">
-
                                     <label
                                         class="form-label"
                                         for="observaciones"
                                     >
                                         Observaciones
                                     </label>
-
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
-
                                             <i class="bi bi-card-text"></i>
-
                                         </span>
-
-
                                         <textarea
                                             class="form-control"
                                             id="observaciones"
@@ -1217,87 +972,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             placeholder="Información adicional para la consulta..."
                                         ><?= htmlspecialchars(
                                             $_POST['observaciones'] ?? ''
-                                        ) ?></textarea>
-
-                                    </div>
-
+                                        ) ?></textarea>                                    </div>
                                 </div>
-
                             </div>
-
-
                             <!-- ==================================================
                                  INFORMACIÓN
                             =================================================== -->
-
                             <div class="nota-info mt-4">
-
                                 <i class="bi bi-info-circle-fill"></i>
-
                                 <p>
                                     Tu turno quedará
                                     <strong>confirmado</strong>
                                     automáticamente porque el horario fue
                                     previamente habilitado por el veterinario.
                                 </p>
-
                             </div>
-
-
                             <!-- ==================================================
                                  BOTONES
                             =================================================== -->
-
                             <div
                                 class="d-flex gap-3 mt-4 pt-3 acciones-formulario"
                             >
-
                                 <button
                                     type="submit"
                                     class="btn-abm-principal"
                                 >
-
                                     <i class="bi bi-calendar-plus"></i>
-
                                     Confirmar turno
-
                                 </button>
-
-
                                 <a
                                     href="inicio_turnos.php"
                                     class="btn-accion btn-volver"
                                 >
                                     Cancelar
                                 </a>
-
                             </div>
-
-
                         </form>
-
                     </div>
-
                 <?php endif; ?>
-
             </div>
-
         </div>
-
     </div>
-
-
     <!-- ============================================================
          BOOTSTRAP
     ============================================================= -->
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
-    <!-- ============================================================
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    <!-- ============================================================
          JAVASCRIPT DEL FORMULARIO
     ============================================================= -->
-
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -1307,7 +1028,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!form) {
                 return;
             }
-
 
             // ========================================================
             // DATOS GENERADOS POR PHP
@@ -1320,14 +1040,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     JSON_UNESCAPED_SLASHES
                 ) ?>;
 
-
             const turnosOcupados =
                 <?= json_encode(
                     $turnosOcupados,
                     JSON_UNESCAPED_UNICODE |
                     JSON_UNESCAPED_SLASHES
                 ) ?>;
-
 
             // ========================================================
             // ELEMENTOS DEL FORMULARIO
@@ -1348,7 +1066,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const motivo =
                 document.getElementById('motivo');
 
-
             // ========================================================
             // MOSTRAR ERROR
             // ========================================================
@@ -1368,7 +1085,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     mensaje ? 'block' : 'none';
             }
 
-
             // ========================================================
             // CONVERTIR HORA A MINUTOS
             // ========================================================
@@ -1384,7 +1100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     parseInt(partes[1], 10)
                 );
             }
-
 
             // ========================================================
             // CONVERTIR MINUTOS A HORA
@@ -1406,7 +1121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     String(minutosRestantes).padStart(2, '0')
                 );
             }
-
 
             // ========================================================
             // OBTENER DÍA DE LA SEMANA
@@ -1438,7 +1152,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return diaJS;
             }
 
-
             // ========================================================
             // CARGAR HORARIOS DISPONIBLES
             // ========================================================
@@ -1448,7 +1161,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 hora.innerHTML = '';
 
                 hora.disabled = true;
-
 
                 if (
                     !veterinario.value ||
@@ -1468,7 +1180,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return;
                 }
 
-
                 const idVet =
                     veterinario.value;
 
@@ -1479,7 +1190,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     obtenerDiaSemana(
                         fechaSeleccionada
                     );
-
 
                 // ====================================================
                 // VERIFICAR SI EXISTE HORARIO
@@ -1503,7 +1213,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return;
                 }
 
-
                 // ====================================================
                 // OBTENER HORARIOS OCUPADOS
                 // ====================================================
@@ -1521,13 +1230,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ][fechaSeleccionada];
                 }
 
-
                 // ====================================================
                 // GENERAR TURNOS DE 30 MINUTOS
                 // ====================================================
 
                 let cantidadHorarios = 0;
-
 
                 horariosVeterinarios[
                     idVet
@@ -1543,7 +1250,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             horario.hasta
                         );
 
-
                     for (
                         let minutos = desde;
                         minutos < hasta;
@@ -1552,7 +1258,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         const horaDisponible =
                             minutosAHora(minutos);
-
 
                         // ==========================================
                         // SI YA ESTÁ OCUPADO, NO SE MUESTRA
@@ -1566,7 +1271,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             continue;
                         }
 
-
                         const opcion =
                             document.createElement('option');
 
@@ -1575,7 +1279,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         opcion.textContent =
                             horaDisponible;
-
 
                         // Si hubo un error PHP y se vuelve a
                         // cargar el formulario, conservar la hora.
@@ -1592,14 +1295,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <?php endif; ?>
 
-
                         hora.appendChild(opcion);
 
                         cantidadHorarios++;
                     }
 
                 });
-
 
                 // ====================================================
                 // RESULTADO
@@ -1624,7 +1325,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return;
                 }
 
-
                 // Agregar opción inicial
 
                 const opcionInicial =
@@ -1640,7 +1340,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     hora.firstChild
                 );
 
-
                 // Si no había hora seleccionada,
                 // mostrar la opción inicial.
 
@@ -1648,16 +1347,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     opcionInicial.selected = true;
                 }
 
-
                 hora.disabled = false;
-
 
                 mostrarError(
                     'errorHora',
                     ''
                 );
             }
-
 
             // ========================================================
             // CAMBIAR VETERINARIO
@@ -1681,7 +1377,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     hora.appendChild(opcion);
 
-
                     mostrarError(
                         'errorVeterinario',
                         ''
@@ -1692,14 +1387,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ''
                     );
 
-
                     if (fecha.value) {
                         cargarHorarios();
                     }
 
                 }
             );
-
 
             // ========================================================
             // CAMBIAR FECHA
@@ -1713,7 +1406,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     hora.disabled = true;
 
-
                     mostrarError(
                         'errorFecha',
                         ''
@@ -1724,7 +1416,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ''
                     );
 
-
                     if (fecha.value) {
 
                         cargarHorarios();
@@ -1732,7 +1423,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 }
             );
-
 
             // ========================================================
             // VALIDACIÓN AL ENVIAR
@@ -1743,7 +1433,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 function (e) {
 
                     let valido = true;
-
 
                     mostrarError(
                         'errorMascota',
@@ -1770,7 +1459,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ''
                     );
 
-
                     // ==============================================
                     // MASCOTA
                     // ==============================================
@@ -1785,7 +1473,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         valido = false;
                     }
 
-
                     // ==============================================
                     // VETERINARIO
                     // ==============================================
@@ -1799,7 +1486,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         valido = false;
                     }
-
 
                     // ==============================================
                     // FECHA
@@ -1831,7 +1517,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             0
                         );
 
-
                         if (
                             fechaSeleccionada < hoy
                         ) {
@@ -1844,7 +1529,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             valido = false;
                         }
                     }
-
 
                     // ==============================================
                     // HORA
@@ -1862,7 +1546,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         valido = false;
                     }
-
 
                     // ==============================================
                     // MOTIVO
@@ -1891,7 +1574,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         valido = false;
                     }
 
-
                     // ==============================================
                     // DETENER ENVÍO SI HAY ERRORES
                     // ==============================================
@@ -1903,7 +1585,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 }
             );
-
 
             // ========================================================
             // CARGAR HORARIOS SI YA HABÍA DATOS
@@ -1919,9 +1600,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         });
 
-    </script>
-
+    </script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>
-```

@@ -34,7 +34,7 @@ function enviarCorreoRecuperacion(
         $password === '' ||
         str_contains($password, 'TU_CONTRASENA')
     ) {
-        $error = 'Falta completar el correo y la contraseña de aplicación en config/mail_config.php.';
+        $error = 'Configurá VETCLINIC_SMTP_USUARIO y VETCLINIC_SMTP_PASSWORD en el servidor.';
         return false;
     }
 

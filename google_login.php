@@ -90,6 +90,7 @@ function cargarSesionUsuario(
     array $usuario,
     string $tipoUsuario
 ): void {
+    session_regenerate_id(true);
     $_SESSION['logueado'] = true;
     $_SESSION['tipo_usuario'] = $tipoUsuario;
 
@@ -304,6 +305,11 @@ $veterinario = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if ($veterinario) {
+
+    if ((int) ($veterinario['activo'] ?? 0) !== 1) {
+        header('Location: index.php?error=cuenta_inactiva');
+        exit;
+    }
 
     cargarSesionUsuario(
         $veterinario,

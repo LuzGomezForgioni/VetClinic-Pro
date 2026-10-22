@@ -1,6 +1,12 @@
 <?php
-
 session_start();
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
+
+
+
 
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
@@ -309,361 +315,234 @@ $fecha_actual =
     date('Y');
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-
     <title>
         Mi configuración · VetClinic Pro
     </title>
-
     <link
         rel="icon"
         type="image/png"
         href="../img/VetClinic Pro.png">
-
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com">
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet">
-
     <link
         rel="stylesheet"
         href="../estilos/inicio.css">
-
     <link
         rel="stylesheet"
         href="../estilos/configuracion_propietario.css">
-
 </head>
-
 <body>
-
 <div class="container-fluid p-0">
-
     <div class="row g-0 min-vh-100">
-
         <!-- ================================================== -->
         <!-- BARRA LATERAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a
                 href="inicio_propietarios.php"
                 class="logo-lateral">
-
                 <img
                     src="../img/VetClinic Pro.png"
                     alt="Logo VetClinic Pro">
-
                 <div>
-
                     <div class="nombre-sistema">
                         VetClinic Pro
                     </div>
-
                     <div class="subtitulo-sistema">
                         Portal del propietario
                     </div>
-
                 </div>
-
             </a>
-
             <div class="seccion-nav">
                 Mi espacio
             </div>
-
             <a
                 href="inicio_propietarios.php"
                 class="item-menu">
-
                 <i class="bi bi-grid"></i>
                 Inicio
-
             </a>
-
             <a
                 href="../mascotas/inicio_mascota.php"
                 class="item-menu">
-
                 <i class="bi bi-heart-pulse"></i>
                 Mis mascotas
-
             </a>
-
             <a
                 href="../turnos/inicio_turnos.php"
                 class="item-menu">
-
                 <i class="bi bi-calendar-check"></i>
                 Mis turnos
-
             </a>
-
             <a
                 href="historial_clinico.php"
                 class="item-menu">
-
                 <i class="bi bi-journal-medical"></i>
                 Historial clínico
-
             </a>
-
             <div class="seccion-nav">
                 Más
             </div>
-
             <a
                 href="vacunaciones.php"
                 class="item-menu">
-
                 <i class="bi bi-shield-plus"></i>
                 Vacunaciones
-
             </a>
-
-            <a
-                href="#"
-                class="item-menu"
-                title="Disponible más adelante">
-
-                <i class="bi bi-chat-dots"></i>
-                Mensajes
-
-            </a>
-
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
+                Mensajes</a>
             <div class="seccion-nav">
                 Configuración
             </div>
-
             <a
                 href="configuracion_propietario.php"
                 class="item-menu activo">
-
                 <i class="bi bi-gear"></i>
                 Mi configuración
-
             </a>
-
             <div class="usuario-lateral">
-
                 <div class="avatar-usuario">
                     <?= strtoupper(substr($nombre, 0, 1)) ?>
                 </div>
-
                 <div>
-
                     <div class="nombre-usuario">
-
                         <?= htmlspecialchars(
                             $nombre . ' ' . $apellido
                         ) ?>
-
                     </div>
-
                     <div class="rol-usuario">
                         Propietario
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
         <!-- ================================================== -->
         <!-- ÁREA PRINCIPAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-10 area-principal">
-
             <div class="barra-superior">
-
                 <div>
-
                     <p class="titulo-pagina">
                         Mi configuración
                     </p>
-
                     <p class="fecha-hoy">
                         <?= htmlspecialchars($fecha_actual) ?> · VetClinic Pro
                     </p>
-
                 </div>
-
                 <div class="d-flex gap-2">
-
                     <a
                         href="configuracion_propietario.php"
                         class="icono-barra"
                         title="Mi configuración">
-
                         <i class="bi bi-gear"></i>
-
                     </a>
-
                     <a
                         href="../logout.php"
                         class="icono-barra"
                         title="Cerrar sesión">
-
                         <i class="bi bi-box-arrow-right"></i>
-
                     </a>
-
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- ENCABEZADO -->
             <!-- ================================================== -->
-
             <div class="encabezado-config-propietario mb-4">
-
                 <div>
-
                     <h1>
                         Administrá tu cuenta
                     </h1>
-
                     <p>
                         Podés actualizar tus datos personales, correo y contraseña cuando lo necesites.
                     </p>
-
                 </div>
-
                 <div class="avatar-config-propietario">
                     <?= strtoupper(substr($nombre, 0, 1)) ?>
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- MENSAJES -->
             <!-- ================================================== -->
-
             <?php if ($mensaje !== ''): ?>
-
                 <div class="alerta-config alerta-config-exito mb-4">
-
                     <i class="bi bi-check-circle"></i>
-
                     <span>
                         <?= htmlspecialchars($mensaje) ?>
                     </span>
-
                 </div>
-
             <?php endif; ?>
-
             <?php if (!empty($errores)): ?>
-
                 <div class="alerta-config alerta-config-error mb-4">
-
                     <i class="bi bi-exclamation-triangle"></i>
-
                     <div>
-
                         <strong>
                             Revisá los siguientes datos:
                         </strong>
-
                         <ul class="mb-0 mt-1">
-
                             <?php foreach ($errores as $error): ?>
-
                                 <li>
                                     <?= htmlspecialchars($error) ?>
                                 </li>
-
                             <?php endforeach; ?>
-
                         </ul>
-
                     </div>
-
                 </div>
-
             <?php endif; ?>
-
             <div class="row g-4">
-
                 <!-- ================================================== -->
                 <!-- DATOS PERSONALES -->
                 <!-- ================================================== -->
-
                 <div class="col-12 col-xl-7">
-
                     <section class="tarjeta tarjeta-config-propietario h-100">
-
                         <div class="cabecera-tarjeta-config">
-
                             <div class="icono-seccion-config">
                                 <i class="bi bi-person"></i>
                             </div>
-
                             <div>
-
                                 <h2>
                                     Datos personales
                                 </h2>
-
                                 <p>
                                     Estos datos se utilizan en tu cuenta y en la información de tus mascotas y turnos.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <form
                             method="POST"
                             action="configuracion_propietario.php">
-
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="guardar_datos">
-
                             <div class="row g-3">
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         for="nombre"
                                         class="form-label">
-
                                         Nombre
-
                                     </label>
-
                                     <input
                                         type="text"
                                         class="form-control"
@@ -672,19 +551,13 @@ $fecha_actual =
                                         maxlength="80"
                                         value="<?= htmlspecialchars($form_nombre) ?>"
                                         required>
-
                                 </div>
-
                                 <div class="col-12 col-md-6">
-
                                     <label
                                         for="apellido"
                                         class="form-label">
-
                                         Apellido
-
                                     </label>
-
                                     <input
                                         type="text"
                                         class="form-control"
@@ -693,25 +566,17 @@ $fecha_actual =
                                         maxlength="80"
                                         value="<?= htmlspecialchars($form_apellido) ?>"
                                         required>
-
                                 </div>
-
                                 <div class="col-12">
-
                                     <label
                                         for="email"
                                         class="form-label">
-
                                         Correo electrónico
-
                                     </label>
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
                                             <i class="bi bi-envelope"></i>
                                         </span>
-
                                         <input
                                             type="email"
                                             class="form-control"
@@ -720,31 +585,21 @@ $fecha_actual =
                                             maxlength="120"
                                             value="<?= htmlspecialchars($form_email) ?>"
                                             required>
-
                                     </div>
-
                                     <div class="ayuda-config">
                                         Si cambiás el correo, la próxima vez deberás iniciar sesión con el nuevo.
                                     </div>
-
                                 </div>
-
                                 <div class="col-12 col-md-7">
-
                                     <label
                                         for="telefono"
                                         class="form-label">
-
                                         Teléfono
-
                                     </label>
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">
                                             <i class="bi bi-telephone"></i>
                                         </span>
-
                                         <input
                                             type="text"
                                             class="form-control"
@@ -753,96 +608,64 @@ $fecha_actual =
                                             maxlength="20"
                                             value="<?= htmlspecialchars($form_telefono) ?>"
                                             placeholder="Ingresá tu teléfono">
-
                                     </div>
-
                                 </div>
-
                                 <div class="col-12 col-md-5">
-
                                     <label class="form-label">
                                         Miembro desde
                                     </label>
-
                                     <div class="dato-solo-lectura-config">
-
                                         <i class="bi bi-calendar3"></i>
-
                                         <?= date(
                                             'd/m/Y',
                                             strtotime(
                                                 $datos_actuales['fecha_registro']
                                             )
                                         ) ?>
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                             <button
                                 type="submit"
                                 class="btn-guardar-config-propietario">
-
                                 <i class="bi bi-check-circle"></i>
                                 Guardar cambios
-
                             </button>
-
                         </form>
-
                     </section>
-
                 </div>
-
                 <!-- ================================================== -->
                 <!-- SEGURIDAD -->
                 <!-- ================================================== -->
-
                 <div class="col-12 col-xl-5">
-
                     <section class="tarjeta tarjeta-config-propietario mb-4">
-
                         <div class="cabecera-tarjeta-config">
-
                             <div class="icono-seccion-config">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
-
                             <div>
-
                                 <h2>
                                     Seguridad
                                 </h2>
-
                                 <p>
                                     Cambiá tu contraseña cuando lo necesites.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <form
                             method="POST"
                             action="configuracion_propietario.php">
-
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="cambiar_password">
-
                             <div class="mb-3">
-
                                 <label
                                     for="password_actual"
                                     class="form-label">
-
                                     Contraseña actual
-
                                 </label>
-
                                 <input
                                     type="password"
                                     class="form-control"
@@ -850,19 +673,13 @@ $fecha_actual =
                                     name="password_actual"
                                     autocomplete="current-password"
                                     required>
-
                             </div>
-
                             <div class="mb-3">
-
                                 <label
                                     for="password_nueva"
                                     class="form-label">
-
                                     Nueva contraseña
-
                                 </label>
-
                                 <input
                                     type="password"
                                     class="form-control"
@@ -871,19 +688,13 @@ $fecha_actual =
                                     maxlength="30"
                                     autocomplete="new-password"
                                     required>
-
                             </div>
-
                             <div class="mb-3">
-
                                 <label
                                     for="password_repetida"
                                     class="form-label">
-
                                     Repetir nueva contraseña
-
                                 </label>
-
                                 <input
                                     type="password"
                                     class="form-control"
@@ -892,92 +703,59 @@ $fecha_actual =
                                     maxlength="30"
                                     autocomplete="new-password"
                                     required>
-
                             </div>
-
                             <button
                                 type="submit"
                                 class="btn-seguridad-config">
-
                                 <i class="bi bi-key"></i>
                                 Cambiar contraseña
-
                             </button>
-
                         </form>
-
                     </section>
-
                     <!-- ================================================== -->
                     <!-- MIS MASCOTAS -->
                     <!-- ================================================== -->
-
                     <section class="tarjeta tarjeta-config-propietario">
-
                         <div class="cabecera-tarjeta-config mb-3">
-
                             <div class="icono-seccion-config">
                                 <i class="bi bi-heart-pulse"></i>
                             </div>
-
                             <div>
-
                                 <h2>
                                     Mis mascotas
                                 </h2>
-
                                 <p>
                                     Accedé a las mascotas asociadas a tu cuenta.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <div class="resumen-mascotas-config">
-
                             <div>
-
                                 <strong>
                                     <?= $cantidad_mascotas ?>
                                 </strong>
-
                                 <span>
                                     <?= $cantidad_mascotas === 1
                                         ? 'mascota registrada'
                                         : 'mascotas registradas'
                                     ?>
                                 </span>
-
                             </div>
-
                             <a
                                 href="../mascotas/inicio_mascota.php"
                                 class="btn-mascotas-config">
-
                                 Gestionar mis mascotas
                                 <i class="bi bi-arrow-right"></i>
-
                             </a>
-
                         </div>
-
                     </section>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
+</script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>

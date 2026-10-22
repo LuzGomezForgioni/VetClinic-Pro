@@ -1,6 +1,12 @@
 <?php
-
 session_start();
+require_once 'config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
+
+
+
 
 include("config/conexion.php");
 require_once "config/suscripciones.php";
@@ -148,6 +154,7 @@ function cargarSesionUsuario(
     array $usuario,
     string $tipoUsuario
 ): void {
+    session_regenerate_id(true);
     $_SESSION["logueado"] = true;
     $_SESSION["tipo_usuario"] = $tipoUsuario;
 
@@ -436,6 +443,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($veterinario) {
 
+    if ((int) ($veterinario['activo'] ?? 0) !== 1) {
+        header('Location: index.php?error=cuenta_inactiva');
+        exit;
+    }
+
         $passwordGuardada =
             (string) $veterinario["password"];
 
@@ -507,27 +519,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión · VetClinic Pro</title>
     <link rel="icon" type="image/png" href="img/VetClinic Pro.png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="estilos/index.css" />
 </head>
-
 <body>
     <div class="container-fluid min-vh-100">
         <div class="row min-vh-100">
-
             <!-- PANEL IZQUIERDO -->
             <div class="col-12 col-lg-6 panel-izquierdo d-flex flex-column">
                 <div class="logo">
@@ -537,12 +544,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <span>Sistema de Gestión Veterinaria</span>
                     </div>
                 </div>
-
                 <div class="contenido-principal flex-grow-1 d-flex flex-column justify-content-center">
                     <h1>Una plataforma diseñada para el <span><i>bienestar animal.</i></span></h1>
                     <p>Accedé con tu cuenta para gestionar turnos, historiales clínicos y comunicación desde un solo lugar.</p>
                 </div>
-
                 <div class="card mascota-card mb-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -557,23 +562,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                     </div>
                 </div>
-
                 <div class="beneficios mt-2">
                     <p><i class="bi bi-check-circle-fill me-2"></i>Historial clínico digital completo</p>
                     <p><i class="bi bi-check-circle-fill me-2"></i>Agendá turnos online y recibí recordatorios automáticos</p>
                     <p><i class="bi bi-check-circle-fill me-2"></i>Acceso rápido a información de vacunaciones y tratamientos</p>
                 </div>
             </div>
-
             <!-- PANEL DERECHO -->
             <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-start">
                 <div class="login-container">
                     <span class="portal-acceso">Portal de acceso</span>
                     <h2>Iniciar sesión</h2>
                     <p class="subtitulo">Accedé a tu cuenta para continuar.</p>
-
                     <form action="index.php" method="POST">
-
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                         <div class="login-campo">
                             <label class="form-label" for="email">Correo electrónico</label>
                             <div class="input-group">
@@ -583,7 +585,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <div class="form-text">Nunca compartiremos tu correo electrónico con nadie más.</div>
                         </div>
-
                         <div class="login-campo">
                             <label class="form-label" for="password">Contraseña</label>
                             <div class="input-group">
@@ -601,7 +602,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </span>
                             </div>
                         </div>
-
                         <div class="d-flex justify-content-between align-items-center login-opciones">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="recordarme" name="recordarme" value="1">
@@ -609,23 +609,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <a href="forgot_password.php" class="custom-link">¿Olvidaste tu contraseña?</a>
                         </div>
-
                         <button type="submit" class="btn btn-login">
                             Iniciar sesión
                             <i class="bi bi-arrow-right ms-2"></i>
                         </button>
                     </form>
-
                     <!-- Separador -->
                     <div class="d-flex align-items-center gap-3 login-separador">
                         <hr class="flex-grow-1 m-0">
                         <span class="text-secondary small">o continuar con</span>
                         <hr class="flex-grow-1 m-0">
                     </div>
-
                     <!-- Botón oficial de Google Identity Services -->
                     <div id="google-signin-button" class="d-flex justify-content-center"></div>
-
                     <!-- Aclaración para cuentas profesionales -->
                     <div class="text-center login-aviso-veterinario">
                         <p class="small text-secondary mb-0">
@@ -634,7 +630,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <a class="custom-link" href="suscripciones/plan_profesional.php">Conocé el plan profesional y empezá ahora</a>.
                         </p>
                     </div>
-
                     <div class="registrarse">
                         ¿No tenés cuenta?
                         <a class="custom-link" href="propietarios/alta_propietario.php">Registrarse</a>
@@ -643,11 +638,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </div>
     </div>
-
     <!-- SweetAlert2 para los mensajes de error -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <?php if (isset($_GET["error"])): ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    <?php if (isset($_GET["error"])): ?>
         <?php if ($_GET["error"] == "email"): ?>
             <script>
                 Swal.fire({
@@ -656,9 +648,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     text: 'No existe una cuenta registrada con ese correo.',
                     confirmButtonColor: '#1a1f5e'
                 });
-            </script>
-        <?php endif; ?>
-
+            </script>        <?php endif; ?>
         <?php if ($_GET["error"] == "password"): ?>
             <script>
                 Swal.fire({
@@ -667,9 +657,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     text: 'La contraseña ingresada no es correcta.',
                     confirmButtonColor: '#1a1f5e'
                 });
-            </script>
-        <?php endif; ?>
-
+            </script>        <?php endif; ?>
         <?php if ($_GET["error"] == "google_creacion"): ?>
             <script>
                 Swal.fire({
@@ -678,9 +666,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     text: 'No pudimos completar el registro con Google. Intentá nuevamente.',
                     confirmButtonColor: '#1a1f5e'
                 });
-            </script>
-        <?php endif; ?>
-
+            </script>        <?php endif; ?>
+        <?php if ($_GET["error"] == "cuenta_inactiva"): ?>
+            <script>
+                Swal.fire({ icon: 'warning', title: 'Cuenta inactiva', text: 'Tu cuenta profesional está deshabilitada. Contactá con administración.' });
+            </script>        <?php endif; ?>
         <?php if ($_GET["error"] == "google_invalido"): ?>
             <script>
                 Swal.fire({
@@ -689,11 +679,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     text: 'La autenticación de Google no pudo validarse. Intentá nuevamente.',
                     confirmButtonColor: '#1a1f5e'
                 });
-            </script>
-        <?php endif; ?>
+            </script>        <?php endif; ?>
     <?php endif; ?>
-
-
     <script>
         document.querySelectorAll('[data-password-target]').forEach(function (boton) {
 
@@ -734,12 +721,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             });
         });
-    </script>
-
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-    <script>
+    </script>    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>    <script>
         window.addEventListener('load', function () {
 
             if (!window.google || !google.accounts || !google.accounts.id) {
@@ -790,7 +773,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             document.body.appendChild(formulario);
             formulario.submit();
         }
-    </script>
-
-</body>
+    </script></body>
 </html>

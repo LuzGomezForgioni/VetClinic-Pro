@@ -22,7 +22,6 @@ $seccionActiva = 'plan';
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -33,7 +32,6 @@ $seccionActiva = 'plan';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../estilos/admin.css">
 </head>
-
 <body>
     <div class="container-fluid">
         <div class="row admin-shell">
@@ -45,8 +43,9 @@ $seccionActiva = 'plan';
                         <div class="texto-suave">Precio mensual y período de tolerancia.</div>
                     </div><a target="_blank" class="btn-admin" href="../suscripciones/plan_profesional.php">Ver página pública</a>
                 </div>
-                <div class="card-admin" style="max-width:650px"><?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?><h2 class="h5 fw-bold"><?= htmlspecialchars($plan['nombre'] ?? 'Plan') ?></h2>
+                <div class="card-admin admin-plan-ancho" ><?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?><h2 class="h5 fw-bold"><?= htmlspecialchars($plan['nombre'] ?? 'Plan') ?></h2>
                     <form method="POST" class="row g-3 mt-1">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                         <div class="col-md-7"><label class="form-label">Precio mensual (ARS)</label><input type="number" step="0.01" min="1" class="form-control" name="precio" value="<?= htmlspecialchars((string)($plan['precio_mensual'] ?? 30000)) ?>" required></div>
                         <div class="col-md-5"><label class="form-label">Días de tolerancia</label><input type="number" min="0" max="30" class="form-control" name="dias_tolerancia" value="<?= (int)($plan['dias_tolerancia'] ?? 5) ?>" required></div>
                         <div class="col-12"><button class="btn-admin">Guardar cambios</button></div>
@@ -57,5 +56,4 @@ $seccionActiva = 'plan';
         </div>
     </div>
 </body>
-
 </html>

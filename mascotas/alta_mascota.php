@@ -1,12 +1,18 @@
 <?php
 session_start();
 
-if (empty($_SESSION['logueado'])) {
+if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'propietario') {
     header('Location: ../index.php');
     exit;
 }
 
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
+require_once '../config/mascotas.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
 
 $idPropietario = $_SESSION['usuario_id'];
 $errores = [];
@@ -24,13 +30,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $color           = trim($_POST['color']            ?? '');
     $castrado        = isset($_POST['castrado']) ? 1 : 0;
 
+    if (mb_strlen($nombre) > 80) $errores[] = 'El nombre no puede superar los 80 caracteres.';
+    if (!in_array($sexo, ['Macho', 'Hembra', 'Desconocido'], true)) $errores[] = 'Seleccioná un sexo válido.';
+    if ($pesoKg !== '' && (!is_numeric($pesoKg) || (float)$pesoKg > 999.99)) $errores[] = 'Ingresá un peso válido (máximo 999,99 kg).';
+    if (!colorMascotaValido($color)) $errores[] = 'El color debe contener letras (sin números ni símbolos) y hasta 60 caracteres.';
+    if ($idEspecie > 0) {
+        $stmtValidarEspecie = $conn->prepare('SELECT id_especie FROM especies WHERE id_especie = ? LIMIT 1');
+        $stmtValidarEspecie->bind_param('i', $idEspecie);
+        $stmtValidarEspecie->execute();
+        if (!$stmtValidarEspecie->get_result()->fetch_assoc()) $errores[] = 'La especie seleccionada no existe.';
+        $stmtValidarEspecie->close();
+    }
+    if ($idRaza > 0) {
+        $stmtValidarRaza = $conn->prepare('SELECT id_raza FROM razas WHERE id_raza = ? AND id_especie = ? LIMIT 1');
+        $stmtValidarRaza->bind_param('ii', $idRaza, $idEspecie);
+        $stmtValidarRaza->execute();
+        if (!$stmtValidarRaza->get_result()->fetch_assoc()) $errores[] = 'La raza no corresponde a la especie seleccionada.';
+        $stmtValidarRaza->close();
+    }
     if ($nombre === '')   $errores[] = 'El nombre de la mascota es obligatorio.';
     if ($idEspecie === 0) $errores[] = 'Seleccioná una especie.';
     if ($sexo === '')     $errores[] = 'Seleccioná el sexo.';
     if ($pesoKg !== '' && (!is_numeric($pesoKg) || $pesoKg <= 0)) $errores[] = 'El peso debe ser mayor a cero.';
     if ($fechaNacimiento !== '') {
         $f = DateTime::createFromFormat('Y-m-d', $fechaNacimiento);
-        if (!$f || $f > new DateTime()) $errores[] = 'La fecha no puede ser en el futuro.';
+        $fechaErrores = DateTime::getLastErrors();
+        if (!$f || ($fechaErrores !== false && ($fechaErrores['warning_count'] > 0 || $fechaErrores['error_count'] > 0))) {
+            $errores[] = 'Ingresá una fecha de nacimiento válida.';
+        } elseif ($f > new DateTime()) {
+            $errores[] = 'La fecha no puede ser en el futuro.';
+        }
     }
 
     if (empty($errores)) {
@@ -42,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fechaFinal  = $fechaNacimiento ?: null;
         $pesoFinal   = $pesoKg !== '' ? (float)$pesoKg : null;
         $colorFinal  = $color ?: null;
-        $stmt->bind_param('iiissssis', $idPropietario, $idEspecie, $idRazaFinal, $nombre, $fechaFinal, $sexo, $pesoFinal, $colorFinal, $castrado);
+        $stmt->bind_param('iiisssdsi', $idPropietario, $idEspecie, $idRazaFinal, $nombre, $fechaFinal, $sexo, $pesoFinal, $colorFinal, $castrado);
         $stmt->execute();
         $stmt->close();
 
@@ -55,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -69,11 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../estilos/inicio.css" />
     <link rel="stylesheet" href="../estilos/abm.css" />
 </head>
-
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0 min-vh-100">
-
             <div class="col-12 col-lg-2 panel-lateral">
                 <div class="logo-lateral">
                     <img src="../img/VetClinic Pro.png" alt="Logo" />
@@ -85,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="seccion-nav">Mi espacio</div>
                 <a href="../propietarios/inicio_propietarios.php" class="item-menu"><i class="bi bi-grid"></i> Inicio</a>
                 <a href="inicio_mascota.php" class="item-menu activo"><i class="bi bi-heart-pulse"></i> Mis mascotas</a>
-                <a href="#" class="item-menu"><i class="bi bi-calendar-check"></i> Mis turnos</a>
+                <a href="../turnos/inicio_turnos.php" class="item-menu"><i class="bi bi-calendar-check"></i> Mis turnos</a>
                 <a href="../propietarios/historial_clinico.php" class="item-menu">
                     <i class="bi bi-journal-medical"></i>
                     Historial clínico
@@ -95,7 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="bi bi-shield-plus"></i>
                     Vacunaciones
                 </a>
-                <a href="#" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
+                <a href="../propietarios/mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
+                <div class="seccion-nav">Configuración</div>
+                <a href="../propietarios/configuracion_propietario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
                 <div class="usuario-lateral">
                     <div class="avatar-usuario"><?= strtoupper(substr($_SESSION['usuario_nombre'], 0, 1)) ?></div>
                     <div>
@@ -104,9 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
             </div>
-
             <div class="col-12 col-lg-10 area-principal">
-
                 <div class="barra-superior">
                     <div>
                         <p class="titulo-pagina">Agregar mascota</p>
@@ -116,18 +144,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="bi bi-arrow-left"></i> Volver
                     </a>
                 </div>
-
                 <?php if (!empty($errores)): ?>
                     <div class="alerta-operacion alerta-error" role="alert">
                         <i class="bi bi-exclamation-circle-fill"></i>
                         <div><?php foreach ($errores as $e): ?><div><?= htmlspecialchars($e) ?></div><?php endforeach; ?></div>
                     </div>
                 <?php endif; ?>
-
                 <div class="tarjeta-formulario">
                     <form action="alta_mascota.php" method="POST" id="formAlta" novalidate>
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                         <div class="row g-3">
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="nombre">Nombre <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
@@ -138,7 +164,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="error-campo" id="errorNombre"></div>
                             </div>
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="id_especie">Especie <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
@@ -155,25 +180,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="error-campo" id="errorEspecie"></div>
                             </div>
-
                             <!-- SELECT RAZA: empieza vacío, el JS lo llena con RAZAS_DATA -->
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="id_raza">Raza</label>
+                                <div class="buscador-razas">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                    <input type="search" id="buscar_raza" class="form-control" autocomplete="off"
+                                        placeholder="Buscá una raza por nombre..." aria-label="Buscar raza" disabled>
+                                </div>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-award"></i></span>
                                     <select class="form-control" id="id_raza" name="id_raza">
-                                        <option value="">Seleccioná primero una especie...</option>
+                                        <option value="">Sin raza específica</option>
                                         <?php foreach ($razas as $r): ?>
                                             <option
                                                 value="<?= $r['id_raza'] ?>"
-                                                data-especie="<?= $r['id_especie'] ?>">
+                                                data-especie="<?= $r['id_especie'] ?>"
+                                                <?= (($_POST['id_raza'] ?? '') == $r['id_raza']) ? 'selected' : '' ?>>
                                                 <?= htmlspecialchars($r['nombre_raza']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                             </div>
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="sexo">Sexo <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
@@ -182,11 +211,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="">Seleccioná...</option>
                                         <option value="Macho" <?= (($_POST['sexo'] ?? '') === 'Macho')  ? 'selected' : '' ?>>Macho</option>
                                         <option value="Hembra" <?= (($_POST['sexo'] ?? '') === 'Hembra') ? 'selected' : '' ?>>Hembra</option>
+                                        <option value="Desconocido" <?= (($_POST['sexo'] ?? '') === 'Desconocido') ? 'selected' : '' ?>>Desconocido</option>
                                     </select>
                                 </div>
                                 <div class="error-campo" id="errorSexo"></div>
                             </div>
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="fecha_nacimiento">Fecha de nacimiento</label>
                                 <div class="input-group">
@@ -197,7 +226,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="error-campo" id="errorFecha"></div>
                             </div>
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="peso_kg">Peso (kg)</label>
                                 <div class="input-group">
@@ -208,17 +236,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="error-campo" id="errorPeso"></div>
                             </div>
-
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="color">Color / Pelaje</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-palette"></i></span>
-                                    <input type="text" class="form-control" id="color" name="color"
+                                    <input type="text" class="form-control" id="color" name="color" maxlength="60" inputmode="text"
                                         placeholder="Ej: Dorado, Blanco con manchas..."
                                         value="<?= htmlspecialchars($_POST['color'] ?? '') ?>" />
                                 </div>
+                                <div class="error-campo" id="errorColor" aria-live="polite"></div>
                             </div>
-
                             <div class="col-12 col-md-6 d-flex align-items-center">
                                 <div class="check-castrado w-100">
                                     <input class="form-check-input" type="checkbox" id="castrado" name="castrado"
@@ -228,10 +255,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </label>
                                 </div>
                             </div>
-
                         </div>
-
-                        <div class="d-flex gap-3 mt-4 pt-3" style="border-top: 1px solid var(--borde);">
+                        <div class="d-flex gap-3 mt-4 pt-3 vc-divisor-acciones" >
                             <button type="submit" class="btn-abm-principal">
                                 <i class="bi bi-plus-lg"></i> Guardar mascota
                             </button>
@@ -239,14 +264,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="abm_mascota.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    <script src="abm_mascota.js"></script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>

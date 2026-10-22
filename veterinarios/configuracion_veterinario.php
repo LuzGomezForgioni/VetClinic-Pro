@@ -282,515 +282,332 @@ $titulo = ($sexo === 'F')
     : 'Dr.';
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-
     <title>
         Configuración — Veterinario · VetClinic Pro
     </title>
-
     <link
         rel="icon"
         type="image/png"
         href="../img/VetClinic Pro.png">
-
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com">
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet">
-
     <link
         rel="stylesheet"
         href="../estilos/inicio.css">
-
     <link
         rel="stylesheet"
         href="../estilos/configuracion_veterinario.css">
-
 </head>
-
 <body>
-
 <div class="container-fluid p-0">
-
     <div class="row g-0 min-vh-100">
-
         <!-- ================================================== -->
         <!-- BARRA LATERAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a
                 href="inicio_veterinario.php"
                 class="logo-lateral">
-
                 <img
                     src="../img/VetClinic Pro.png"
                     alt="Logo VetClinic Pro">
-
                 <div>
-
                     <div class="nombre-sistema">
                         VetClinic Pro
                     </div>
-
                     <div class="subtitulo-sistema">
                         Portal del veterinario
                     </div>
-
                 </div>
-
             </a>
-
             <div class="seccion-nav">
                 Principal
             </div>
-
             <a
                 href="inicio_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-grid"></i>
                 Inicio
-
             </a>
-
             <a
                 href="turnos_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-calendar-check"></i>
                 Turnos
-
             </a>
-
             <a
                 href="mascotas_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-heart-pulse"></i>
                 Mascotas
-
             </a>
-
             <a
                 href="historiales_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-journal-medical"></i>
                 Historial clínico
-
             </a>
-
             <div class="seccion-nav">
                 Gestión
             </div>
-
             <a
                 href="propietarios_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-people"></i>
                 Propietarios
-
             </a>
-
             <a
                 href="vacunaciones_veterinario.php"
                 class="item-menu">
-
                 <i class="bi bi-shield-plus"></i>
                 Vacunaciones
-
             </a>
-
-            <a
-                href="#"
-                class="item-menu"
-                title="Disponible más adelante">
-
-                <i class="bi bi-chat-dots"></i>
-                Mensajes
-
-            </a>
-
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
+                Mensajes</a>
             <div class="seccion-nav">
                 Configuración
             </div>
-
             <a
                 href="configuracion_veterinario.php"
                 class="item-menu activo">
-
                 <i class="bi bi-gear"></i>
                 Mi configuración
-
             </a>
-
             <a
                 href="horarios_atencion.php"
                 class="item-menu">
-
                 <i class="bi bi-clock"></i>
                 Horarios de atención
-
             </a>
-
             <a href="../suscripciones/mi_suscripcion.php" class="item-menu">
                 <i class="bi bi-credit-card-2-front"></i> Mi suscripción
             </a>
-
             <div class="usuario-lateral">
-
                 <div class="avatar-usuario">
-
                     <?= strtoupper(
                         substr($nombre, 0, 1) .
                         substr($apellido, 0, 1)
                     ) ?>
-
                 </div>
-
                 <div>
-
                     <div class="nombre-usuario">
-
                         <?= htmlspecialchars(
                             $nombre . ' ' . $apellido
                         ) ?>
-
                     </div>
-
                     <div class="rol-usuario">
                         Veterinario
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
         <!-- ================================================== -->
         <!-- ÁREA PRINCIPAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-10 area-principal">
-
             <div class="barra-superior">
-
                 <div>
-
                     <p class="titulo-pagina">
                         Configuración
                     </p>
-
                     <p class="fecha-hoy">
                         Administrá tu información personal, seguridad y horarios.
                     </p>
-
                 </div>
-
                 <div class="d-flex gap-2">
-
                     <a
                         href="inicio_veterinario.php"
                         class="icono-barra"
                         title="Volver al inicio">
-
                         <i class="bi bi-arrow-left"></i>
-
                     </a>
-
                     <a
                         href="../logout.php"
                         class="icono-barra"
                         title="Cerrar sesión">
-
                         <i class="bi bi-box-arrow-right"></i>
-
                     </a>
-
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- MENSAJE GENERAL -->
             <!-- ================================================== -->
-
             <?php if ($mensaje !== ''): ?>
-
                 <div class="alerta-config alerta-config-exito mb-4">
-
                     <i class="bi bi-check-circle"></i>
-
                     <span>
                         <?= htmlspecialchars($mensaje) ?>
                     </span>
-
                 </div>
-
             <?php endif; ?>
-
             <!-- ================================================== -->
             <!-- CABECERA DEL PERFIL -->
             <!-- ================================================== -->
-
             <section class="cabecera-configuracion mb-4">
-
                 <div class="avatar-configuracion">
-
                     <?= strtoupper(
                         substr($nombre, 0, 1) .
                         substr($apellido, 0, 1)
                     ) ?>
-
                 </div>
-
                 <div>
-
                     <span class="etiqueta-configuracion">
                         Mi cuenta
                     </span>
-
                     <h1>
-
                         <?= htmlspecialchars(
                             $titulo . ' ' . $nombre . ' ' . $apellido
                         ) ?>
-
                     </h1>
-
                     <p>
                         <?= htmlspecialchars(
                             $veterinario['especialidad'] ?: 'Veterinario/a'
                         ) ?>
                     </p>
-
                 </div>
-
             </section>
-
             <div class="row g-4">
-
                 <!-- ================================================== -->
                 <!-- COLUMNA IZQUIERDA -->
                 <!-- ================================================== -->
-
                 <div class="col-12 col-xl-7">
-
                     <!-- ============================================== -->
                     <!-- MI PERFIL -->
                     <!-- ============================================== -->
-
                     <section class="tarjeta tarjeta-configuracion mb-4">
-
                         <div class="cabecera-seccion-config">
-
                             <div>
-
                                 <div class="titulo-tarjeta mb-1">
-
                                     <i class="bi bi-person-vcard"></i>
                                     Mi perfil
-
                                 </div>
-
                                 <p>
                                     Los datos profesionales son administrados por el responsable del sistema.
                                 </p>
-
                             </div>
-
                             <span class="badge-datos-protegidos">
-
                                 <i class="bi bi-lock"></i>
                                 Datos protegidos
-
                             </span>
-
                         </div>
-
                         <div class="grilla-datos-perfil">
-
                             <div class="dato-perfil-config">
-
                                 <span>
                                     Nombre
                                 </span>
-
                                 <strong>
                                     <?= htmlspecialchars($veterinario['nombre']) ?>
                                 </strong>
-
                                 <i class="bi bi-lock"></i>
-
                             </div>
-
                             <div class="dato-perfil-config">
-
                                 <span>
                                     Apellido
                                 </span>
-
                                 <strong>
                                     <?= htmlspecialchars($veterinario['apellido']) ?>
                                 </strong>
-
                                 <i class="bi bi-lock"></i>
-
                             </div>
-
                             <div class="dato-perfil-config">
-
                                 <span>
                                     Matrícula
                                 </span>
-
                                 <strong>
                                     <?= htmlspecialchars($veterinario['matricula']) ?>
                                 </strong>
-
                                 <i class="bi bi-lock"></i>
-
                             </div>
-
                             <div class="dato-perfil-config">
-
                                 <span>
                                     Especialidad
                                 </span>
-
                                 <strong>
                                     <?= htmlspecialchars(
                                         $veterinario['especialidad'] ?: 'No registrada'
                                     ) ?>
                                 </strong>
-
                                 <i class="bi bi-lock"></i>
-
                             </div>
-
                             <div class="dato-perfil-config dato-perfil-ancho">
-
                                 <span>
                                     Email asociado a la cuenta
                                 </span>
-
                                 <strong>
                                     <?= htmlspecialchars($veterinario['email']) ?>
                                 </strong>
-
                                 <i class="bi bi-lock"></i>
-
                             </div>
-
                         </div>
-
                         <div class="nota-email-config">
-
                             <i class="bi bi-info-circle"></i>
-
                             <span>
                                 El correo identifica tu cuenta. Para modificar nombre, matrícula, especialidad o email, contactá al administrador del sistema.
                             </span>
-
                         </div>
-
                     </section>
-
                     <!-- ============================================== -->
                     <!-- TELÉFONO -->
                     <!-- ============================================== -->
-
                     <section class="tarjeta tarjeta-configuracion">
-
                         <div class="titulo-tarjeta mb-1">
-
                             <i class="bi bi-telephone"></i>
                             Datos de contacto
-
                         </div>
-
                         <p class="texto-seccion-config">
                             Podés actualizar únicamente tu número de teléfono.
                         </p>
-
                         <?php if (!empty($errores_telefono)): ?>
-
                             <div class="alerta-config alerta-config-error mb-3">
-
                                 <i class="bi bi-exclamation-triangle"></i>
-
                                 <div>
-
                                     <?php foreach ($errores_telefono as $error): ?>
-
                                         <div>
                                             <?= htmlspecialchars($error) ?>
                                         </div>
-
                                     <?php endforeach; ?>
-
                                 </div>
-
                             </div>
-
                         <?php endif; ?>
-
                         <form method="POST">
-
                             <input
                                 type="hidden"
                                 name="csrf_token"
                                 value="<?= htmlspecialchars($csrf_token) ?>">
-
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="actualizar_telefono">
-
                             <label
                                 for="telefono"
                                 class="form-label">
-
                                 Teléfono
-
                             </label>
-
                             <div class="input-group input-contacto-config">
-
                                 <span class="input-group-text">
                                     <i class="bi bi-phone"></i>
                                 </span>
-
                                 <input
                                     type="text"
                                     class="form-control"
@@ -803,137 +620,86 @@ $titulo = ($sexo === 'F')
                                             ? ($_POST['telefono'] ?? '')
                                             : ($veterinario['telefono'] ?? '')
                                     ) ?>">
-
                             </div>
-
                             <div class="acciones-configuracion">
-
                                 <button
                                     type="submit"
                                     class="btn-config-principal">
-
                                     <i class="bi bi-check-circle"></i>
                                     Guardar teléfono
-
                                 </button>
-
                             </div>
-
                         </form>
-
                     </section>
-
                 </div>
-
                 <!-- ================================================== -->
                 <!-- COLUMNA DERECHA -->
                 <!-- ================================================== -->
-
                 <div class="col-12 col-xl-5">
-
                     <!-- ============================================== -->
                     <!-- HORARIOS -->
                     <!-- ============================================== -->
-
                     <section class="tarjeta tarjeta-opcion-config mb-4">
-
                         <div class="icono-opcion-config">
-
                             <i class="bi bi-clock"></i>
-
                         </div>
-
                         <div class="contenido-opcion-config">
-
                             <h2>
                                 Horarios de atención
                             </h2>
-
                             <p>
                                 Configurá los días y bloques horarios en los que atendés.
                             </p>
-
                             <a
                                 href="horarios_atencion.php"
                                 class="btn-config-secundario">
-
                                 Administrar horarios
-
                                 <i class="bi bi-arrow-right"></i>
-
                             </a>
-
                         </div>
-
                     </section>
-
                     <!-- ============================================== -->
                     <!-- SEGURIDAD -->
                     <!-- ============================================== -->
-
                     <section class="tarjeta tarjeta-configuracion">
-
                         <div class="titulo-tarjeta mb-1">
-
                             <i class="bi bi-shield-lock"></i>
                             Seguridad
-
                         </div>
-
                         <p class="texto-seccion-config">
                             Cambiá la contraseña utilizada para ingresar a tu cuenta.
                         </p>
-
                         <?php if (!empty($errores_password)): ?>
-
                             <div class="alerta-config alerta-config-error mb-3">
-
                                 <i class="bi bi-exclamation-triangle"></i>
-
                                 <div>
-
                                     <?php foreach ($errores_password as $error): ?>
-
                                         <div>
                                             <?= htmlspecialchars($error) ?>
                                         </div>
-
                                     <?php endforeach; ?>
-
                                 </div>
-
                             </div>
-
                         <?php endif; ?>
-
                         <form method="POST">
-
                             <input
                                 type="hidden"
                                 name="csrf_token"
                                 value="<?= htmlspecialchars($csrf_token) ?>">
-
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="cambiar_password">
-
                             <div class="campo-password-config">
-
                                 <label
                                     for="password_actual"
                                     class="form-label">
-
                                     Contraseña actual
-
                                 </label>
-
                                 <div class="input-group">
-
                                     <span class="input-group-text">
                                         <i class="bi bi-lock"></i>
                                     </span>
-
                                     <input
                                         type="password"
                                         class="form-control"
@@ -941,27 +707,18 @@ $titulo = ($sexo === 'F')
                                         name="password_actual"
                                         autocomplete="current-password"
                                         required>
-
                                 </div>
-
                             </div>
-
                             <div class="campo-password-config">
-
                                 <label
                                     for="password_nueva"
                                     class="form-label">
-
                                     Nueva contraseña
-
                                 </label>
-
                                 <div class="input-group">
-
                                     <span class="input-group-text">
                                         <i class="bi bi-key"></i>
                                     </span>
-
                                     <input
                                         type="password"
                                         class="form-control"
@@ -971,27 +728,18 @@ $titulo = ($sexo === 'F')
                                         maxlength="72"
                                         autocomplete="new-password"
                                         required>
-
                                 </div>
-
                             </div>
-
                             <div class="campo-password-config">
-
                                 <label
                                     for="password_repetida"
                                     class="form-label">
-
                                     Repetir nueva contraseña
-
                                 </label>
-
                                 <div class="input-group">
-
                                     <span class="input-group-text">
                                         <i class="bi bi-key-fill"></i>
                                     </span>
-
                                     <input
                                         type="password"
                                         class="form-control"
@@ -1001,42 +749,25 @@ $titulo = ($sexo === 'F')
                                         maxlength="72"
                                         autocomplete="new-password"
                                         required>
-
                                 </div>
-
                             </div>
-
                             <div class="acciones-configuracion">
-
                                 <button
                                     type="submit"
                                     class="btn-config-principal">
-
                                     <i class="bi bi-shield-check"></i>
                                     Cambiar contraseña
-
                                 </button>
-
                             </div>
-
                         </form>
-
                     </section>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
+</script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>

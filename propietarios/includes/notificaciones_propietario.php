@@ -14,7 +14,6 @@
 |
 */
 
-
 // ============================================================
 // SEGURIDAD
 // ============================================================
@@ -23,13 +22,11 @@ if (!isset($conn) || !isset($id_propietario)) {
     return;
 }
 
-
 // ============================================================
 // PÁGINA ACTUAL
 // ============================================================
 
 $pagina_actual_notificaciones = basename($_SERVER['PHP_SELF']);
-
 
 // ============================================================
 // MARCAR UNA NOTIFICACIÓN COMO LEÍDA
@@ -38,7 +35,6 @@ $pagina_actual_notificaciones = basename($_SERVER['PHP_SELF']);
 if (isset($_GET['leer_notificacion'])) {
 
     $id_notificacion = (int) $_GET['leer_notificacion'];
-
 
     // Primero comprobamos que pertenezca al propietario logueado
 
@@ -74,7 +70,6 @@ if (isset($_GET['leer_notificacion'])) {
 
     $stmt_notificacion->close();
 
-
     if ($notificacion_seleccionada) {
 
         // Marcar como leída
@@ -100,13 +95,11 @@ if (isset($_GET['leer_notificacion'])) {
 
         $stmt_notificacion->close();
 
-
         // ====================================================
         // DECIDIR A DÓNDE IR
         // ====================================================
 
         $destino = 'inicio_propietarios.php';
-
 
         // Vacunación
 
@@ -120,7 +113,6 @@ if (isset($_GET['leer_notificacion'])) {
                 (int) $notificacion_seleccionada['id_mascota'];
         }
 
-
         // Turnos
 
         elseif (
@@ -132,7 +124,6 @@ if (isset($_GET['leer_notificacion'])) {
 
             $destino = '../turnos/inicio_turnos.php';
         }
-
 
         // Historia clínica
 
@@ -146,12 +137,10 @@ if (isset($_GET['leer_notificacion'])) {
                 (int) $notificacion_seleccionada['id_mascota'];
         }
 
-
         header('Location: ' . $destino);
         exit;
     }
 }
-
 
 // ============================================================
 // MARCAR TODAS COMO LEÍDAS
@@ -179,7 +168,6 @@ if (isset($_GET['leer_todas'])) {
 
     $stmt_notificacion->close();
 
-
     /*
         Volvemos a la misma pantalla.
 
@@ -200,7 +188,6 @@ if (isset($_GET['leer_todas'])) {
     exit;
 }
 
-
 // ============================================================
 // CREAR NOTIFICACIONES DE VACUNAS
 // ============================================================
@@ -220,6 +207,7 @@ $sql_vacunas_notificaciones = "
         ON v.id_mascota = m.id_mascota
 
     WHERE m.id_propietario = ?
+      AND m.fallecido = 0
       AND v.fecha_proxima IS NOT NULL
       AND v.fecha_proxima <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
 
@@ -240,7 +228,6 @@ $stmt_notificacion->execute();
 $resultado_vacunas_notificacion =
     $stmt_notificacion->get_result();
 
-
 while (
     $vacuna_notificacion =
     $resultado_vacunas_notificacion->fetch_assoc()
@@ -253,7 +240,6 @@ while (
 
     $hoy_notificaciones =
         new DateTime('today');
-
 
     // ========================================================
     // MENSAJE
@@ -281,7 +267,6 @@ while (
             $fecha_proxima->format('d/m/Y') .
             '.';
     }
-
 
     // ========================================================
     // COMPROBAR QUE NO EXISTA
@@ -320,7 +305,6 @@ while (
         ->fetch_assoc();
 
     $stmt_existe->close();
-
 
     // Crear solamente si todavía no existe
 
@@ -363,7 +347,6 @@ while (
 
 $stmt_notificacion->close();
 
-
 // ============================================================
 // CREAR NOTIFICACIONES DE TURNOS PRÓXIMOS
 // ============================================================
@@ -403,7 +386,6 @@ $stmt_notificacion->execute();
 $resultado_turnos_notificacion =
     $stmt_notificacion->get_result();
 
-
 while (
     $turno_notificacion =
     $resultado_turnos_notificacion->fetch_assoc()
@@ -414,7 +396,6 @@ while (
             $turno_notificacion['fecha_hora']
         );
 
-
     $mensaje_turno =
         $turno_notificacion['nombre_mascota'] .
         ' tiene un turno confirmado para el ' .
@@ -422,7 +403,6 @@ while (
         ' a las ' .
         $fecha_turno_notificacion->format('H:i') .
         ' hs.';
-
 
     // ========================================================
     // COMPROBAR DUPLICADO
@@ -461,7 +441,6 @@ while (
         ->fetch_assoc();
 
     $stmt_existe->close();
-
 
     // Insertar si todavía no existe
 
@@ -510,7 +489,6 @@ while (
 
 $stmt_notificacion->close();
 
-
 // ============================================================
 // CANTIDAD DE NO LEÍDAS
 // ============================================================
@@ -544,7 +522,6 @@ $cantidad_notificaciones =
     (int) ($fila_cantidad['total'] ?? 0);
 
 $stmt_notificacion->close();
-
 
 // ============================================================
 // ÚLTIMAS 5 NOTIFICACIONES
@@ -597,7 +574,6 @@ while (
 
 $stmt_notificacion->close();
 
-
 // ============================================================
 // ICONO SEGÚN TIPO
 // ============================================================
@@ -623,7 +599,6 @@ function iconoNotificacionPropietario(string $tipo): string
     }
 }
 
-
 // ============================================================
 // DIBUJAR CAMPANITA
 // ============================================================
@@ -637,9 +612,7 @@ function mostrarCampanaNotificaciones(
         basename($_SERVER['PHP_SELF']);
 
     ?>
-
     <div class="dropdown">
-
         <button
             type="button"
             class="icono-barra boton-notificaciones"
@@ -647,51 +620,30 @@ function mostrarCampanaNotificaciones(
             aria-expanded="false"
             title="Notificaciones"
         >
-
             <i class="bi bi-bell"></i>
-
-
             <?php if ($cantidad_notificaciones > 0): ?>
-
                 <span class="contador-notificaciones">
-
                     <?= $cantidad_notificaciones > 9
                         ? '9+'
                         : $cantidad_notificaciones
                     ?>
-
                 </span>
-
             <?php endif; ?>
-
         </button>
-
-
         <div
             class="dropdown-menu dropdown-menu-end menu-notificaciones"
         >
-
             <div class="encabezado-notificaciones">
-
                 <div>
-
                     <strong>
                         Notificaciones
                     </strong>
-
                     <div class="subtitulo-notificaciones">
-
                         <?= $cantidad_notificaciones ?>
-
                         sin leer
-
                     </div>
-
                 </div>
-
-
                 <?php if ($cantidad_notificaciones > 0): ?>
-
                     <?php
 
                     $url_leer_todas =
@@ -706,47 +658,28 @@ function mostrarCampanaNotificaciones(
                     }
 
                     ?>
-
                     <a
                         href="<?= htmlspecialchars($url_leer_todas) ?>"
                         class="leer-todas"
                     >
                         Marcar todas como leídas
                     </a>
-
                 <?php endif; ?>
-
             </div>
-
-
             <?php if (empty($notificaciones)): ?>
-
-
                 <div class="sin-notificaciones">
-
                     <i class="bi bi-bell-slash"></i>
-
                     <div>
                         No tenés notificaciones
                     </div>
-
                 </div>
-
-
             <?php else: ?>
-
-
                 <?php foreach ($notificaciones as $notificacion): ?>
-
-
                     <a
                         href="<?= htmlspecialchars($pagina_actual) ?>?leer_notificacion=<?= (int) $notificacion['id_notificacion'] ?>"
                         class="item-notificacion <?= !$notificacion['leida'] ? 'no-leida' : '' ?>"
                     >
-
-
                         <div class="icono-notificacion">
-
                             <i
                                 class="bi <?= htmlspecialchars(
                                     iconoNotificacionPropietario(
@@ -754,54 +687,29 @@ function mostrarCampanaNotificaciones(
                                     )
                                 ) ?>"
                             ></i>
-
                         </div>
-
-
                         <div class="contenido-notificacion">
-
                             <div class="mensaje-notificacion">
-
                                 <?= htmlspecialchars(
                                     $notificacion['mensaje']
                                 ) ?>
-
                             </div>
-
-
                             <div class="fecha-notificacion">
-
                                 <?= date(
                                     'd/m/Y H:i',
                                     strtotime(
                                         $notificacion['fecha_envio']
                                     )
                                 ) ?>
-
                             </div>
-
                         </div>
-
-
                         <?php if (!$notificacion['leida']): ?>
-
                             <span class="punto-notificacion"></span>
-
                         <?php endif; ?>
-
-
                     </a>
-
-
                 <?php endforeach; ?>
-
-
             <?php endif; ?>
-
-
         </div>
-
     </div>
-
     <?php
 }

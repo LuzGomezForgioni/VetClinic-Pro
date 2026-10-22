@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
 
 $total = 0;
 $res = $conn->query("SELECT COUNT(*) AS total FROM administradores");
@@ -15,6 +16,7 @@ if ($total > 0) {
     $bloqueado = false;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        exigirCsrf();
         $nombre = trim((string)($_POST['nombre'] ?? ''));
         $apellido = trim((string)($_POST['apellido'] ?? ''));
         $email = mb_strtolower(trim((string)($_POST['email'] ?? '')));
@@ -39,7 +41,6 @@ if ($total > 0) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -49,7 +50,6 @@ if ($total > 0) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../estilos/admin.css">
 </head>
-
 <body>
     <div class="login-wrap">
         <div class="login-card">
@@ -61,6 +61,7 @@ if ($total > 0) {
             <?php else: ?>
                 <?php foreach ($errores as $e): ?><div class="alert alert-danger py-2"><?= htmlspecialchars($e) ?></div><?php endforeach; ?>
                 <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                     <div class="col-md-6"><label class="form-label">Nombre</label><input class="form-control" name="nombre" required></div>
                     <div class="col-md-6"><label class="form-label">Apellido</label><input class="form-control" name="apellido" required></div>
                     <div class="col-12"><label class="form-label">Email</label><input type="email" class="form-control" name="email" required></div>
@@ -72,5 +73,4 @@ if ($total > 0) {
         </div>
     </div>
 </body>
-
 </html>

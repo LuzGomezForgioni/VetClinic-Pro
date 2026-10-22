@@ -7,12 +7,14 @@ session_start();
 
 // ── Verificar sesión ──────────────────────────────────────
 // Cambiá 'logueado' por el nombre exacto que uses en tu login
-if (empty($_SESSION['logueado'])) {
+if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'propietario') {
     header('Location: ../index.php');
     exit;
 }
 
-require_once '../config/conexion.php'; // usa $conn (mysqli)
+require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
+require_once '../config/mascotas.php'; // usa $conn (mysqli)
 
 $idPropietario = $_SESSION['usuario_id'];
 $nombre        = $_SESSION['usuario_nombre'];
@@ -62,13 +64,11 @@ function calcularEdad(?string $fecha): string
 
 function emojiEspecie(?string $esp): string
 {
-    $map = ['perro' => '🐕', 'gato' => '🐱', 'conejo' => '🐇', 'pájaro' => '🦜', 'pajaro' => '🦜', 'hámster' => '🐹', 'hamster' => '🐹'];
-    return $map[mb_strtolower($esp ?? '')] ?? '🐾';
+    return iconoEspecieMascota($esp);
 }
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -82,11 +82,9 @@ function emojiEspecie(?string $esp): string
     <link rel="stylesheet" href="../estilos/inicio.css" />
     <link rel="stylesheet" href="../estilos/abm.css" />
 </head>
-
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0 min-vh-100">
-
             <!-- SIDEBAR -->
             <div class="col-12 col-lg-2 panel-lateral">
                 <a href="../propietarios/inicio_propietarios.php" class="logo-lateral">
@@ -96,7 +94,6 @@ function emojiEspecie(?string $esp): string
                         <div class="subtitulo-sistema">Portal del propietario</div>
                     </div>
                 </a>
-
                 <div class="seccion-nav">Mi espacio</div>
                 <a href="../propietarios/inicio_propietarios.php" class="item-menu">
                     <i class="bi bi-grid"></i> Inicio
@@ -116,24 +113,16 @@ function emojiEspecie(?string $esp): string
                     <i class="bi bi-shield-plus"></i>
                     Vacunaciones
                 </a>
-                <a href="#" class="item-menu">
-                    <i class="bi bi-chat-dots"></i> Mensajes
-                </a>
-
+                <a href="../propietarios/mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
                 <div class="seccion-nav">
                     Configuración
                 </div>
-
                 <a
                     href="../propietarios/configuracion_propietario.php"
                     class="item-menu">
-
                     <i class="bi bi-gear"></i>
                     Mi configuración
-
                 </a>
-
-
                 <div class="usuario-lateral">
                     <div class="avatar-usuario">
                         <?= strtoupper(substr($nombre, 0, 1)) ?>
@@ -144,10 +133,8 @@ function emojiEspecie(?string $esp): string
                     </div>
                 </div>
             </div>
-
             <!-- ÁREA PRINCIPAL -->
             <div class="col-12 col-lg-10 area-principal">
-
                 <div class="barra-superior">
                     <div>
                         <p class="titulo-pagina">Mis Mascotas 🐾</p>
@@ -163,16 +150,13 @@ function emojiEspecie(?string $esp): string
                             href="../propietarios/configuracion_propietario.php"
                             class="icono-barra"
                             title="Mi configuración">
-
                             <i class="bi bi-gear"></i>
-
                         </a>
-                        <a href="../index.php" class="icono-barra" title="Cerrar sesión">
+                        <a href="../logout.php" class="icono-barra" title="Cerrar sesión">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </div>
                 </div>
-
                 <!-- Alerta de operación -->
                 <?php if ($mensaje): ?>
                     <div class="alerta-operacion alerta-<?= $tipoMsg ?>" role="alert">
@@ -180,7 +164,6 @@ function emojiEspecie(?string $esp): string
                         <?= htmlspecialchars($mensaje) ?>
                     </div>
                 <?php endif; ?>
-
                 <!-- Sin mascotas -->
                 <?php if (empty($mascotas)): ?>
                     <div class="tarjeta estado-vacio">
@@ -191,7 +174,6 @@ function emojiEspecie(?string $esp): string
                             <i class="bi bi-plus-lg"></i> Agregar mi primera mascota
                         </a>
                     </div>
-
                     <!-- Grilla de mascotas -->
                 <?php else: ?>
                     <div class="row g-3">
@@ -203,14 +185,10 @@ function emojiEspecie(?string $esp): string
                                         <div class="flex-grow-1">
                                             <div class="nombre-mascota-card"><?= htmlspecialchars($m['nombre']) ?></div>
                                             <?php if ((int)$m['fallecido'] === 1): ?>
-
                                                 <span class="badge bg-secondary mt-1">
-
                                                     <i class="bi bi-heartbreak"></i>
                                                     Fallecida
-
                                                 </span>
-
                                             <?php endif; ?>
                                             <div class="especie-raza">
                                                 <?= htmlspecialchars($m['nombre_especie'] ?? '—') ?>
@@ -218,7 +196,6 @@ function emojiEspecie(?string $esp): string
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="datos-mascota">
                                         <div class="dato-fila">
                                             <i class="bi bi-calendar3"></i>
@@ -243,34 +220,26 @@ function emojiEspecie(?string $esp): string
                                             <span><?= $m['castrado'] ? 'Castrado/a' : 'No castrado/a' ?></span>
                                         </div>
                                     </div>
-
                                     <div class="acciones-mascota">
                                         <a href="editar_mascota.php?id=<?= $m['id_mascota'] ?>" class="btn-accion btn-editar">
                                             <i class="bi bi-pencil"></i> Editar
                                         </a>
-                                        <a href="eliminar_mascota.php?id=<?= $m['id_mascota'] ?>"
-                                            class="btn-accion btn-eliminar"
-                                            onclick="return confirmarEliminar(event, this, '<?= htmlspecialchars(addslashes($m['nombre'])) ?>')">
-                                            <i class="bi bi-trash3"></i> Eliminar
-                                        </a>
+                                        <form action="eliminar_mascota.php" method="POST" class="form-accion-eliminar" onsubmit="return confirmarEliminar(event, this, <?= htmlspecialchars(json_encode($m['nombre'], JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP), ENT_QUOTES, 'UTF-8') ?>)">
+                                            <input type="hidden" name="id" value="<?= (int)$m['id_mascota'] ?>">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar"><i class="bi bi-trash3"></i> Eliminar</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        function confirmarEliminar(e, enlace, nombre) {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    <script>
+        function confirmarEliminar(e, formulario, nombre) {
             e.preventDefault();
             Swal.fire({
                 title: '¿Eliminar a ' + nombre + '?',
@@ -283,11 +252,10 @@ function emojiEspecie(?string $esp): string
                 cancelButtonColor: '#6b7280'
             }).then(function(result) {
                 if (result.isConfirmed) {
-                    window.location.href = enlace.href;
+                    formulario.submit();
                 }
             });
         }
-    </script>
+    </script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>

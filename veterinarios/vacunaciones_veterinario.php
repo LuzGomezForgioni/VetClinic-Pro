@@ -9,6 +9,10 @@ if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'veter
 
 require_once '../config/conexion.php';
 require_once '../config/proteger_acceso_veterinario.php';
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
 
 $nombre   = $_SESSION['usuario_nombre'] ?? 'Doctor/a';
 $apellido = $_SESSION['usuario_apellido'] ?? '';
@@ -352,23 +356,19 @@ $vacunaciones = array_values(array_filter(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vacunaciones · VetClinic Pro</title>
-
     <link rel="icon" type="image/png" href="../img/VetClinic Pro.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="../estilos/inicio.css">
     <link rel="stylesheet" href="../estilos/vacunaciones_veterinario.css">
 </head>
 <body>
 <div class="container-fluid p-0">
     <div class="row g-0 min-vh-100">
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a href="inicio_veterinario.php" class="logo-lateral">
                 <img src="../img/VetClinic Pro.png" alt="Logo VetClinic Pro">
                 <div>
@@ -376,49 +376,37 @@ $vacunaciones = array_values(array_filter(
                     <div class="subtitulo-sistema">Portal del veterinario</div>
                 </div>
             </a>
-
             <div class="seccion-nav">Principal</div>
-
             <a href="inicio_veterinario.php" class="item-menu">
                 <i class="bi bi-grid"></i> Inicio
             </a>
-
             <a href="turnos_veterinario.php" class="item-menu">
                 <i class="bi bi-calendar-check"></i> Turnos
             </a>
-
             <a href="mascotas_veterinario.php" class="item-menu">
                 <i class="bi bi-heart-pulse"></i> Mascotas
             </a>
-
             <a href="historiales_veterinario.php" class="item-menu">
                 <i class="bi bi-journal-medical"></i> Historial clínico
             </a>
-
             <div class="seccion-nav">Gestión</div>
-
             <a href="propietarios_veterinario.php" class="item-menu">
                 <i class="bi bi-people"></i> Propietarios
             </a>
-
             <a href="vacunaciones_veterinario.php" class="item-menu activo">
                 <i class="bi bi-shield-plus"></i> Vacunaciones
             </a>
-
-            <a href="#" class="item-menu">
-                <i class="bi bi-chat-dots"></i> Mensajes
-            </a>
-
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
             <div class="seccion-nav">Configuración</div>
-
-            <a href="horarios_atencion.php" class="item-menu">
+            <a href="configuracion_veterinario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
+                <a href="horarios_atencion.php" class="item-menu">
                 <i class="bi bi-clock"></i> Horarios de atención
             </a>
-
             <a href="../suscripciones/mi_suscripcion.php" class="item-menu">
                 <i class="bi bi-credit-card-2-front"></i> Mi suscripción
             </a>
-
             <div class="usuario-lateral">
                 <div class="avatar-usuario">
                     <?= strtoupper(substr($nombre, 0, 1) . substr($apellido, 0, 1)) ?>
@@ -430,17 +418,13 @@ $vacunaciones = array_values(array_filter(
                     <div class="rol-usuario">Veterinario</div>
                 </div>
             </div>
-
         </div>
-
         <div class="col-12 col-lg-10 area-principal">
-
             <div class="barra-superior">
                 <div>
                     <p class="titulo-pagina">Vacunaciones</p>
                     <p class="fecha-hoy">Control y registro de vacunas de los pacientes.</p>
                 </div>
-
                 <div class="d-flex gap-2">
                     <a href="inicio_veterinario.php" class="icono-barra" title="Volver al inicio">
                         <i class="bi bi-arrow-left"></i>
@@ -450,13 +434,11 @@ $vacunaciones = array_values(array_filter(
                     </a>
                 </div>
             </div>
-
             <div class="encabezado-vacunaciones mb-4">
                 <div>
                     <h2 class="titulo-pagina">Vacunaciones registradas</h2>
                     <p class="fecha-hoy">Consultá el estado de las vacunas y registrá nuevas aplicaciones.</p>
                 </div>
-
                 <button
                     class="btn-registrar-vacuna"
                     type="button"
@@ -467,14 +449,12 @@ $vacunaciones = array_values(array_filter(
                     Registrar vacunación
                 </button>
             </div>
-
             <?php if ($mensaje !== ''): ?>
                 <div class="alerta-vacunacion alerta-vacunacion-exito mb-4">
                     <i class="bi bi-check-circle"></i>
                     <?= htmlspecialchars($mensaje) ?>
                 </div>
             <?php endif; ?>
-
             <?php if (!empty($errores)): ?>
                 <div class="alerta-vacunacion alerta-vacunacion-error mb-4">
                     <i class="bi bi-exclamation-triangle"></i>
@@ -488,7 +468,6 @@ $vacunaciones = array_values(array_filter(
                     </div>
                 </div>
             <?php endif; ?>
-
             <div class="collapse <?= !empty($errores) ? 'show' : '' ?>" id="formularioVacuna">
                 <section class="tarjeta formulario-vacunacion mb-4">
                     <div class="titulo-tarjeta mb-1">
@@ -496,11 +475,10 @@ $vacunaciones = array_values(array_filter(
                         Registrar vacunación
                     </div>
                     <p class="texto-ayuda-formulario">Cargá la vacuna aplicada a una mascota activa.</p>
-
                     <?php if (!empty($mascotasActivas)): ?>
                         <form method="POST" action="vacunaciones_veterinario.php">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                             <input type="hidden" name="accion" value="registrar">
-
                             <div class="row g-3">
                                 <div class="col-12 col-lg-6">
                                     <label for="id_mascota_registro" class="form-label">
@@ -521,7 +499,6 @@ $vacunaciones = array_values(array_filter(
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-
                                 <div class="col-12 col-lg-6">
                                     <label for="nombre_vacuna" class="form-label">
                                         Vacuna <span class="campo-requerido">*</span>
@@ -535,7 +512,6 @@ $vacunaciones = array_values(array_filter(
                                         value="<?= htmlspecialchars($_POST['nombre_vacuna'] ?? '') ?>"
                                         required>
                                 </div>
-
                                 <div class="col-12 col-md-6">
                                     <label for="fecha_aplicacion" class="form-label">
                                         Fecha de aplicación <span class="campo-requerido">*</span>
@@ -549,7 +525,6 @@ $vacunaciones = array_values(array_filter(
                                         value="<?= htmlspecialchars($_POST['fecha_aplicacion'] ?? date('Y-m-d')) ?>"
                                         required>
                                 </div>
-
                                 <div class="col-12 col-md-6">
                                     <label for="fecha_proxima" class="form-label">Próxima dosis</label>
                                     <input
@@ -560,7 +535,6 @@ $vacunaciones = array_values(array_filter(
                                         value="<?= htmlspecialchars($_POST['fecha_proxima'] ?? '') ?>">
                                     <div class="ayuda-campo-vacuna">Puede quedar vacío si todavía no corresponde definirla.</div>
                                 </div>
-
                                 <div class="col-12">
                                     <label for="observaciones" class="form-label">Observaciones</label>
                                     <textarea
@@ -568,16 +542,13 @@ $vacunaciones = array_values(array_filter(
                                         id="observaciones"
                                         name="observaciones"
                                         rows="3"
-                                        placeholder="Información adicional sobre la aplicación..."><?= htmlspecialchars($_POST['observaciones'] ?? '') ?></textarea>
-                                </div>
+                                        placeholder="Información adicional sobre la aplicación..."><?= htmlspecialchars($_POST['observaciones'] ?? '') ?></textarea>                                </div>
                             </div>
-
                             <div class="acciones-formulario-vacuna">
                                 <button type="submit" class="btn-guardar-vacuna">
                                     <i class="bi bi-check-circle"></i>
                                     Guardar vacunación
                                 </button>
-
                                 <button
                                     type="button"
                                     class="btn-cancelar-vacuna"
@@ -598,7 +569,6 @@ $vacunaciones = array_values(array_filter(
                     <?php endif; ?>
                 </section>
             </div>
-
             <div class="resumen-vacunaciones mb-4">
                 <div class="tarjeta-resumen-vacuna">
                     <span>Registros</span>
@@ -617,13 +587,11 @@ $vacunaciones = array_values(array_filter(
                     <strong><?= $contadorVencidas ?></strong>
                 </div>
             </div>
-
             <section class="tarjeta filtros-vacunaciones mb-4">
                 <div class="titulo-tarjeta mb-3">
                     <i class="bi bi-funnel"></i>
                     Buscar y filtrar
                 </div>
-
                 <form method="GET" action="vacunaciones_veterinario.php">
                     <div class="grilla-filtros-vacunaciones">
                         <div class="campo-filtro-vacuna">
@@ -639,7 +607,6 @@ $vacunaciones = array_values(array_filter(
                                     value="<?= htmlspecialchars($busqueda) ?>">
                             </div>
                         </div>
-
                         <div class="campo-filtro-vacuna">
                             <label for="id_mascota">Mascota</label>
                             <select class="form-select" id="id_mascota" name="id_mascota">
@@ -657,7 +624,6 @@ $vacunaciones = array_values(array_filter(
                                 <?php endforeach; ?>
                             </select>
                         </div>
-
                         <div class="campo-filtro-vacuna">
                             <label for="estado">Estado</label>
                             <select class="form-select" id="estado" name="estado">
@@ -669,12 +635,10 @@ $vacunaciones = array_values(array_filter(
                             </select>
                         </div>
                     </div>
-
                     <div class="acciones-filtros-vacunaciones">
                         <button type="submit" class="btn-buscar-vacunacion">
                             <i class="bi bi-search"></i> Buscar
                         </button>
-
                         <?php if ($busqueda !== '' || $idMascotaFiltro > 0 || $estadoFiltro !== ''): ?>
                             <a href="vacunaciones_veterinario.php" class="btn-limpiar-vacunacion">
                                 <i class="bi bi-x-circle"></i> Limpiar filtros
@@ -683,61 +647,47 @@ $vacunaciones = array_values(array_filter(
                     </div>
                 </form>
             </section>
-
             <?php if (!empty($vacunaciones)): ?>
-
                 <div class="lista-vacunaciones-veterinario">
-
                     <?php foreach ($vacunaciones as $vacuna): ?>
                         <?php $estado = $vacuna['estado_calculado']; ?>
-
                         <article class="tarjeta tarjeta-vacunacion">
-
                             <div class="icono-vacunacion <?= htmlspecialchars($estado['clase']) ?>">
                                 <i class="bi bi-shield-check"></i>
                             </div>
-
                             <div class="contenido-vacunacion">
-
                                 <div class="cabecera-registro-vacuna">
                                     <div>
                                         <h3><?= htmlspecialchars($vacuna['nombre_vacuna']) ?></h3>
-
                                         <div class="paciente-vacunacion">
                                             <a href="ficha_mascota.php?id_mascota=<?= (int) $vacuna['id_mascota'] ?>">
                                                 <?= htmlspecialchars($vacuna['nombre_mascota']) ?>
                                             </a>
-
                                             <span>
                                                 <?= htmlspecialchars($vacuna['nombre_especie'] ?? 'Especie no registrada') ?>
                                                 <?php if (!empty($vacuna['nombre_raza'])): ?>
                                                     · <?= htmlspecialchars($vacuna['nombre_raza']) ?>
                                                 <?php endif; ?>
                                             </span>
-
                                             <?php if ((int) $vacuna['fallecido'] === 1): ?>
                                                 <span class="badge-mascota-fallecida">Fallecida</span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
-
                                     <span class="badge-estado-vacuna <?= htmlspecialchars($estado['clase']) ?>">
                                         <i class="bi <?= htmlspecialchars($estado['icono']) ?>"></i>
                                         <?= htmlspecialchars($estado['texto']) ?>
                                     </span>
                                 </div>
-
                                 <div class="datos-vacunacion">
                                     <div>
                                         <span>Aplicada</span>
                                         <strong><?= htmlspecialchars(formatearFechaVacuna($vacuna['fecha_aplicacion'])) ?></strong>
                                     </div>
-
                                     <div>
                                         <span>Próxima dosis</span>
                                         <strong><?= htmlspecialchars(formatearFechaVacuna($vacuna['fecha_proxima'])) ?></strong>
                                     </div>
-
                                     <div>
                                         <span>Propietario</span>
                                         <a href="ficha_propietario.php?id_propietario=<?= (int) $vacuna['id_propietario'] ?>">
@@ -748,14 +698,12 @@ $vacunaciones = array_values(array_filter(
                                         </a>
                                     </div>
                                 </div>
-
                                 <?php if (!empty($vacuna['observaciones'])): ?>
                                     <div class="observaciones-vacunacion">
                                         <i class="bi bi-chat-left-text"></i>
                                         <p><?= nl2br(htmlspecialchars($vacuna['observaciones'])) ?></p>
                                     </div>
                                 <?php endif; ?>
-
                                 <div class="acciones-registro-vacuna">
                                     <a
                                         href="ficha_mascota.php?id_mascota=<?= (int) $vacuna['id_mascota'] ?>"
@@ -763,7 +711,6 @@ $vacunaciones = array_values(array_filter(
                                         <i class="bi bi-heart-pulse"></i>
                                         Ver mascota
                                     </a>
-
                                     <a
                                         href="historiales_veterinario.php?id_mascota=<?= (int) $vacuna['id_mascota'] ?>"
                                         class="btn-ver-historial-vacuna">
@@ -771,15 +718,11 @@ $vacunaciones = array_values(array_filter(
                                         Ver historial
                                     </a>
                                 </div>
-
                             </div>
                         </article>
                     <?php endforeach; ?>
-
                 </div>
-
             <?php else: ?>
-
                 <div class="tarjeta estado-vacio-vacunaciones">
                     <div class="icono-vacio-vacunaciones">
                         <i class="bi bi-shield-x"></i>
@@ -795,13 +738,10 @@ $vacunaciones = array_values(array_filter(
                         </p>
                     </div>
                 </div>
-
             <?php endif; ?>
-
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
 </html>

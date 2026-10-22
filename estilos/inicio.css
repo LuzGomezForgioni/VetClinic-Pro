@@ -30,15 +30,15 @@ body {
 }
 
 .logo-lateral {
-    text-decoration: none !important;
-    color: inherit !important;
+    text-decoration: none;
+    color: inherit;
     display: flex;
     align-items: center;
 }
 
 .logo-lateral:hover {
-    text-decoration: none !important;
-    color: inherit !important;
+    text-decoration: none;
+    color: inherit;
 }
 
 .logo-lateral img {
@@ -898,7 +898,6 @@ body {
     font-size: 23px;
 }
 
-
 /* Enlace dentro de los recordatorios */
 
 .enlace-recordatorio {
@@ -919,3 +918,45 @@ body {
 .enlace-recordatorio:hover {
     color: var(--azul-medio);
 }
+/* Formularios de acciones con la misma distribución que los enlaces. */
+.form-accion-eliminar { display: inline-flex; margin: 0; }
+.form-accion-eliminar .btn-accion { cursor: pointer; }
+
+/* Estilos de componentes trasladados desde las vistas. */
+.vc-contador-notificaciones { background:var(--azul-claro);color:var(--azul-oscuro);font-size:10px; }
+.vc-inicio-propietarios-33d3bc6 { border-top:1px solid rgba(255,255,255,.2); }
+.vc-inicio-propietarios-10e56a2 { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.3); color:#fff; font-size:13px; }
+.vc-inicio-propietarios-792bd2d { width:56px;height:56px;font-size:26px; }
+.vc-inicio-propietarios-37dc9ec { font-size:22px; font-weight:800; color:var(--azul-oscuro); }
+.vc-inicio-propietarios-4117867 { font-size:28px; font-weight:800; color:var(--azul-oscuro); margin:4px 0; }
+.vc-inicio-propietarios-47aa402 { font-size:13px; color:var(--texto-gris); }
+.vc-inicio-propietarios-45ce0e3 { font-size:12px; color:var(--texto-gris); margin-top:5px; }
+.vc-divisor-acciones { border-top:1px solid var(--borde); }
+.vc-inicio-propietarios-5e0faad { font-size:13px; }
+.vc-inicio-propietarios-b0506e8 { font-size:13px; border-color:#fca5a5; color:#991b1b; background:#fff0f0; }
+.vc-inicio-propietarios-3c6965c { font-size:20px; font-weight:800; color:var(--azul-oscuro); }
+.vc-inicio-propietarios-ecd7d17 { font-size:13px; color:var(--texto-gris); margin-top:8px; }
+.vc-inicio-propietarios-c99cf0a { font-size:12px; font-weight:700; color:var(--azul-medio); margin-top:-10px; margin-bottom:16px; }
+.vc-texto-destacado { font-size:14px;font-weight:700;color:var(--azul-oscuro); }
+.vc-inicio-propietarios-2f04701 { background:#fee2e2; color:#991b1b; }
+.vc-etiqueta-compacta { font-size:12px; padding:6px 14px; }
+.vc-suscripcion-tarjeta { border-left:4px solid #1a1f5e; }
+.vc-etiqueta-mayuscula { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em; }
+.vc-nombre-plan { color:var(--azul-oscuro);font-size:16px; }
+.vc-texto-xs { font-size:12px; }
+.vc-texto-xxs { font-size:11px; }
+.vc-ancho-icono { min-width:52px; }
+
+.vc-contador-notificaciones { background:var(--azul-claro);color:var(--azul-oscuro);font-size:10px; }
+
+/* Las funciones aún no implementadas no se muestran como enlaces activos. */
+.item-menu-no-disponible { opacity: .55; cursor: not-allowed; }
+
+.icono-inactivo { opacity: .55; cursor: not-allowed; }
+
+/* Contador y avisos no leídos de mensajería (paneles existentes). */
+.contador-mensajes-dinamico { margin-left: auto; background: var(--azul-medio, #4992b5); color: #fff; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+.mensajes-notificacion-toast { position: fixed; right: 22px; bottom: 22px; z-index: 1200; width: min(350px, calc(100vw - 44px)); background: #fff; color: #1d2939; padding: 14px 18px; border-radius: 12px; box-shadow: 0 12px 34px rgba(20, 27, 68, .18); border: 1px solid var(--borde, #dce2ea); font-size: 13px; }
+.mensajes-notificacion-toast a { color: var(--azul-oscuro, #1a1f5e); font-weight: 700; }
+.mensajes-notificacion-toast p { margin: 9px 0; }
+.mensajes-notificacion-toast button { float: right; border: 0; background: transparent; padding: 0; font-size: 19px; }

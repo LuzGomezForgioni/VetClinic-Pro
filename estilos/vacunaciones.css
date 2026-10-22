@@ -3,7 +3,6 @@
    Complementa inicio.css
 ========================================================= */
 
-
 /* =========================================================
    ENCABEZADO
 ========================================================= */
@@ -24,7 +23,6 @@
     color: var(--texto-gris);
     font-size: 13px;
 }
-
 
 /* =========================================================
    SELECTOR DE MASCOTAS
@@ -54,7 +52,6 @@
     white-space: nowrap;
 }
 
-
 /*
    Una sola fila.
    Si hay muchas mascotas aparece desplazamiento horizontal.
@@ -68,7 +65,6 @@
     overflow-x: auto;
     padding: 2px 2px 10px;
 }
-
 
 /* Tarjeta de mascota */
 
@@ -102,7 +98,6 @@
     transform: translateY(-2px);
 }
 
-
 /* Seleccionada */
 
 .tarjeta-selector-mascota.activa {
@@ -115,7 +110,6 @@
     border-color: transparent;
     color: var(--blanco);
 }
-
 
 /* Icono mascota */
 
@@ -138,7 +132,6 @@
 .tarjeta-selector-mascota.activa .icono-selector-mascota {
     background: rgba(255, 255, 255, .16);
 }
-
 
 /* Datos */
 
@@ -182,7 +175,6 @@
     color: var(--blanco);
     font-size: 14px;
 }
-
 
 /* =========================================================
    MASCOTA SELECCIONADA
@@ -242,7 +234,6 @@
     font-size: 12px;
 }
 
-
 /* Contador */
 
 .contador-vacunas {
@@ -272,7 +263,6 @@
     font-weight: 600;
 }
 
-
 /* =========================================================
    RESUMEN
 ========================================================= */
@@ -281,7 +271,6 @@
     background: #fee2e2;
     color: #991b1b;
 }
-
 
 /* =========================================================
    LISTA DE VACUNAS
@@ -300,7 +289,6 @@
 
     padding: 18px 20px;
 }
-
 
 /* Icono principal */
 
@@ -339,7 +327,6 @@
     color: #6b7280;
 }
 
-
 /* Información */
 
 .contenido-vacuna {
@@ -374,7 +361,6 @@
     margin-right: 4px;
     color: var(--azul-medio);
 }
-
 
 /* =========================================================
    DATOS DE LA VACUNA
@@ -426,7 +412,6 @@
     line-height: 1.5;
 }
 
-
 /* =========================================================
    BADGES
 ========================================================= */
@@ -443,7 +428,6 @@
     background: #f3f4f6;
     color: #6b7280;
 }
-
 
 /* =========================================================
    VACÍO
@@ -489,3 +473,5 @@
     color: var(--texto-gris);
     font-size: 13px;
 }
+/* Estilos de componentes trasladados desde las vistas. */
+.vc-contador-notificaciones { background: var(--azul-claro); color: var(--azul-oscuro); font-size: 10px; }

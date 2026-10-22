@@ -5,12 +5,13 @@
 // ============================================================
 session_start();
 
-if (empty($_SESSION['logueado'])) {
+if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'propietario') {
     header('Location: ../index.php');
     exit;
 }
 
 require_once '../config/conexion.php';
+require_once '../config/seguridad.php';
 
 $idPropietario = (int)$_SESSION['usuario_id'];
 $nombre        = $_SESSION['usuario_nombre'];
@@ -100,7 +101,6 @@ function horaTurno(string $fechaHora): string
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -114,11 +114,9 @@ function horaTurno(string $fechaHora): string
     <link rel="stylesheet" href="../estilos/inicio.css" />
     <link rel="stylesheet" href="../estilos/abm.css" />
 </head>
-
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0 min-vh-100">
-
             <!-- SIDEBAR -->
             <div class="col-12 col-lg-2 panel-lateral">
                 <a href="../propietarios/inicio_propietarios.php" class="logo-lateral">
@@ -128,7 +126,6 @@ function horaTurno(string $fechaHora): string
                         <div class="subtitulo-sistema">Portal del propietario</div>
                     </div>
                 </a>
-
                 <div class="seccion-nav">Mi espacio</div>
                 <a href="../propietarios/inicio_propietarios.php" class="item-menu">
                     <i class="bi bi-grid"></i> Inicio
@@ -147,22 +144,16 @@ function horaTurno(string $fechaHora): string
                 <a href="../propietarios/vacunaciones.php" class="item-menu">
                     <i class="bi bi-shield-plus"></i> Vacunaciones
                 </a>
-                <a href="#" class="item-menu">
-                    <i class="bi bi-chat-dots"></i> Mensajes
-                </a>
+                <a href="../propietarios/mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
                 <div class="seccion-nav">
                     Configuración
                 </div>
-
                 <a
                     href="../propietarios/configuracion_propietario.php"
                     class="item-menu">
-
                     <i class="bi bi-gear"></i>
                     Mi configuración
-
                 </a>
-
                 <div class="usuario-lateral">
                     <div class="avatar-usuario">
                         <?= htmlspecialchars(strtoupper(mb_substr($nombre, 0, 1))) ?>
@@ -173,10 +164,8 @@ function horaTurno(string $fechaHora): string
                     </div>
                 </div>
             </div>
-
             <!-- ÁREA PRINCIPAL -->
             <div class="col-12 col-lg-10 area-principal">
-
                 <div class="barra-superior">
                     <div>
                         <p class="titulo-pagina">Mis Turnos 📅</p>
@@ -192,23 +181,19 @@ function horaTurno(string $fechaHora): string
                             href="../propietarios/configuracion_propietario.php"
                             class="icono-barra"
                             title="Mi configuración">
-
                             <i class="bi bi-gear"></i>
-
                         </a>
-                        <a href="../index.php" class="icono-barra" title="Cerrar sesión">
+                        <a href="../logout.php" class="icono-barra" title="Cerrar sesión">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </div>
                 </div>
-
                 <?php if ($mensaje): ?>
                     <div class="alerta-operacion alerta-<?= $tipoMsg ?>" role="alert">
                         <i class="bi bi-<?= $tipoMsg === 'exito' ? 'check-circle-fill' : 'exclamation-circle-fill' ?>"></i>
                         <?= htmlspecialchars($mensaje) ?>
                     </div>
                 <?php endif; ?>
-
                 <?php if (empty($turnos)): ?>
                     <div class="tarjeta estado-vacio">
                         <div class="emoji-vacio">📅</div>
@@ -219,17 +204,14 @@ function horaTurno(string $fechaHora): string
                         </a>
                     </div>
                 <?php else: ?>
-
                     <div class="lista-turnos">
                         <?php foreach ($turnos as $t): ?>
                             <div class="tarjeta-turno">
-
                                 <div class="cabecera-turno">
                                     <div class="fecha-turno">
                                         <div class="dia-turno"><?= htmlspecialchars((new DateTime($t['fecha_hora']))->format('d')) ?></div>
                                         <div class="mes-turno"><?= htmlspecialchars(mb_strtoupper((new DateTime($t['fecha_hora']))->format('M'))) ?></div>
                                     </div>
-
                                     <div class="datos-turno">
                                         <div class="nombre-mascota-turno">
                                             <?= htmlspecialchars($t['nombre_mascota']) ?>
@@ -245,13 +227,11 @@ function horaTurno(string $fechaHora): string
                                             <?php endif; ?>
                                         </div>
                                     </div>
-
                                     <span class="estado-turno <?= claseEstado($t['estado']) ?>">
                                         <i class="bi bi-<?= iconoEstado($t['estado']) ?>"></i>
                                         <?= htmlspecialchars(ucfirst($t['estado'])) ?>
                                     </span>
                                 </div>
-
                                 <div class="cuerpo-turno">
                                     <div class="dato-fila">
                                         <i class="bi bi-clock"></i>
@@ -268,34 +248,27 @@ function horaTurno(string $fechaHora): string
                                         </div>
                                     <?php endif; ?>
                                 </div>
-
                                 <?php if (mb_strtolower($t['estado']) !== 'cancelado' && mb_strtolower($t['estado']) !== 'realizado'): ?>
                                     <div class="acciones-turno">
                                         <a href="editar_turno.php?id=<?= (int)$t['id_turno'] ?>" class="btn-accion btn-editar">
                                             <i class="bi bi-pencil"></i> Editar
                                         </a>
-                                        <a href="eliminar_turno.php?id=<?= (int)$t['id_turno'] ?>"
-                                            class="btn-accion btn-eliminar"
-                                            onclick="return confirmarEliminar(event, this)">
-                                            <i class="bi bi-x-lg"></i> Cancelar
-                                        </a>
+                                        <form action="eliminar_turno.php" method="POST" class="form-accion-eliminar" onsubmit="return confirmarEliminar(event, this)">
+                                            <input type="hidden" name="id" value="<?= (int)$t['id_turno'] ?>">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar"><i class="bi bi-x-lg"></i> Cancelar</button>
+                                        </form>
                                     </div>
                                 <?php endif; ?>
-
                             </div>
                         <?php endforeach; ?>
                     </div>
-
                 <?php endif; ?>
-
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmarEliminar(e, enlace) {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    <script>
+        function confirmarEliminar(e, formulario) {
             e.preventDefault();
 
             Swal.fire({
@@ -309,11 +282,10 @@ function horaTurno(string $fechaHora): string
                 cancelButtonColor: '#6b7280'
             }).then(function(result) {
                 if (result.isConfirmed) {
-                    window.location.href = enlace.href;
+                    formulario.submit();
                 }
             });
         }
-    </script>
+    </script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
-
 </html>

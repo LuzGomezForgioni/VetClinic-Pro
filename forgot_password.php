@@ -1,4 +1,11 @@
 <?php
+session_start();
+require_once 'config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
+
+
 
 include("config/conexion.php");
 
@@ -193,159 +200,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-
     <title>
         Recuperar contraseña · VetClinic Pro
     </title>
-
     <link
         rel="icon"
         type="image/png"
         href="img/VetClinic Pro.png">
-
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com">
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet">
-
     <link
         rel="stylesheet"
         href="estilos/index.css">
-
 </head>
-
 <body>
-
 <div class="container-fluid min-vh-100">
-
     <div class="row min-vh-100">
-
         <!-- PANEL IZQUIERDO -->
         <div class="col-12 col-lg-6 panel-izquierdo d-flex flex-column">
-
             <div class="logo">
-
                 <img
                     src="img/VetClinic Pro.png"
                     alt="Logo"
                     class="logo-img">
-
                 <div>
                     <h4>VetClinic Pro</h4>
                     <span>Sistema de Gestión Veterinaria</span>
                 </div>
-
             </div>
-
             <div class="contenido-principal flex-grow-1 d-flex flex-column justify-content-center">
-
                 <h1>
                     Recuperá el acceso a
                     <span><i>tu cuenta.</i></span>
                 </h1>
-
                 <p>
                     Ingresá el correo asociado a tu cuenta y te ayudaremos
                     a crear una nueva contraseña.
                 </p>
-
             </div>
-
             <div class="beneficios mt-2">
-
                 <p>
                     <i class="bi bi-check-circle-fill me-2"></i>
                     El enlace de recuperación dura 30 minutos
                 </p>
-
                 <p>
                     <i class="bi bi-check-circle-fill me-2"></i>
                     La contraseña anterior nunca se muestra
                 </p>
-
                 <p>
                     <i class="bi bi-check-circle-fill me-2"></i>
                     La nueva contraseña se guarda protegida con hash
                 </p>
-
             </div>
-
         </div>
-
         <!-- PANEL DERECHO -->
         <div class="col-12 col-lg-6 panel-derecho d-flex justify-content-center align-items-center">
-
             <div class="login-container">
-
                 <span class="portal-acceso">
                     Recuperar acceso
                 </span>
-
                 <h2>
                     ¿Olvidaste tu contraseña?
                 </h2>
-
                 <p class="subtitulo">
                     Escribí el correo electrónico de tu cuenta.
                 </p>
-
                 <?php if ($mensaje !== ''): ?>
-
                     <div class="alert alert-info">
-
                         <i class="bi bi-info-circle me-2"></i>
-
                         <?= htmlspecialchars($mensaje) ?>
-
                     </div>
-
                 <?php endif; ?>
-
                 <form method="POST" action="forgot_password.php">
-
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                     <div class="mb-4">
-
                         <label
                             class="form-label"
                             for="email">
-
                             Correo electrónico
-
                         </label>
-
                         <div class="input-group">
-
                             <span class="input-group-text">
                                 <i class="bi bi-envelope"></i>
                             </span>
-
                             <input
                                 type="email"
                                 class="form-control"
@@ -355,70 +313,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 value="<?= htmlspecialchars($email_form) ?>"
                                 autocomplete="email"
                                 required>
-
                         </div>
-
                     </div>
-
                     <button
                         type="submit"
                         class="btn btn-login">
-
                         Generar enlace de recuperación
-
                         <i class="bi bi-arrow-right ms-2"></i>
-
                     </button>
-
                 </form>
-
                 <?php if ($enlace_prueba !== ''): ?>
-
                     <div class="alert alert-warning mt-4">
-
                         <strong>
                             Modo de prueba en XAMPP
                         </strong>
-
                         <div class="mt-2">
                             Como estás en localhost, el correo no se envía.
                             Usá este enlace para probar la recuperación:
                         </div>
-
                         <a
                             href="<?= htmlspecialchars($enlace_prueba) ?>"
                             class="btn btn-outline-dark mt-3">
-
                             <i class="bi bi-key"></i>
                             Abrir enlace de recuperación
-
                         </a>
-
                     </div>
-
                 <?php endif; ?>
-
                 <div class="registrarse">
-
                     <a
                         class="custom-link"
                         href="index.php">
-
                         <i class="bi bi-arrow-left"></i>
                         Volver a iniciar sesión
-
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 </body>
-
 </html>

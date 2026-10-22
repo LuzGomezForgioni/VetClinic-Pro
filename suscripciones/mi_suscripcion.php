@@ -254,329 +254,222 @@ $finToleranciaTexto =
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-
     <title>
         Mi suscripción · VetClinic Pro
     </title>
-
     <link
         rel="icon"
         type="image/png"
         href="../img/VetClinic Pro.png">
-
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com">
-
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet">
-
     <link
         rel="stylesheet"
         href="../estilos/suscripciones.css">
 </head>
-
-
 <body class="sus-page">
-
 <nav class="plan-navbar">
-
     <div class="container plan-navbar-inner">
-
         <a
             href="<?= $puedeUsar
                 ? '../veterinarios/inicio_veterinario.php'
                 : 'mi_suscripcion.php'
             ?>"
             class="plan-marca">
-
             <img
                 src="../img/VetClinic Pro.png"
                 alt="VetClinic Pro">
-
             <div>
                 <span class="plan-marca-nombre">
                     VetClinic Pro
                 </span>
-
                 <span class="plan-marca-subtitulo">
                     Mi suscripción
                 </span>
             </div>
-
         </a>
-
-
         <div class="sus-nav-actions">
-
             <?php if ($puedeUsar): ?>
-
                 <a
                     href="../veterinarios/inicio_veterinario.php"
                     class="sus-top-link">
-
                     <i class="bi bi-grid"></i>
-
                     Volver al sistema
-
                 </a>
-
             <?php endif; ?>
-
-
             <a
                 href="../logout.php"
                 class="sus-logout-link">
-
                 <i class="bi bi-box-arrow-right"></i>
-
                 Cerrar sesión
-
             </a>
-
         </div>
-
     </div>
-
 </nav>
-
-
 <main class="sus-account-main">
-
     <div class="container">
-
         <?php if ($mensaje): ?>
-
             <div class="sus-message">
                 <i class="bi bi-check-circle-fill"></i>
-
                 <span>
                     <?= htmlspecialchars($mensaje) ?>
                 </span>
             </div>
-
         <?php endif; ?>
-
-
         <div class="sus-account-heading">
-
             <div>
                 <div class="sus-section-kicker">
                     Cuenta profesional
                 </div>
-
                 <h1>
                     Mi suscripción
                 </h1>
-
                 <p>
                     Revisá el estado de tu plan, próximos vencimientos,
                     pagos realizados y opciones de administración.
                 </p>
             </div>
-
-
             <span
                 class="estado-chip sus-account-status <?= htmlspecialchars(
                     claseEstadoSuscripcion($estado)
                 ) ?>">
-
                 <i class="bi bi-circle-fill"></i>
-
                 <?= htmlspecialchars(
                     etiquetaEstadoSuscripcion($estado)
                 ) ?>
-
             </span>
-
         </div>
-
-
         <?php if ($bloqueoAdministrativo): ?>
-
             <div class="sus-state-banner administrativo">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-shield-lock-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Cuenta deshabilitada por administración
                     </strong>
-
                     <p>
                         Esta cuenta no puede reactivarse automáticamente mediante
                         un pago. Contactate con la administración de VetClinic Pro.
                     </p>
                 </div>
-
             </div>
-
-
         <?php elseif ($estado === 'suspendida'): ?>
-
             <div class="sus-state-banner suspendida">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-lock-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Suscripción temporalmente suspendida
                     </strong>
-
                     <p>
                         El período de tolerancia finalizó. Tus datos siguen guardados
                         y recuperarás el acceso automáticamente cuando regularices
                         la mensualidad.
                     </p>
                 </div>
-
                 <a
                     href="checkout_demo.php"
                     class="sus-banner-action">
-
                     Regularizar ahora
-
                 </a>
-
             </div>
-
-
         <?php elseif ($estado === 'atrasada'): ?>
-
             <div class="sus-state-banner atrasada">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Tenés una mensualidad pendiente
                     </strong>
-
                     <p>
                         Podés seguir usando VetClinic Pro hasta el
                         <b><?= htmlspecialchars($finToleranciaTexto) ?></b>.
                         Después de esa fecha la cuenta se suspenderá automáticamente.
                     </p>
                 </div>
-
                 <a
                     href="checkout_demo.php"
                     class="sus-banner-action">
-
                     Pagar ahora
-
                 </a>
-
             </div>
-
-
         <?php elseif ($estado === 'pendiente_pago'): ?>
-
             <div class="sus-state-banner pendiente">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-credit-card-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Falta activar tu cuenta profesional
                     </strong>
-
                     <p>
                         Completá el primer pago de demostración y el acceso
                         a VetClinic Pro se habilitará inmediatamente.
                     </p>
                 </div>
-
                 <a
                     href="checkout_demo.php?primer_pago=1"
                     class="sus-banner-action">
-
                     Activar cuenta
-
                 </a>
-
             </div>
-
-
         <?php elseif ($estado === 'cancelada'): ?>
-
             <div class="sus-state-banner cancelada">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-slash-circle-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Suscripción cancelada
                     </strong>
-
                     <p>
                         Podés volver a utilizar VetClinic Pro abonando
                         una nueva mensualidad.
                     </p>
                 </div>
-
                 <?php if (!$bloqueoAdministrativo): ?>
-
                     <a
                         href="checkout_demo.php"
                         class="sus-banner-action">
-
                         Reactivar
-
                     </a>
-
                 <?php endif; ?>
-
             </div>
-
-
         <?php elseif (
             $diasRestantes !== null &&
             $diasRestantes >= 0 &&
             $diasRestantes <= 7
         ): ?>
-
             <div class="sus-state-banner proxima">
-
                 <div class="sus-state-banner-icon">
                     <i class="bi bi-clock-fill"></i>
                 </div>
-
                 <div>
                     <strong>
                         Tu próximo vencimiento está cerca
                     </strong>
-
                     <p>
                         Vence en
                         <b>
@@ -589,74 +482,49 @@ $finToleranciaTexto =
                         Podés pagar anticipadamente sin perder tu fecha habitual.
                     </p>
                 </div>
-
                 <a
                     href="checkout_demo.php"
                     class="sus-banner-action">
-
                     Pagar anticipado
-
                 </a>
-
             </div>
-
         <?php endif; ?>
-
-
         <div class="row g-4">
-
             <div class="col-lg-8">
-
                 <section class="sus-subscription-hero">
-
                     <div class="sus-subscription-hero-top">
-
                         <div>
                             <span>
                                 Plan actual
                             </span>
-
                             <h2>
                                 <?= htmlspecialchars(
                                     $suscripcion['nombre_plan']
                                 ) ?>
                             </h2>
-
                             <p>
                                 <?= htmlspecialchars(
                                     $textoPrincipal
                                 ) ?>
                             </p>
                         </div>
-
-
                         <div class="sus-subscription-price">
-
                             <?= formatoDinero(
                                 (float) $suscripcion['precio_mensual']
                             ) ?>
-
                             <small>
                                 / mes
                             </small>
-
                         </div>
-
                     </div>
-
-
                     <div class="sus-subscription-stats">
-
                         <div>
-
                             <div class="sus-stat-icon">
                                 <i class="bi bi-calendar-check"></i>
                             </div>
-
                             <span>
                                 Inicio
                             </span>
-
                             <strong>
                                 <?= $suscripcion['fecha_inicio']
                                     ? date(
@@ -668,59 +536,39 @@ $finToleranciaTexto =
                                     : 'Pendiente'
                                 ?>
                             </strong>
-
                         </div>
-
-
                         <div>
-
                             <div class="sus-stat-icon">
                                 <i class="bi bi-calendar-event"></i>
                             </div>
-
                             <span>
                                 Próximo vencimiento
                             </span>
-
                             <strong>
                                 <?= htmlspecialchars(
                                     $proximoPagoTexto
                                 ) ?>
                             </strong>
-
                         </div>
-
-
                         <div>
-
                             <div class="sus-stat-icon">
                                 <i class="bi bi-hourglass-split"></i>
                             </div>
-
                             <span>
                                 Tolerancia
                             </span>
-
                             <strong>
                                 <?= (int) $suscripcion['dias_tolerancia'] ?>
                                 días
                             </strong>
-
                         </div>
-
                     </div>
-
-
                     <?php if (!$bloqueoAdministrativo): ?>
-
                         <div class="sus-subscription-actions">
-
                             <a
                                 href="checkout_demo.php"
                                 class="plan-btn plan-btn-principal">
-
                                 <i class="bi bi-credit-card"></i>
-
                                 <?= in_array(
                                     $estado,
                                     [
@@ -733,283 +581,180 @@ $finToleranciaTexto =
                                     ? 'Activar / regularizar'
                                     : 'Pagar próxima mensualidad'
                                 ?>
-
                             </a>
-
-
                             <?php if ($puedeUsar): ?>
-
                                 <a
                                     href="../veterinarios/inicio_veterinario.php"
                                     class="plan-btn plan-btn-secundario">
-
                                     Volver al panel
-
                                 </a>
-
                             <?php endif; ?>
-
                         </div>
-
                     <?php endif; ?>
-
                 </section>
-
             </div>
-
-
             <div class="col-lg-4">
-
                 <section class="sus-surface sus-manage-card">
-
                     <div class="sus-manage-icon">
                         <i class="bi bi-sliders"></i>
                     </div>
-
                     <h2>
                         Administrar suscripción
                     </h2>
-
                     <p>
                         La cancelación mantiene el acceso hasta finalizar
                         el período que ya abonaste.
                     </p>
-
-
                     <?php if (
                         (int) $suscripcion['cancelacion_fin_periodo'] === 1 &&
                         $estado !== 'cancelada'
                     ): ?>
-
                         <div class="sus-cancel-pending">
-
                             <i class="bi bi-calendar-x"></i>
-
                             <div>
                                 <strong>
                                     Cancelación programada
                                 </strong>
-
                                 <span>
                                     El plan finalizará al terminar
                                     el período vigente.
                                 </span>
                             </div>
-
                         </div>
-
-
                         <form method="POST">
-
                             <input
                                 type="hidden"
                                 name="csrf_token"
                                 value="<?= htmlspecialchars(
                                     $_SESSION['csrf_suscripcion']
                                 ) ?>">
-
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="mantener">
-
                             <button
                                 class="sus-manage-button mantener"
                                 type="submit">
-
                                 <i class="bi bi-arrow-counterclockwise"></i>
-
                                 Mantener mi suscripción
-
                             </button>
-
                         </form>
-
-
                     <?php elseif (
                         $estado !== 'cancelada' &&
                         $estado !== 'pendiente_pago'
                     ): ?>
-
                         <form
                             method="POST"
                             onsubmit="return confirm('¿Querés cancelar al finalizar el período abonado?');">
-
                             <input
                                 type="hidden"
                                 name="csrf_token"
                                 value="<?= htmlspecialchars(
                                     $_SESSION['csrf_suscripcion']
                                 ) ?>">
-
                             <input
                                 type="hidden"
                                 name="accion"
                                 value="cancelar">
-
                             <button
                                 class="sus-manage-button cancelar"
                                 type="submit">
-
                                 <i class="bi bi-x-circle"></i>
-
                                 Cancelar suscripción
-
                             </button>
-
                         </form>
-
                     <?php endif; ?>
-
-
                     <div class="sus-manage-help">
-
                         <i class="bi bi-headset"></i>
-
                         <span>
                             ¿Necesitás ayuda con pagos, vencimientos o tu cuenta?
                             Contactate con la administración de VetClinic Pro.
                         </span>
-
                     </div>
-
                 </section>
-
             </div>
-
         </div>
-
-
         <section class="sus-surface sus-cycle-card">
-
             <div class="sus-card-heading">
-
                 <div>
                     <span>
                         Ciclo mensual
                     </span>
-
                     <h2>
                         Cómo se gestiona tu acceso
                     </h2>
                 </div>
-
                 <i class="bi bi-arrow-repeat"></i>
-
             </div>
-
-
             <div class="sus-cycle">
-
                 <div class="sus-cycle-item activo">
-
                     <div>
                         <i class="bi bi-check-lg"></i>
                     </div>
-
                     <strong>
                         Suscripción activa
                     </strong>
-
                     <span>
                         Acceso completo al sistema
                     </span>
-
                 </div>
-
-
                 <div class="sus-cycle-line"></div>
-
-
                 <div class="sus-cycle-item">
-
                     <div>
                         <i class="bi bi-calendar-event"></i>
                     </div>
-
                     <strong>
                         Vencimiento
                     </strong>
-
                     <span>
                         <?= htmlspecialchars(
                             $proximoPagoTexto
                         ) ?>
                     </span>
-
                 </div>
-
-
                 <div class="sus-cycle-line"></div>
-
-
                 <div class="sus-cycle-item">
-
                     <div>
                         <i class="bi bi-hourglass"></i>
                     </div>
-
                     <strong>
                         Tolerancia
                     </strong>
-
                     <span>
                         <?= (int) $suscripcion['dias_tolerancia'] ?>
                         días
                     </span>
-
                 </div>
-
-
                 <div class="sus-cycle-line"></div>
-
-
                 <div class="sus-cycle-item">
-
                     <div>
                         <i class="bi bi-lock"></i>
                     </div>
-
                     <strong>
                         Suspensión
                     </strong>
-
                     <span>
                         Solo si no se regulariza
                     </span>
-
                 </div>
-
             </div>
-
         </section>
-
-
         <section class="sus-surface sus-history-card">
-
             <div class="sus-card-heading">
-
                 <div>
                     <span>
                         Movimientos
                     </span>
-
                     <h2>
                         Historial de pagos
                     </h2>
                 </div>
-
                 <small>
                     Últimas 20 operaciones
                 </small>
-
             </div>
-
-
             <div class="table-responsive">
-
                 <table class="table sus-history-table align-middle mb-0">
-
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -1020,43 +765,27 @@ $finToleranciaTexto =
                             <th></th>
                         </tr>
                     </thead>
-
-
                     <tbody>
-
                         <?php if (!$pagos): ?>
-
                             <tr>
                                 <td colspan="6" class="p-0">
-
                                     <div class="sus-empty-history">
-
                                         <i class="bi bi-receipt"></i>
-
                                         <strong>
                                             Todavía no hay pagos registrados
                                         </strong>
-
                                         <span>
                                             Las operaciones aparecerán acá
                                             después de realizar tu primer pago.
                                         </span>
-
                                     </div>
-
                                 </td>
                             </tr>
-
                         <?php endif; ?>
-
-
                         <?php foreach ($pagos as $pago): ?>
-
                             <tr>
-
                                 <td>
                                     <div class="sus-history-date">
-
                                         <strong>
                                             <?= date(
                                                 'd/m/Y',
@@ -1065,7 +794,6 @@ $finToleranciaTexto =
                                                 )
                                             ) ?>
                                         </strong>
-
                                         <span>
                                             <?= date(
                                                 'H:i',
@@ -1074,11 +802,8 @@ $finToleranciaTexto =
                                                 )
                                             ) ?>
                                         </span>
-
                                     </div>
                                 </td>
-
-
                                 <td>
                                     <span class="sus-operation-number">
                                         <?= htmlspecialchars(
@@ -1086,26 +811,19 @@ $finToleranciaTexto =
                                         ) ?>
                                     </span>
                                 </td>
-
-
                                 <td>
                                     <div class="sus-payment-label">
-
                                         <i class="bi <?= $pago['medio_pago'] === 'billetera'
                                             ? 'bi-phone'
                                             : 'bi-credit-card'
                                         ?>"></i>
-
                                         <?= htmlspecialchars(
                                             ucfirst(
                                                 $pago['medio_pago']
                                             )
                                         ) ?>
-
                                     </div>
                                 </td>
-
-
                                 <td>
                                     <strong class="sus-history-amount">
                                         <?= formatoDinero(
@@ -1113,14 +831,11 @@ $finToleranciaTexto =
                                         ) ?>
                                     </strong>
                                 </td>
-
-
                                 <td>
                                     <span
                                         class="sus-payment-state <?= htmlspecialchars(
                                             $pago['estado']
                                         ) ?>">
-
                                         <i class="bi <?= $pago['estado'] === 'aprobado'
                                             ? 'bi-check-circle-fill'
                                             : (
@@ -1129,56 +844,35 @@ $finToleranciaTexto =
                                                     : 'bi-x-circle-fill'
                                             )
                                         ?>"></i>
-
                                         <?= htmlspecialchars(
                                             ucfirst(
                                                 $pago['estado']
                                             )
                                         ) ?>
-
                                     </span>
                                 </td>
-
-
                                 <td class="text-end">
                                     <a
                                         href="comprobante.php?id=<?= (int) $pago['id_pago'] ?>"
                                         class="sus-view-receipt">
-
                                         Ver comprobante
-
                                         <i class="bi bi-arrow-right"></i>
-
                                     </a>
                                 </td>
-
                             </tr>
-
                         <?php endforeach; ?>
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </section>
-
-
         <div class="sus-demo-footer-note">
-
             <i class="bi bi-flask"></i>
-
             <span>
                 Los pagos de esta versión son simulados para fines de demostración
                 y no representan movimientos bancarios reales.
             </span>
-
         </div>
-
     </div>
-
 </main>
-
 </body>
 </html>

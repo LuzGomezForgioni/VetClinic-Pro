@@ -24,6 +24,20 @@ require_once '../config/proteger_acceso_veterinario.php';
 // ============================================================
 
 $id_veterinario = (int) ($_SESSION['usuario_id'] ?? 0);
+
+$mensajes_pendientes_inicio = 0;
+try {
+    $stmtMsg = $conn->prepare("SELECT COUNT(*) AS total FROM mensajes m
+        INNER JOIN conversaciones c ON c.id_conversacion = m.id_conversacion
+        WHERE c.id_veterinario = ? AND m.remitente_tipo = 'propietario' AND m.leido_en IS NULL");
+    $stmtMsg->bind_param('i', $id_veterinario);
+    $stmtMsg->execute();
+    $mensajes_pendientes_inicio = (int)($stmtMsg->get_result()->fetch_assoc()['total'] ?? 0);
+    $stmtMsg->close();
+} catch (mysqli_sql_exception $e) {
+    error_log('VetClinic Pro: ejecutar la migración de mensajería para mostrar pendientes.');
+}
+
 $nombre = $_SESSION['usuario_nombre'] ?? 'Doctor/a';
 $apellido = $_SESSION['usuario_apellido'] ?? '';
 $sexo = strtoupper(trim($_SESSION['usuario_sexo'] ?? ''));
@@ -410,36 +424,27 @@ while ($fila = $resultado->fetch_assoc()) {
 $stmt->close();
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inicio — Veterinario · VetClinic Pro</title>
     <link rel="icon" type="image/png" href="../img/VetClinic Pro.png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-
     <link rel="stylesheet" href="../estilos/inicio.css" />
 </head>
-
 <body>
 <div class="container-fluid p-0">
     <div class="row g-0 min-vh-100">
-
         <!-- ================================================== -->
         <!-- BARRA LATERAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a href="inicio_veterinario.php" class="logo-lateral">
                 <img src="../img/VetClinic Pro.png" alt="Logo VetClinic Pro" />
                 <div>
@@ -447,55 +452,44 @@ $stmt->close();
                     <div class="subtitulo-sistema">Portal del veterinario</div>
                 </div>
             </a>
-
             <div class="seccion-nav">Principal</div>
-
             <a href="inicio_veterinario.php" class="item-menu activo">
                 <i class="bi bi-grid"></i> Inicio
             </a>
-
             <a href="turnos_veterinario.php" class="item-menu">
                 <i class="bi bi-calendar-check"></i> Turnos
             </a>
-
             <a href="mascotas_veterinario.php" class="item-menu">
                 <i class="bi bi-heart-pulse"></i> Mascotas
             </a>
-
             <a href="historiales_veterinario.php" class="item-menu">
                 <i class="bi bi-journal-medical"></i> Historial clínico
             </a>
-
             <div class="seccion-nav">Gestión</div>
-
             <a href="propietarios_veterinario.php" class="item-menu">
                 <i class="bi bi-people"></i> Propietarios
             </a>
-
             <a href="vacunaciones_veterinario.php" class="item-menu">
                 <i class="bi bi-shield-plus"></i> Vacunaciones
             </a>
-
             <!-- Mensajes queda pendiente por ahora -->
-            <a href="#" class="item-menu" title="Disponible más adelante">
-                <i class="bi bi-chat-dots"></i> Mensajes
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes
+                <?php if ($mensajes_pendientes_inicio > 0): ?><span class="badge bg-light text-primary ms-auto"><?= $mensajes_pendientes_inicio ?></span><?php endif; ?>
             </a>
-
             <div class="seccion-nav">Configuración</div>
-
-            <a href="horarios_atencion.php" class="item-menu">
+            <a href="configuracion_veterinario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
+                <a href="horarios_atencion.php" class="item-menu">
                 <i class="bi bi-clock"></i> Horarios de atención
             </a>
-
             <a href="../suscripciones/mi_suscripcion.php" class="item-menu">
                 <i class="bi bi-credit-card-2-front"></i> Mi suscripción
             </a>
-
             <div class="usuario-lateral">
                 <div class="avatar-usuario">
                     <?= strtoupper(substr($nombre, 0, 1) . substr($apellido, 0, 1)) ?>
                 </div>
-
                 <div>
                     <div class="nombre-usuario">
                         <?= htmlspecialchars($nombre . ' ' . $apellido) ?>
@@ -503,17 +497,12 @@ $stmt->close();
                     <div class="rol-usuario">Veterinario</div>
                 </div>
             </div>
-
         </div>
-
         <!-- ================================================== -->
         <!-- ÁREA PRINCIPAL -->
         <!-- ================================================== -->
-
         <div class="col-12 col-lg-10 area-principal">
-
             <!-- BARRA SUPERIOR -->
-
             <div class="barra-superior">
                 <div>
                     <p class="titulo-pagina">
@@ -521,31 +510,25 @@ $stmt->close();
                         <?= htmlspecialchars($titulo) ?>
                         <?= htmlspecialchars($apellido) ?> 👋
                     </p>
-
                     <p class="fecha-hoy">
                         <?= htmlspecialchars($fecha_actual) ?>
                     </p>
                 </div>
-
                 <div class="d-flex gap-2">
                     <a href="#recordatorios" class="icono-barra" title="Recordatorios">
                         <i class="bi bi-bell"></i>
                     </a>
-
                     <a href="horarios_atencion.php" class="icono-barra" title="Horarios de atención">
                         <i class="bi bi-gear"></i>
                     </a>
-
                     <a href="../logout.php" class="icono-barra" title="Cerrar sesión">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
             </div>
-
             <!-- ================================================== -->
             <!-- ESTADO DE LA SUSCRIPCIÓN -->
             <!-- ================================================== -->
-
             <?php if (!empty($suscripcionGuard)): ?>
                 <?php
                     $estadoSuscripcionInicio = (string) $suscripcionGuard['estado'];
@@ -557,17 +540,17 @@ $stmt->close();
                         $diasParaVencerInicio = (int) $hoySuscripcionInicio->diff($venceSuscripcionInicio)->format('%r%a');
                     }
                 ?>
-                <div class="tarjeta mb-4" style="border-left:4px solid #1a1f5e;">
+                <div class="tarjeta mb-4 vc-suscripcion-tarjeta" >
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <div class="text-muted" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Mi suscripción</div>
+                            <div class="text-muted vc-etiqueta-mayuscula" >Mi suscripción</div>
                             <div class="d-flex align-items-center gap-2 mt-1">
-                                <strong style="color:var(--azul-oscuro);font-size:16px;"><?= htmlspecialchars($suscripcionGuard['nombre_plan']) ?></strong>
+                                <strong class="vc-nombre-plan" ><?= htmlspecialchars($suscripcionGuard['nombre_plan']) ?></strong>
                                 <span class="badge <?= $estadoSuscripcionInicio === 'activa' ? 'text-bg-success' : 'text-bg-warning' ?>">
                                     <?= htmlspecialchars(etiquetaEstadoSuscripcion($estadoSuscripcionInicio)) ?>
                                 </span>
                             </div>
-                            <div class="text-muted mt-1" style="font-size:12px;">
+                            <div class="text-muted mt-1 vc-texto-xs" >
                                 <?= formatoDinero((float)$suscripcionGuard['precio_mensual']) ?> / mes
                                 <?php if ($fechaVencimientoInicio): ?>
                                     · Próximo vencimiento: <strong><?= date('d/m/Y', strtotime($fechaVencimientoInicio)) ?></strong>
@@ -583,13 +566,10 @@ $stmt->close();
                     </div>
                 </div>
             <?php endif; ?>
-
             <!-- ================================================== -->
             <!-- TARJETAS RESUMEN -->
             <!-- ================================================== -->
-
             <div class="row g-3 mb-4">
-
                 <div class="col-6 col-lg-3">
                     <div class="tarjeta-resumen">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -598,9 +578,7 @@ $stmt->close();
                             </div>
                             <span class="etiqueta-metrica">Turnos hoy</span>
                         </div>
-
                         <div class="numero-metrica"><?= $total_turnos_hoy ?></div>
-
                         <div class="sub-metrica">
                             <?php if ($turnos_pendientes_hoy > 0): ?>
                                 <?= $turnos_pendientes_hoy ?>
@@ -611,7 +589,6 @@ $stmt->close();
                         </div>
                     </div>
                 </div>
-
                 <div class="col-6 col-lg-3">
                     <div class="tarjeta-resumen">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -620,12 +597,10 @@ $stmt->close();
                             </div>
                             <span class="etiqueta-metrica">Mascotas atendidas</span>
                         </div>
-
                         <div class="numero-metrica"><?= $mascotas_atendidas_semana ?></div>
                         <div class="sub-metrica">Esta semana</div>
                     </div>
                 </div>
-
                 <div class="col-6 col-lg-3">
                     <div class="tarjeta-resumen">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -634,12 +609,10 @@ $stmt->close();
                             </div>
                             <span class="etiqueta-metrica">Vacunaciones próximas</span>
                         </div>
-
                         <div class="numero-metrica"><?= $vacunaciones_proximas ?></div>
                         <div class="sub-metrica">En los próximos 7 días</div>
                     </div>
                 </div>
-
                 <div class="col-6 col-lg-3">
                     <div class="tarjeta-resumen">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -648,18 +621,14 @@ $stmt->close();
                             </div>
                             <span class="etiqueta-metrica">Pacientes activos</span>
                         </div>
-
                         <div class="numero-metrica"><?= $pacientes_activos ?></div>
                         <div class="sub-metrica">Registrados en la clínica</div>
                     </div>
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- ACCESOS RÁPIDOS -->
             <!-- ================================================== -->
-
             <div class="row g-3 mb-4">
                 <div class="col-12">
                     <div class="tarjeta">
@@ -667,102 +636,80 @@ $stmt->close();
                             <i class="bi bi-lightning-charge-fill"></i>
                             Accesos rápidos
                         </div>
-
                         <div class="row g-3">
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="mascotas_veterinario.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-heart-pulse"></i></div>
                                     Gestionar mascotas
                                 </a>
                             </div>
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="propietarios_veterinario.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-people"></i></div>
                                     Propietarios
                                 </a>
                             </div>
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="historiales_veterinario.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-journal-medical"></i></div>
                                     Historial clínico
                                 </a>
                             </div>
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="vacunaciones_veterinario.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-shield-plus"></i></div>
                                     Vacunaciones
                                 </a>
                             </div>
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="turnos_veterinario.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-calendar-check"></i></div>
                                     Ver turnos
                                 </a>
                             </div>
-
                             <div class="col-6 col-md-4 col-lg-2">
                                 <a href="horarios_atencion.php" class="acceso-rapido">
                                     <div class="icono-acceso"><i class="bi bi-clock"></i></div>
                                     Horarios
                                 </a>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
-
             <!-- ================================================== -->
             <!-- TURNOS DE HOY + ÚLTIMAS ATENDIDAS -->
             <!-- ================================================== -->
-
             <div class="row g-3 mb-4">
-
                 <!-- TURNOS DE HOY -->
-
                 <div class="col-12 col-lg-6">
                     <div class="tarjeta h-100">
-
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="titulo-tarjeta mb-0">
                                 <i class="bi bi-calendar2-week"></i>
                                 Turnos de hoy
                             </div>
-
-                            <a href="turnos_veterinario.php" class="btn-secundario" style="font-size:12px; padding:6px 14px;">
+                            <a href="turnos_veterinario.php" class="btn-secundario vc-etiqueta-compacta" >
                                 Ver todos <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-
                         <?php if (!empty($turnos_hoy)): ?>
-
                             <ul class="lista-turnos">
-
                                 <?php foreach (array_slice($turnos_hoy, 0, 5) as $turno): ?>
-
                                     <li class="item-turno">
                                         <span class="hora-turno">
                                             <?= date('H:i', strtotime($turno['fecha_hora'])) ?>
                                         </span>
-
                                         <div class="separador-turno"></div>
-
                                         <div class="flex-grow-1">
                                             <div class="nombre-paciente">
                                                 <?= htmlspecialchars($turno['nombre_mascota']) ?>
-
                                                 <?php if (!empty($turno['nombre_raza'])): ?>
                                                     — <?= htmlspecialchars($turno['nombre_raza']) ?>
                                                 <?php elseif (!empty($turno['nombre_especie'])): ?>
                                                     — <?= htmlspecialchars($turno['nombre_especie']) ?>
                                                 <?php endif; ?>
                                             </div>
-
                                             <div class="tipo-consulta">
                                                 <?= htmlspecialchars($turno['motivo']) ?>
                                                 ·
@@ -772,67 +719,48 @@ $stmt->close();
                                                 ) ?>
                                             </div>
                                         </div>
-
                                         <?= mostrarEstadoInicio($turno['estado']) ?>
                                     </li>
-
                                 <?php endforeach; ?>
-
                             </ul>
-
                         <?php else: ?>
-
                             <div class="text-center py-4">
                                 <div class="icono-metrica icono-azul-claro mx-auto mb-3">
                                     <i class="bi bi-calendar-x"></i>
                                 </div>
-
-                                <div style="font-size:14px;font-weight:700;color:var(--azul-oscuro);">
+                                <div class="vc-texto-destacado" >
                                     No tenés turnos para hoy
                                 </div>
-
-                                <div class="text-muted mt-1" style="font-size:11px;">
+                                <div class="text-muted mt-1 vc-texto-xxs" >
                                     Tu agenda de hoy está libre.
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </div>
                 </div>
-
                 <!-- ÚLTIMAS ATENDIDAS -->
-
                 <div class="col-12 col-lg-6">
                     <div class="tarjeta h-100">
-
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="titulo-tarjeta mb-0">
                                 <i class="bi bi-clock-history"></i>
                                 Últimas atendidas
                             </div>
-
-                            <a href="historiales_veterinario.php" class="btn-secundario" style="font-size:12px; padding:6px 14px;">
+                            <a href="historiales_veterinario.php" class="btn-secundario vc-etiqueta-compacta" >
                                 Ver historial <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-
                         <?php if (!empty($ultimas_atendidas)): ?>
-
                             <ul class="lista-mascotas">
-
                                 <?php foreach ($ultimas_atendidas as $mascota): ?>
-
                                     <li class="item-mascota">
                                         <div class="avatar-mascota">
                                             <?= iconoMascotaInicio($mascota['nombre_especie']) ?>
                                         </div>
-
                                         <div class="informacion-mascota flex-grow-1">
                                             <div class="nombre-mascota">
                                                 <?= htmlspecialchars($mascota['nombre_mascota']) ?>
                                             </div>
-
                                             <div class="detalle-mascota">
                                                 <?= htmlspecialchars(
                                                     $mascota['nombre_raza']
@@ -844,57 +772,39 @@ $stmt->close();
                                                 <?= htmlspecialchars($mascota['motivo_consulta']) ?>
                                             </div>
                                         </div>
-
-                                        <span class="text-muted" style="font-size:12px;">
+                                        <span class="text-muted vc-texto-xs" >
                                             <?= htmlspecialchars(fechaRelativaInicio($mascota['fecha_consulta'])) ?>
                                         </span>
                                     </li>
-
                                 <?php endforeach; ?>
-
                             </ul>
-
                         <?php else: ?>
-
                             <div class="text-center py-4">
                                 <div class="icono-metrica icono-azul-claro mx-auto mb-3">
                                     <i class="bi bi-journal-medical"></i>
                                 </div>
-
-                                <div style="font-size:14px;font-weight:700;color:var(--azul-oscuro);">
+                                <div class="vc-texto-destacado" >
                                     Todavía no registraste consultas
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </div>
                 </div>
-
             </div>
-
             <!-- ================================================== -->
             <!-- RECORDATORIOS + PRÓXIMOS TURNOS -->
             <!-- ================================================== -->
-
             <div class="row g-3">
-
                 <!-- RECORDATORIOS -->
-
                 <div class="col-12 col-lg-6" id="recordatorios">
                     <div class="tarjeta h-100">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-bell-fill"></i>
                             Recordatorios importantes
                         </div>
-
                         <?php if (!empty($recordatorios)): ?>
-
                             <ul class="lista-recordatorios">
-
                                 <?php foreach ($recordatorios as $recordatorio): ?>
-
                                     <?php
                                     $dias_restantes = (int) $recordatorio['dias_restantes'];
                                     $clase_recordatorio = 'info';
@@ -928,22 +838,17 @@ $stmt->close();
                                             ' en ' . $dias_restantes . ' días';
                                     }
                                     ?>
-
                                     <li class="item-recordatorio <?= $clase_recordatorio ?>">
                                         <i class="bi <?= $icono_recordatorio ?>"></i>
-
                                         <div>
                                             <div class="texto-recordatorio">
                                                 <?= htmlspecialchars($texto_recordatorio) ?>
                                             </div>
-
                                             <div class="sub-recordatorio">
                                                 <?= htmlspecialchars($recordatorio['nombre_mascota']) ?>
-
                                                 <?php if (!empty($recordatorio['nombre_raza'])): ?>
                                                     — <?= htmlspecialchars($recordatorio['nombre_raza']) ?>
                                                 <?php endif; ?>
-
                                                 · Prop.
                                                 <?= htmlspecialchars(
                                                     $recordatorio['nombre_propietario'] . ' ' .
@@ -952,68 +857,49 @@ $stmt->close();
                                             </div>
                                         </div>
                                     </li>
-
                                 <?php endforeach; ?>
-
                             </ul>
-
                         <?php else: ?>
-
                             <div class="text-center py-4">
                                 <div class="icono-metrica icono-azul-claro mx-auto mb-3">
                                     <i class="bi bi-check-circle"></i>
                                 </div>
-
-                                <div style="font-size:14px;font-weight:700;color:var(--azul-oscuro);">
+                                <div class="vc-texto-destacado" >
                                     No hay vacunas próximas o vencidas
                                 </div>
-
-                                <div class="text-muted mt-1" style="font-size:11px;">
+                                <div class="text-muted mt-1 vc-texto-xxs" >
                                     No hay recordatorios para los próximos 30 días.
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </div>
                 </div>
-
                 <!-- PRÓXIMOS TURNOS -->
-
                 <div class="col-12 col-lg-6">
                     <div class="tarjeta h-100">
-
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="titulo-tarjeta mb-0">
                                 <i class="bi bi-calendar-plus"></i>
                                 Próximos turnos
                             </div>
-
-                            <a href="turnos_veterinario.php" class="btn-secundario" style="font-size:12px; padding:6px 14px;">
+                            <a href="turnos_veterinario.php" class="btn-secundario vc-etiqueta-compacta" >
                                 Ver todos <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-
                         <?php if (!empty($proximos_turnos)): ?>
-
                             <ul class="lista-turnos">
-
                                 <?php foreach ($proximos_turnos as $turno): ?>
-
                                     <li class="item-turno">
-                                        <span class="hora-turno" style="min-width:52px;">
+                                        <span class="hora-turno vc-ancho-icono" >
                                             <?= date('d/m', strtotime($turno['fecha_hora'])) ?>
                                         </span>
-
                                         <div class="separador-turno"></div>
-
                                         <div class="flex-grow-1">
                                             <div class="nombre-paciente">
                                                 <?= htmlspecialchars($turno['nombre_mascota']) ?>
                                                 ·
                                                 <?= date('H:i', strtotime($turno['fecha_hora'])) ?> hs
                                             </div>
-
                                             <div class="tipo-consulta">
                                                 <?= htmlspecialchars($turno['motivo']) ?>
                                                 ·
@@ -1023,39 +909,26 @@ $stmt->close();
                                                 ) ?>
                                             </div>
                                         </div>
-
                                         <?= mostrarEstadoInicio($turno['estado']) ?>
                                     </li>
-
                                 <?php endforeach; ?>
-
                             </ul>
-
                         <?php else: ?>
-
                             <div class="text-center py-4">
                                 <div class="icono-metrica icono-azul-claro mx-auto mb-3">
                                     <i class="bi bi-calendar-check"></i>
                                 </div>
-
-                                <div style="font-size:14px;font-weight:700;color:var(--azul-oscuro);">
+                                <div class="vc-texto-destacado" >
                                     No tenés próximos turnos
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
 </html>

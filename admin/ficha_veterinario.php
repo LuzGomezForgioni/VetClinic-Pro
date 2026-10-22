@@ -84,7 +84,6 @@ $seccionActiva = 'veterinarios';
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -95,7 +94,6 @@ $seccionActiva = 'veterinarios';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../estilos/admin.css">
 </head>
-
 <body>
     <div class="container-fluid">
         <div class="row admin-shell">
@@ -160,14 +158,20 @@ $seccionActiva = 'veterinarios';
                                 <div class="d-flex justify-content-between py-2 border-bottom"><span>Vencimiento</span><strong><?= $sus['fecha_vencimiento'] ? date('d/m/Y', strtotime($sus['fecha_vencimiento'])) : '-' ?></strong></div>
                                 <div class="d-flex justify-content-between py-2"><span>Tolerancia hasta</span><strong><?= $sus['fecha_fin_tolerancia'] ? date('d/m/Y', strtotime($sus['fecha_fin_tolerancia'])) : '-' ?></strong></div>
                                 <hr>
-                                <form method="POST" class="mb-2"><input type="hidden" name="accion" value="pago_manual"><button class="btn-admin w-100 justify-content-center" onclick="return confirm('¿Registrar una mensualidad como pagada?')"><i class="bi bi-cash"></i> Registrar pago manual</button></form>
-                                <form method="POST" class="row g-2 mb-2"><input type="hidden" name="accion" value="extender">
+                                <form method="POST" class="mb-2">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="pago_manual"><button class="btn-admin w-100 justify-content-center" onclick="return confirm('¿Registrar una mensualidad como pagada?')"><i class="bi bi-cash"></i> Registrar pago manual</button></form>
+                                <form method="POST" class="row g-2 mb-2">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="extender">
                                     <div class="col-5"><input type="number" class="form-control" name="dias" value="5" min="1" max="30"></div>
                                     <div class="col-7"><button class="btn btn-outline-warning w-100 h-100">Extender tolerancia</button></div>
                                 </form>
-                                <?php if ($sus['estado'] !== 'suspendida'): ?><form method="POST" class="mb-2"><input type="hidden" name="accion" value="suspender"><input type="hidden" name="motivo" value="Suspensión manual por administración."><button class="btn btn-outline-danger w-100" onclick="return confirm('¿Suspender esta suscripción?')">Suspender manualmente</button></form><?php else: ?><form method="POST" class="mb-2"><input type="hidden" name="accion" value="reactivar"><button class="btn btn-outline-success w-100">Reactivar temporalmente</button></form><?php endif; ?>
+                                <?php if ($sus['estado'] !== 'suspendida'): ?><form method="POST" class="mb-2">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="suspender"><input type="hidden" name="motivo" value="Suspensión manual por administración."><button class="btn btn-outline-danger w-100" onclick="return confirm('¿Suspender esta suscripción?')">Suspender manualmente</button></form><?php else: ?><form method="POST" class="mb-2">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="reactivar"><button class="btn btn-outline-success w-100">Reactivar temporalmente</button></form><?php endif; ?>
                             <?php else: ?><div class="alert alert-warning">Sin suscripción asociada.</div><?php endif; ?>
-                            <hr><?php if ((int)$vet['activo'] === 1): ?><form method="POST"><input type="hidden" name="accion" value="baja"><button class="btn btn-outline-dark w-100" onclick="return confirm('¿Dar de baja esta cuenta profesional?')">Dar de baja</button></form><?php else: ?><form method="POST"><input type="hidden" name="accion" value="habilitar"><button class="btn btn-outline-primary w-100">Habilitar cuenta</button></form><?php endif; ?>
+                            <hr><?php if ((int)$vet['activo'] === 1): ?><form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="baja"><button class="btn btn-outline-dark w-100" onclick="return confirm('¿Dar de baja esta cuenta profesional?')">Dar de baja</button></form><?php else: ?><form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="accion" value="habilitar"><button class="btn btn-outline-primary w-100">Habilitar cuenta</button></form><?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -175,5 +179,4 @@ $seccionActiva = 'veterinarios';
         </div>
     </div>
 </body>
-
 </html>

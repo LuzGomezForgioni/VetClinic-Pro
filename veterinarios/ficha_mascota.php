@@ -9,6 +9,10 @@ if (empty($_SESSION['logueado']) || ($_SESSION['tipo_usuario'] ?? '') !== 'veter
 
 include("../config/conexion.php");
 require_once '../config/proteger_acceso_veterinario.php';
+require_once '../config/seguridad.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+}
 
 $nombre = $_SESSION['usuario_nombre'] ?? 'Doctor/a';
 $apellido = $_SESSION['usuario_apellido'] ?? '';
@@ -63,7 +67,6 @@ if (!$mascota) {
     header('Location: mascotas_veterinario.php');
     exit;
 }
-
 
 // ======================================================
 // MENSAJES DE ACCIONES
@@ -400,26 +403,20 @@ function fechaFicha(?string $fecha): string
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title><?= htmlspecialchars($mascota['nombre']) ?> · VetClinic Pro</title>
-
     <link rel="icon" type="image/png" href="../img/VetClinic Pro.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="../estilos/inicio.css">
     <link rel="stylesheet" href="../estilos/mascotas_veterinario.css">
 </head>
-
 <body>
 <div class="container-fluid p-0">
     <div class="row g-0 min-vh-100">
-
         <div class="col-12 col-lg-2 panel-lateral">
-
             <a href="inicio_veterinario.php" class="logo-lateral">
                 <img src="../img/VetClinic Pro.png" alt="Logo VetClinic Pro">
                 <div>
@@ -427,57 +424,45 @@ function fechaFicha(?string $fecha): string
                     <div class="subtitulo-sistema">Portal del veterinario</div>
                 </div>
             </a>
-
             <div class="seccion-nav">Principal</div>
-
             <a href="inicio_veterinario.php" class="item-menu">
                 <i class="bi bi-grid"></i>
                 Inicio
             </a>
-
             <a href="turnos_veterinario.php" class="item-menu">
                 <i class="bi bi-calendar-check"></i>
                 Turnos
             </a>
-
             <a href="mascotas_veterinario.php" class="item-menu activo">
                 <i class="bi bi-heart-pulse"></i>
                 Mascotas
             </a>
-
-            <a href="#" class="item-menu">
+            <a href="historiales_veterinario.php" class="item-menu">
                 <i class="bi bi-journal-medical"></i>
                 Historial clínico
             </a>
-
             <div class="seccion-nav">Gestión</div>
-
             <a href="propietarios_veterinario.php" class="item-menu">
                 <i class="bi bi-people"></i>
                 Propietarios
             </a>
-
-            <a href="#" class="item-menu">
+            <a href="vacunaciones_veterinario.php" class="item-menu">
                 <i class="bi bi-shield-plus"></i>
                 Vacunaciones
             </a>
-
-            <a href="#" class="item-menu">
-                <i class="bi bi-chat-dots"></i>
-                Mensajes
-            </a>
-
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
+                Mensajes</a>
             <div class="seccion-nav">Configuración</div>
-
-            <a href="horarios_atencion.php" class="item-menu">
+            <a href="configuracion_veterinario.php" class="item-menu">
+                    <i class="bi bi-gear"></i> Mi configuración
+                </a>
+                <a href="horarios_atencion.php" class="item-menu">
                 <i class="bi bi-clock"></i>
                 Horarios de atención
             </a>
-
             <a href="../suscripciones/mi_suscripcion.php" class="item-menu">
                 <i class="bi bi-credit-card-2-front"></i> Mi suscripción
             </a>
-
             <div class="usuario-lateral">
                 <div class="avatar-usuario">
                     <?= strtoupper(substr($nombre, 0, 1) . substr($apellido, 0, 1)) ?>
@@ -489,17 +474,13 @@ function fechaFicha(?string $fecha): string
                     <div class="rol-usuario">Veterinario</div>
                 </div>
             </div>
-
         </div>
-
         <div class="col-12 col-lg-10 area-principal">
-
             <div class="barra-superior">
                 <div>
                     <p class="titulo-pagina">Ficha de mascota</p>
                     <p class="fecha-hoy">Información general y clínica del paciente.</p>
                 </div>
-
                 <div class="d-flex gap-2">
                     <a href="mascotas_veterinario.php" class="icono-barra" title="Volver a mascotas">
                         <i class="bi bi-arrow-left"></i>
@@ -509,76 +490,57 @@ function fechaFicha(?string $fecha): string
                     </a>
                 </div>
             </div>
-
             <?php if ($mensaje_accion !== ''): ?>
                 <div class="alert alert-<?= htmlspecialchars($tipo_mensaje_accion) ?> alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($mensaje_accion) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-
             <section class="cabecera-ficha-mascota mb-4 <?= (int) $mascota['fallecido'] === 1 ? 'cabecera-ficha-fallecida' : '' ?>">
-
                 <div class="avatar-ficha-mascota">
                     <i class="bi bi-heart-pulse"></i>
                 </div>
-
                 <div class="flex-grow-1">
                     <div class="etiqueta-paciente">Paciente</div>
-
                     <h1><?= htmlspecialchars($mascota['nombre']) ?></h1>
-
                     <p>
                         <?= htmlspecialchars($mascota['nombre_especie'] ?? 'Especie no registrada') ?>
-
                         <?php if (!empty($mascota['nombre_raza'])): ?>
                             · <?= htmlspecialchars($mascota['nombre_raza']) ?>
                         <?php endif; ?>
                     </p>
-
                     <span class="estado-ficha-mascota <?= (int) $mascota['fallecido'] === 1 ? 'fallecida' : 'activa' ?>">
                         <i class="bi <?= (int) $mascota['fallecido'] === 1 ? 'bi-heartbreak' : 'bi-check-circle' ?>"></i>
                         <?= (int) $mascota['fallecido'] === 1 ? 'Fallecida' : 'Activa' ?>
                     </span>
                 </div>
-
                 <a
                     href="turnos_veterinario.php?mascota=<?= urlencode($mascota['nombre']) ?>"
                     class="btn-ver-turnos-ficha">
                     <i class="bi bi-calendar-check"></i>
                     Ver turnos
                 </a>
-
             </section>
-
             <div class="row g-4">
-
                 <div class="col-12 col-xl-8">
-
                     <section class="tarjeta mb-4">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-heart-pulse"></i>
                             Datos de la mascota
                         </div>
-
                         <div class="grilla-datos-ficha">
-
                             <div class="dato-ficha">
                                 <span>Sexo</span>
                                 <strong><?= htmlspecialchars(sexoFicha($mascota['sexo'])) ?></strong>
                             </div>
-
                             <div class="dato-ficha">
                                 <span>Edad</span>
                                 <strong><?= htmlspecialchars(calcularEdadFicha($mascota['fecha_nacimiento'])) ?></strong>
                             </div>
-
                             <div class="dato-ficha">
                                 <span>Fecha de nacimiento</span>
                                 <strong><?= htmlspecialchars(fechaFicha($mascota['fecha_nacimiento'])) ?></strong>
                             </div>
-
                             <div class="dato-ficha">
                                 <span>Peso</span>
                                 <strong>
@@ -589,12 +551,10 @@ function fechaFicha(?string $fecha): string
                                     <?php endif; ?>
                                 </strong>
                             </div>
-
                             <div class="dato-ficha">
                                 <span>Color</span>
                                 <strong><?= htmlspecialchars($mascota['color'] ?: 'No registrado') ?></strong>
                             </div>
-
                             <div class="dato-ficha">
                                 <span>Castrado/a</span>
                                 <strong><?= htmlspecialchars(castradoFicha($mascota['castrado'])) ?></strong>
@@ -605,38 +565,27 @@ function fechaFicha(?string $fecha): string
                                     <?= (int) $mascota['fallecido'] === 1 ? 'Fallecida' : 'Activa' ?>
                                 </strong>
                             </div>
-
                         </div>
-
                     </section>
-
                     <section class="tarjeta mb-4">
-
                         <div class="cabecera-seccion-ficha">
                             <div class="titulo-tarjeta mb-0">
                                 <i class="bi bi-journal-medical"></i>
                                 Últimas consultas
                             </div>
-
                             <span class="etiqueta-cantidad">
                                 <?= count($historial) ?>
                                 <?= count($historial) === 1 ? 'registro' : 'registros' ?>
                             </span>
                         </div>
-
                         <?php if (!empty($historial)): ?>
-
                             <div class="lista-historial-ficha">
-
                                 <?php foreach ($historial as $registro): ?>
-
                                     <article class="registro-historial-ficha">
-
                                         <div class="fecha-registro-ficha">
                                             <strong>
                                                 <?= htmlspecialchars(fechaFicha($registro['fecha_consulta'])) ?>
                                             </strong>
-
                                             <span>
                                                 <?= htmlspecialchars(
                                                     trim(
@@ -646,19 +595,16 @@ function fechaFicha(?string $fecha): string
                                                 ) ?>
                                             </span>
                                         </div>
-
                                         <div class="contenido-registro-ficha">
                                             <h3>
                                                 <?= htmlspecialchars($registro['motivo_consulta'] ?: 'Consulta') ?>
                                             </h3>
-
                                             <?php if (!empty($registro['diagnostico'])): ?>
                                                 <p>
                                                     <strong>Diagnóstico:</strong>
                                                     <?= htmlspecialchars($registro['diagnostico']) ?>
                                                 </p>
                                             <?php endif; ?>
-
                                             <?php if (!empty($registro['tratamiento'])): ?>
                                                 <p>
                                                     <strong>Tratamiento:</strong>
@@ -666,15 +612,10 @@ function fechaFicha(?string $fecha): string
                                                 </p>
                                             <?php endif; ?>
                                         </div>
-
                                     </article>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
-
                             <div class="estado-vacio-seccion">
                                 <i class="bi bi-journal-medical"></i>
                                 <div>
@@ -684,31 +625,22 @@ function fechaFicha(?string $fecha): string
                                     </span>
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </section>
-
                     <section class="tarjeta">
-
                         <div class="cabecera-seccion-ficha">
                             <div class="titulo-tarjeta mb-0">
                                 <i class="bi bi-shield-plus"></i>
                                 Vacunaciones
                             </div>
-
                             <span class="etiqueta-cantidad">
                                 <?= count($vacunaciones) ?>
                                 <?= count($vacunaciones) === 1 ? 'vacuna' : 'vacunas' ?>
                             </span>
                         </div>
-
                         <?php if (!empty($vacunaciones)): ?>
-
                             <div class="lista-vacunas-ficha">
-
                                 <?php foreach ($vacunaciones as $vacuna): ?>
-
                                     <?php
                                     $vencida = false;
 
@@ -718,13 +650,10 @@ function fechaFicha(?string $fecha): string
                                             strtotime(date('Y-m-d'));
                                     }
                                     ?>
-
                                     <article class="vacuna-ficha">
-
                                         <div class="icono-vacuna-ficha">
                                             <i class="bi bi-shield-check"></i>
                                         </div>
-
                                         <div class="flex-grow-1">
                                             <h3><?= htmlspecialchars($vacuna['nombre_vacuna']) ?></h3>
                                             <p>
@@ -732,26 +661,18 @@ function fechaFicha(?string $fecha): string
                                                 <?= htmlspecialchars(fechaFicha($vacuna['fecha_aplicacion'])) ?>
                                             </p>
                                         </div>
-
                                         <?php if (!empty($vacuna['fecha_proxima'])): ?>
-
                                             <div class="proxima-vacuna-ficha <?= $vencida ? 'vencida' : '' ?>">
                                                 <span><?= $vencida ? 'Vencida' : 'Próxima' ?></span>
                                                 <strong>
                                                     <?= htmlspecialchars(fechaFicha($vacuna['fecha_proxima'])) ?>
                                                 </strong>
                                             </div>
-
                                         <?php endif; ?>
-
                                     </article>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
-
                             <div class="estado-vacio-seccion">
                                 <i class="bi bi-shield-plus"></i>
                                 <div>
@@ -759,31 +680,22 @@ function fechaFicha(?string $fecha): string
                                     <span>No hay vacunas cargadas para esta mascota.</span>
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </section>
-
                 </div>
-
                 <div class="col-12 col-xl-4">
-
                     <section class="tarjeta tarjeta-propietario-ficha mb-4">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-person"></i>
                             Propietario
                         </div>
-
                         <div class="propietario-destacado">
-
                             <div class="avatar-propietario-ficha">
                                 <?= strtoupper(
                                     substr($mascota['nombre_propietario'], 0, 1) .
                                     substr($mascota['apellido_propietario'], 0, 1)
                                 ) ?>
                             </div>
-
                             <div>
                                 <strong>
                                     <?= htmlspecialchars(
@@ -791,52 +703,41 @@ function fechaFicha(?string $fecha): string
                                         $mascota['apellido_propietario']
                                     ) ?>
                                 </strong>
-
                                 <span>Responsable de la mascota</span>
                             </div>
-
                         </div>
-
                         <?php if (!empty($mascota['telefono_propietario'])): ?>
                             <div class="dato-contacto-propietario">
                                 <i class="bi bi-telephone"></i>
                                 <span><?= htmlspecialchars($mascota['telefono_propietario']) ?></span>
                             </div>
                         <?php endif; ?>
-
                         <?php if (!empty($mascota['email_propietario'])): ?>
                             <div class="dato-contacto-propietario">
                                 <i class="bi bi-envelope"></i>
                                 <span><?= htmlspecialchars($mascota['email_propietario']) ?></span>
                             </div>
                         <?php endif; ?>
-
                         <div class="nota-propietario-ficha">
                             <i class="bi bi-info-circle"></i>
                             Esta mascota está vinculada a este propietario mediante su registro en el sistema.
                         </div>
-
                     </section>
-
                     <section class="tarjeta tarjeta-gestion-mascota mb-4">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-sliders"></i>
                             Gestión de la mascota
                         </div>
-
                         <div class="bloque-gestion-mascota">
                             <label for="nuevo_propietario">Cambiar propietario</label>
-
                             <form method="POST" class="form-cambiar-propietario">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="accion" value="cambiar_propietario">
-
                                 <select
                                     id="nuevo_propietario"
                                     name="nuevo_propietario"
                                     class="form-select"
                                     required>
-
                                     <?php foreach ($propietarios_disponibles as $propietario_opcion): ?>
                                         <option
                                             value="<?= (int) $propietario_opcion['id_propietario'] ?>"
@@ -845,56 +746,45 @@ function fechaFicha(?string $fecha): string
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-
                                 <button type="submit" class="btn-gestion-principal">
                                     <i class="bi bi-person-check"></i>
                                     Guardar propietario
                                 </button>
                             </form>
-
                             <p class="ayuda-gestion-mascota">
                                 La mascota nunca queda sin responsable. Los turnos futuros activos pasan al nuevo propietario; los turnos anteriores conservan el responsable histórico.
                             </p>
                         </div>
-
                         <div class="separador-gestion-mascota"></div>
-
                         <div class="bloque-gestion-mascota">
                             <span class="label-gestion-mascota">Estado de la mascota</span>
-
                             <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="accion" value="cambiar_estado">
                                 <input type="hidden" name="fallecido" value="<?= (int) $mascota['fallecido'] === 1 ? 0 : 1 ?>">
-
                                 <button
                                     type="submit"
                                     class="<?= (int) $mascota['fallecido'] === 1 ? 'btn-reactivar-mascota' : 'btn-fallecida-mascota' ?>"
                                     onclick="return confirm('¿Confirmás este cambio de estado?');">
-
                                     <i class="bi <?= (int) $mascota['fallecido'] === 1 ? 'bi-arrow-counterclockwise' : 'bi-heartbreak' ?>"></i>
-
                                     <?= (int) $mascota['fallecido'] === 1
                                         ? 'Marcar como activa'
                                         : 'Marcar como fallecida'
                                     ?>
                                 </button>
                             </form>
-
                             <?php if ((int) $mascota['fallecido'] === 0): ?>
                                 <p class="ayuda-gestion-mascota">
                                     Si la marcás como fallecida, se conservarán su historia clínica y vacunas, pero no podrá recibir nuevos turnos.
                                 </p>
                             <?php endif; ?>
                         </div>
-
                         <div class="separador-gestion-mascota"></div>
-
                         <div class="bloque-gestion-mascota zona-peligro-mascota">
                             <span class="label-gestion-mascota">Registro cargado por error</span>
-
                             <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="accion" value="eliminar_mascota">
-
                                 <button
                                     type="submit"
                                     class="btn-eliminar-registro-mascota"
@@ -903,31 +793,22 @@ function fechaFicha(?string $fecha): string
                                     Eliminar registro
                                 </button>
                             </form>
-
                             <p class="ayuda-gestion-mascota">
                                 Solo funciona si la mascota no tiene turnos, historia clínica ni vacunaciones. Si ya posee información, el sistema no permitirá borrarla.
                             </p>
                         </div>
-
                     </section>
-
                     <section class="tarjeta">
-
                         <div class="titulo-tarjeta">
                             <i class="bi bi-calendar-check"></i>
                             Próximos turnos
                         </div>
-
                         <?php if (!empty($proximos_turnos)): ?>
-
                             <div class="lista-turnos-ficha">
-
                                 <?php foreach ($proximos_turnos as $turno): ?>
-
                                     <a
                                         href="historial_clinico.php?id_turno=<?= (int) $turno['id_turno'] ?>"
                                         class="turno-ficha">
-
                                         <div class="fecha-turno-ficha">
                                             <strong>
                                                 <?= date('d/m', strtotime($turno['fecha_hora'])) ?>
@@ -936,22 +817,15 @@ function fechaFicha(?string $fecha): string
                                                 <?= date('H:i', strtotime($turno['fecha_hora'])) ?> hs
                                             </span>
                                         </div>
-
                                         <div class="flex-grow-1">
                                             <strong><?= htmlspecialchars($turno['motivo']) ?></strong>
                                             <span><?= htmlspecialchars(ucfirst($turno['estado'])) ?></span>
                                         </div>
-
                                         <i class="bi bi-chevron-right"></i>
-
                                     </a>
-
                                 <?php endforeach; ?>
-
                             </div>
-
                         <?php else: ?>
-
                             <div class="estado-vacio-seccion estado-vacio-pequeno">
                                 <i class="bi bi-calendar-x"></i>
                                 <div>
@@ -959,19 +833,13 @@ function fechaFicha(?string $fecha): string
                                     <span>No hay turnos futuros para esta mascota.</span>
                                 </div>
                             </div>
-
                         <?php endif; ?>
-
                     </section>
-
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="../mensajeria/notificaciones.js" defer></script>
 </body>
 </html>
