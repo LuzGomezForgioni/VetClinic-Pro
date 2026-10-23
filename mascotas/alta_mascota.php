@@ -48,9 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$stmtValidarRaza->get_result()->fetch_assoc()) $errores[] = 'La raza no corresponde a la especie seleccionada.';
         $stmtValidarRaza->close();
     }
-    if ($nombre === '')   $errores[] = 'El nombre de la mascota es obligatorio.';
+    if ($nombre === '') $errores[] = 'El nombre de la mascota es obligatorio.';
     if ($idEspecie === 0) $errores[] = 'Seleccioná una especie.';
-    if ($sexo === '')     $errores[] = 'Seleccioná el sexo.';
+    if ($sexo === '') $errores[] = 'Seleccioná el sexo.';
+    if ($fechaNacimiento === '') $errores[] = 'La fecha de nacimiento es obligatoria.';
+    if ($pesoKg === '') $errores[] = 'El peso es obligatorio.';
+    if ($color === '') $errores[] = 'El color o pelaje es obligatorio.';
     if ($pesoKg !== '' && (!is_numeric($pesoKg) || $pesoKg <= 0)) $errores[] = 'El peso debe ser mayor a cero.';
     if ($fechaNacimiento !== '') {
         $f = DateTime::createFromFormat('Y-m-d', $fechaNacimiento);
@@ -217,30 +220,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="error-campo" id="errorSexo"></div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label" for="fecha_nacimiento">Fecha de nacimiento</label>
+                                <label class="form-label" for="fecha_nacimiento">Fecha de nacimiento <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
                                     <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento"
-                                        max="<?= date('Y-m-d') ?>"
+                                        max="<?= date('Y-m-d') ?>" required
                                         value="<?= htmlspecialchars($_POST['fecha_nacimiento'] ?? '') ?>" />
                                 </div>
                                 <div class="error-campo" id="errorFecha"></div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label" for="peso_kg">Peso (kg)</label>
+                                <label class="form-label" for="peso_kg">Peso (kg) <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-speedometer2"></i></span>
                                     <input type="number" class="form-control" id="peso_kg" name="peso_kg"
-                                        placeholder="Ej: 8.5" step="0.1" min="0.1"
+                                        placeholder="Ej: 8.5" step="0.1" min="0.1" required
                                         value="<?= htmlspecialchars($_POST['peso_kg'] ?? '') ?>" />
                                 </div>
                                 <div class="error-campo" id="errorPeso"></div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label" for="color">Color / Pelaje</label>
+                                <label class="form-label" for="color">Color / Pelaje <span class="campo-requerido">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-palette"></i></span>
-                                    <input type="text" class="form-control" id="color" name="color" maxlength="60" inputmode="text"
+                                    <input type="text" class="form-control" id="color" name="color" maxlength="60" inputmode="text" required
                                         placeholder="Ej: Dorado, Blanco con manchas..."
                                         value="<?= htmlspecialchars($_POST['color'] ?? '') ?>" />
                                 </div>

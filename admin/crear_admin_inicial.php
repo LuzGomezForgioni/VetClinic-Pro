@@ -54,10 +54,10 @@ if ($total > 0) {
     <div class="login-wrap">
         <div class="login-card">
             <h1 class="h3 fw-bold">Crear Superadministrador</h1>
-            <p class="texto-suave">Este asistente solo funciona mientras no exista ningún administrador.</p>
+            <p class="texto-suave">Este asistente crea solamente el primer Superadmin. Los demás se agregan luego desde Administración → Administradores.</p>
             <?php if ($bloqueado): ?><div class="alert alert-warning">Ya existe un administrador. Por seguridad, este asistente está bloqueado.</div><a href="login.php" class="btn-admin">Ir al login</a>
             <?php elseif ($creado): ?><div class="alert alert-success">Administrador creado correctamente. Ya podés iniciar sesión.</div><a href="login.php" class="btn-admin">Iniciar sesión</a>
-                <p class="small texto-suave mt-3 mb-0">Podés eliminar este archivo del servidor cuando termines.</p>
+                <p class="small texto-suave mt-3 mb-0">Después ingresá al panel. Desde Administración → Administradores podés crear la cuenta independiente del segundo dueño.</p>
             <?php else: ?>
                 <?php foreach ($errores as $e): ?><div class="alert alert-danger py-2"><?= htmlspecialchars($e) ?></div><?php endforeach; ?>
                 <form method="POST" class="row g-3">

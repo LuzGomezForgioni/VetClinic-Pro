@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById('formAlta') || document.getElementById('formEditar');
     if (!form) return;
+    const esAlta = form.id === 'formAlta';
 
     function mostrarError(id, mensaje) {
         const elemento = document.getElementById(id);
@@ -99,7 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
             mostrarError('errorSexo', 'Seleccioná el sexo.');
             correcto = false;
         }
-        if (fecha && fecha.value) {
+        if (fecha && esAlta && !fecha.value) {
+            mostrarError('errorFecha', 'La fecha de nacimiento es obligatoria.');
+            correcto = false;
+        } else if (fecha && fecha.value) {
             const fechaIngresada = new Date(`${fecha.value}T12:00:00`);
             const hoy = new Date();
             hoy.setHours(23, 59, 59, 999);
@@ -108,14 +112,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 correcto = false;
             }
         }
-        if (peso && peso.value.trim()) {
+        if (peso && esAlta && !peso.value.trim()) {
+            mostrarError('errorPeso', 'El peso es obligatorio.');
+            correcto = false;
+        } else if (peso && peso.value.trim()) {
             const valor = Number(peso.value);
             if (!Number.isFinite(valor) || valor <= 0 || valor > 999.99) {
                 mostrarError('errorPeso', 'Ingresá un peso mayor a 0 y de hasta 999,99 kg.');
                 correcto = false;
             }
         }
-        if (color && !validarColor(color.value.trim())) {
+        if (color && esAlta && !color.value.trim()) {
+            mostrarError('errorColor', 'El color o pelaje es obligatorio.');
+            correcto = false;
+        } else if (color && !validarColor(color.value.trim())) {
             mostrarError('errorColor', 'El color solo admite letras, espacios y separadores (sin números).');
             correcto = false;
         }

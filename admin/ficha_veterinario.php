@@ -3,6 +3,7 @@ session_start();
 require_once '_auth.php';
 require_once '../config/conexion.php';
 require_once '../config/suscripciones.php';
+require_once '../config/auditoria_admin.php';
 $idVet = (int)($_GET['id'] ?? 0);
 if ($idVet <= 0) {
     header('Location:veterinarios.php');
@@ -16,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($accion === 'pago_manual') {
             registrarPagoDemo($conn, $idVet, 'manual', 'aprobado', 'Pago registrado manualmente por Superadmin.');
+            registrarAuditoriaAdmin($conn, 'pago_manual', 'veterinario', $idVet, 'Se registró una mensualidad manual aprobada.');
             $msg = 'Pago manual registrado y suscripción actualizada.';
         } elseif ($accion === 'extender' && $sus) {
             $dias = max(1, min(30, (int)($_POST['dias'] ?? 5)));
@@ -24,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('ii', $dias, $idSus);
             $stmt->execute();
             $stmt->close();
+            registrarAuditoriaAdmin($conn, 'extender_tolerancia', 'veterinario', $idVet, 'Se extendió la tolerancia en ' . $dias . ' días.');
             $msg = 'Tolerancia extendida.';
         } elseif ($accion === 'suspender' && $sus) {
             $idSus = (int)$sus['id_suscripcion'];
@@ -32,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('si', $motivo, $idSus);
             $stmt->execute();
             $stmt->close();
+            registrarAuditoriaAdmin($conn, 'suspender_suscripcion', 'veterinario', $idVet, 'Motivo: ' . $motivo);
             $msg = 'Suscripción suspendida manualmente.';
         } elseif ($accion === 'reactivar' && $sus) {
             $idSus = (int)$sus['id_suscripcion'];
@@ -40,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('ii', $dias, $idSus);
             $stmt->execute();
             $stmt->close();
+            registrarAuditoriaAdmin($conn, 'reactivar_suscripcion', 'veterinario', $idVet, 'Reactivación temporal con ' . $dias . ' días de tolerancia.');
             $msg = 'Acceso reactivado temporalmente; el pago sigue pendiente.';
         } elseif ($accion === 'baja') {
             $stmt = $conn->prepare("UPDATE veterinarios SET activo=0 WHERE id_veterinario=?");
@@ -53,12 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
                 $stmt->close();
             }
+            registrarAuditoriaAdmin($conn, 'baja_veterinario', 'veterinario', $idVet, 'Cuenta profesional dada de baja y suscripción cancelada administrativamente.');
             $msg = 'Cuenta profesional dada de baja.';
         } elseif ($accion === 'habilitar') {
             $stmt = $conn->prepare("UPDATE veterinarios SET activo=1 WHERE id_veterinario=?");
             $stmt->bind_param('i', $idVet);
             $stmt->execute();
             $stmt->close();
+            registrarAuditoriaAdmin($conn, 'habilitar_veterinario', 'veterinario', $idVet, 'Cuenta profesional habilitada.');
             $msg = 'Cuenta profesional habilitada.';
         }
     } catch (Throwable $e) {

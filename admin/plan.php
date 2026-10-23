@@ -3,6 +3,7 @@ session_start();
 require_once '_auth.php';
 require_once '../config/conexion.php';
 require_once '../config/suscripciones.php';
+require_once '../config/auditoria_admin.php';
 $plan = obtenerPlanProfesional($conn);
 $mensaje = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $plan) {
@@ -12,8 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $plan) {
         $stmt = $conn->prepare("UPDATE planes SET precio_mensual=?,dias_tolerancia=? WHERE id_plan=?");
         $id = (int)$plan['id_plan'];
         $stmt->bind_param('dii', $precio, $dias, $id);
+        $precioAnterior = (float)$plan['precio_mensual'];
+        $diasAnteriores = (int)$plan['dias_tolerancia'];
         $stmt->execute();
         $stmt->close();
+        registrarAuditoriaAdmin(
+            $conn,
+            'actualizar_plan',
+            'plan',
+            $id,
+            'Precio: $' . number_format($precioAnterior, 2, ',', '.') . ' → $' . number_format($precio, 2, ',', '.') . '. Tolerancia: ' . $diasAnteriores . ' → ' . $dias . ' días.'
+        );
         $mensaje = 'Plan actualizado correctamente.';
         $plan = obtenerPlanProfesional($conn);
     }

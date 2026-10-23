@@ -475,7 +475,10 @@ $stmt->close();
             <!-- Mensajes queda pendiente por ahora -->
             <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes
                 <?php if ($mensajes_pendientes_inicio > 0): ?><span class="badge bg-light text-primary ms-auto"><?= $mensajes_pendientes_inicio ?></span><?php endif; ?>
+            </a>            <a href="estadisticas.php" class="item-menu">
+                <i class="bi bi-graph-up-arrow"></i> Estadísticas
             </a>
+
             <div class="seccion-nav">Configuración</div>
             <a href="configuracion_veterinario.php" class="item-menu">
                     <i class="bi bi-gear"></i> Mi configuración

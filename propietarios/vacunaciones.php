@@ -844,6 +844,11 @@ foreach ($vacunaciones as $vacuna) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="mt-3">
+                                            <a href="../reportes/pdf.php?tipo=vacuna&id=<?= (int) $vacuna['id_vacunacion'] ?>" class="btn-secundario">
+                                                <i class="bi bi-file-earmark-pdf"></i> Descargar constancia PDF
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

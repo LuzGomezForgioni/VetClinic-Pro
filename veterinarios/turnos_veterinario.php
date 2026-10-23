@@ -642,7 +642,10 @@ function mostrarEstado(string $estado): string
                     Vacunaciones
                 </a>
                 <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
-                    Mensajes</a>
+                    Mensajes</a>                    <a href="estadisticas.php" class="item-menu">
+                        <i class="bi bi-graph-up-arrow"></i> Estadísticas
+                    </a>
+
                 <!-- Configuración -->
                 <div class="seccion-nav">
                     Configuración
@@ -921,6 +924,12 @@ function mostrarEstado(string $estado): string
                                                 <i class="bi bi-eye"></i>
                                                 Ver mascota
                                             </button>
+                                            <a
+                                                href="../reportes/pdf.php?tipo=turno&id=<?= (int) $turno['id_turno'] ?>"
+                                                class="btn-turno btn-turno-secundario">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                                Comprobante
+                                            </a>
                                             <?php if ($turno['estado'] !== 'cancelado'): ?>
                                                 <a
                                                     href="historial_clinico.php?id_turno=<?= (int) $turno['id_turno'] ?>"
@@ -1002,6 +1011,12 @@ function mostrarEstado(string $estado): string
                                                 <i class="bi bi-eye"></i>
                                                 Ver mascota
                                             </button>
+                                            <a
+                                                href="../reportes/pdf.php?tipo=turno&id=<?= (int) $turno['id_turno'] ?>"
+                                                class="btn-turno btn-turno-secundario">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                                Comprobante
+                                            </a>
                                             <?php if ($turno['estado'] !== 'cancelado'): ?>
                                                 <a
                                                     href="historial_clinico.php?id_turno=<?= (int) $turno['id_turno'] ?>"
@@ -1084,6 +1099,12 @@ function mostrarEstado(string $estado): string
                                                 <i class="bi bi-eye"></i>
                                                 Ver mascota
                                             </button>
+                                            <a
+                                                href="../reportes/pdf.php?tipo=turno&id=<?= (int) $turno['id_turno'] ?>"
+                                                class="btn-turno btn-turno-secundario">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                                Comprobante
+                                            </a>
                                             <?php if ($turno['estado'] !== 'cancelado'): ?>
                                                 <a
                                                     href="historial_clinico.php?id_turno=<?= (int) $turno['id_turno'] ?>"

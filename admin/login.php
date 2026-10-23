@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 require_once '../config/conexion.php';
+require_once '../config/auditoria_admin.php';
 
 if (!empty($_SESSION['admin_logueado'])) {
     header('Location: dashboard.php');
@@ -30,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['admin_id'] = (int)$admin['id_administrador'];
         $_SESSION['admin_nombre'] = $admin['nombre'];
         $_SESSION['admin_apellido'] = $admin['apellido'];
+        registrarAuditoriaAdmin($conn, 'inicio_sesion', 'administrador', (int)$admin['id_administrador'], 'Inicio de sesión correcto.');
         header('Location: dashboard.php');
         exit;
     }
@@ -55,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h1 class="h3 fw-bold mt-3">Administración General</h1>
                 <p class="texto-suave">VetClinic Pro</p>
             </div>
+            <?php if (($_GET['estado'] ?? '') === 'inactivo'): ?><div class="alert alert-warning">Tu cuenta de Superadmin está desactivada. Contactá a otro administrador activo.</div><?php endif; ?>
             <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
             <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">

@@ -34,7 +34,7 @@ function enviarCorreoRecuperacion(
         $password === '' ||
         str_contains($password, 'TU_CONTRASENA')
     ) {
-        $error = 'Configurá VETCLINIC_SMTP_USUARIO y VETCLINIC_SMTP_PASSWORD en el servidor.';
+        $error = 'Falta configurar el correo SMTP. En XAMPP completá config/mail_config.local.php; en un servidor también podés usar VETCLINIC_SMTP_USUARIO y VETCLINIC_SMTP_PASSWORD.';
         return false;
     }
 

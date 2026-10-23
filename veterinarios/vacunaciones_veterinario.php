@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $nombre   = $_SESSION['usuario_nombre'] ?? 'Doctor/a';
 $apellido = $_SESSION['usuario_apellido'] ?? '';
+$idVeterinario = (int) ($_SESSION['usuario_id'] ?? 0);
 
 $errores = [];
 $mensaje = $_SESSION['mensaje_vacuna'] ?? '';
@@ -90,8 +91,8 @@ function estadoVacunaVeterinario(?string $fechaProxima): array
 
 $mascotasActivas = [];
 
-$sqlMascotasActivas = "
-    SELECT
+$stmt = $conn->prepare("
+    SELECT DISTINCT
         m.id_mascota,
         m.nombre,
         p.nombre AS nombre_propietario,
@@ -99,17 +100,21 @@ $sqlMascotasActivas = "
     FROM mascotas m
     INNER JOIN propietarios p
         ON m.id_propietario = p.id_propietario
+    INNER JOIN turnos t
+        ON t.id_mascota = m.id_mascota
     WHERE m.fallecido = 0
+      AND t.id_veterinario = ?
     ORDER BY m.nombre ASC, p.apellido ASC, p.nombre ASC
-";
+");
+$stmt->bind_param('i', $idVeterinario);
+$stmt->execute();
+$resultadoMascotasActivas = $stmt->get_result();
 
-$resultadoMascotasActivas = $conn->query($sqlMascotasActivas);
-
-if ($resultadoMascotasActivas) {
-    while ($fila = $resultadoMascotasActivas->fetch_assoc()) {
-        $mascotasActivas[] = $fila;
-    }
+while ($fila = $resultadoMascotasActivas->fetch_assoc()) {
+    $mascotasActivas[] = $fila;
 }
+
+$stmt->close();
 
 // ============================================================
 // REGISTRAR NUEVA VACUNACIÓN
@@ -127,13 +132,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'regis
         $errores[] = 'Seleccioná una mascota.';
     } else {
         $stmt = $conn->prepare("
-            SELECT id_mascota
-            FROM mascotas
-            WHERE id_mascota = ?
-              AND fallecido = 0
+            SELECT DISTINCT m.id_mascota
+            FROM mascotas m
+            INNER JOIN turnos t
+                ON t.id_mascota = m.id_mascota
+            WHERE m.id_mascota = ?
+              AND m.fallecido = 0
+              AND t.id_veterinario = ?
             LIMIT 1
         ");
-        $stmt->bind_param('i', $idMascota);
+        $stmt->bind_param('ii', $idMascota, $idVeterinario);
         $stmt->execute();
         $mascotaValida = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -152,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'regis
     if ($fechaAplicacion === '') {
         $errores[] = 'La fecha de aplicación es obligatoria.';
     } else {
-        $fechaAplicacionObj = DateTime::createFromFormat('Y-m-d', $fechaAplicacion);
+        $fechaAplicacionObj = DateTime::createFromFormat('!Y-m-d', $fechaAplicacion);
         $erroresFecha = DateTime::getLastErrors();
 
         if (
@@ -185,13 +193,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'regis
 
         $stmt = $conn->prepare("
             INSERT INTO vacunaciones
-                (id_mascota, nombre_vacuna, fecha_aplicacion, fecha_proxima, observaciones)
-            VALUES (?, ?, ?, ?, ?)
+                (id_mascota, id_veterinario, nombre_vacuna, fecha_aplicacion, fecha_proxima, observaciones)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            'issss',
+            'iissss',
             $idMascota,
+            $idVeterinario,
             $nombreVacuna,
             $fechaAplicacion,
             $fechaProximaFinal,
@@ -233,23 +242,29 @@ $idMascotaPreseleccionada =
 
 $mascotasFiltro = [];
 
-$resultadoMascotasFiltro = $conn->query("
-    SELECT
+$stmt = $conn->prepare("
+    SELECT DISTINCT
         m.id_mascota,
         m.nombre,
         p.nombre AS nombre_propietario,
         p.apellido AS apellido_propietario
     FROM mascotas m
     INNER JOIN propietarios p
-        ON m.id_propietario = p.id_propietario
+        ON p.id_propietario = m.id_propietario
+    INNER JOIN turnos t
+        ON t.id_mascota = m.id_mascota
+    WHERE t.id_veterinario = ?
     ORDER BY m.nombre ASC, p.apellido ASC, p.nombre ASC
 ");
+$stmt->bind_param('i', $idVeterinario);
+$stmt->execute();
+$resultadoMascotasFiltro = $stmt->get_result();
 
-if ($resultadoMascotasFiltro) {
-    while ($fila = $resultadoMascotasFiltro->fetch_assoc()) {
-        $mascotasFiltro[] = $fila;
-    }
+while ($fila = $resultadoMascotasFiltro->fetch_assoc()) {
+    $mascotasFiltro[] = $fila;
 }
+
+$stmt->close();
 
 // ============================================================
 // CONSULTAR VACUNACIONES
@@ -259,6 +274,7 @@ $sqlVacunas = "
     SELECT
         va.id_vacunacion,
         va.id_mascota,
+        va.id_veterinario,
         va.nombre_vacuna,
         va.fecha_aplicacion,
         va.fecha_proxima,
@@ -288,8 +304,13 @@ $sqlVacunas = "
     LEFT JOIN razas r
         ON m.id_raza = r.id_raza
 
-    WHERE
-        (
+    WHERE EXISTS (
+        SELECT 1
+        FROM turnos tv
+        WHERE tv.id_mascota = va.id_mascota
+          AND tv.id_veterinario = ?
+    )
+      AND (
             ? = ''
             OR m.nombre LIKE CONCAT('%', ?, '%')
             OR p.nombre LIKE CONCAT('%', ?, '%')
@@ -307,7 +328,8 @@ $sqlVacunas = "
 
 $stmt = $conn->prepare($sqlVacunas);
 $stmt->bind_param(
-    'ssssssii',
+    'issssssii',
+    $idVeterinario,
     $busqueda,
     $busqueda,
     $busqueda,
@@ -396,7 +418,10 @@ $vacunaciones = array_values(array_filter(
             <a href="vacunaciones_veterinario.php" class="item-menu activo">
                 <i class="bi bi-shield-plus"></i> Vacunaciones
             </a>
-            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>
+            <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i> Mensajes</a>            <a href="estadisticas.php" class="item-menu">
+                <i class="bi bi-graph-up-arrow"></i> Estadísticas
+            </a>
+
             <div class="seccion-nav">Configuración</div>
             <a href="configuracion_veterinario.php" class="item-menu">
                     <i class="bi bi-gear"></i> Mi configuración
@@ -716,6 +741,12 @@ $vacunaciones = array_values(array_filter(
                                         class="btn-ver-historial-vacuna">
                                         <i class="bi bi-journal-medical"></i>
                                         Ver historial
+                                    </a>
+                                    <a
+                                        href="../reportes/pdf.php?tipo=vacuna&id=<?= (int) $vacuna['id_vacunacion'] ?>"
+                                        class="btn-ver-historial-vacuna">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                        Constancia PDF
                                     </a>
                                 </div>
                             </div>

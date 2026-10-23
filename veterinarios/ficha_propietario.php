@@ -388,7 +388,10 @@ function sexoMascotaPropietario(?string $sexo): string
                 Vacunaciones
             </a>
             <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
-                Mensajes</a>
+                Mensajes</a>                <a href="estadisticas.php" class="item-menu">
+                    <i class="bi bi-graph-up-arrow"></i> Estadísticas
+                </a>
+
             <div class="seccion-nav">
                 Configuración
             </div>

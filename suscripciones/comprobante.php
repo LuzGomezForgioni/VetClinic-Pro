@@ -328,6 +328,12 @@ $configEstado = match ($estado) {
                         <i class="bi bi-printer"></i>
                         Imprimir
                     </button>
+                    <a
+                        class="plan-btn plan-btn-secundario"
+                        href="../reportes/pdf.php?tipo=pago&id=<?= (int) $pago['id_pago'] ?>">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        Descargar PDF
+                    </a>
                     <?php if ($estado !== 'aprobado'): ?>
                         <a
                             class="plan-btn plan-btn-secundario"

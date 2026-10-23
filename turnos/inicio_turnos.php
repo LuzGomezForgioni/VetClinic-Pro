@@ -248,8 +248,11 @@ function horaTurno(string $fechaHora): string
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                                <?php if (mb_strtolower($t['estado']) !== 'cancelado' && mb_strtolower($t['estado']) !== 'realizado'): ?>
-                                    <div class="acciones-turno">
+                                <div class="acciones-turno">
+                                    <a href="../reportes/pdf.php?tipo=turno&id=<?= (int) $t['id_turno'] ?>" class="btn-accion btn-volver">
+                                        <i class="bi bi-file-earmark-pdf"></i> Comprobante
+                                    </a>
+                                    <?php if (mb_strtolower($t['estado']) !== 'cancelado' && mb_strtolower($t['estado']) !== 'realizado'): ?>
                                         <a href="editar_turno.php?id=<?= (int)$t['id_turno'] ?>" class="btn-accion btn-editar">
                                             <i class="bi bi-pencil"></i> Editar
                                         </a>
@@ -258,8 +261,8 @@ function horaTurno(string $fechaHora): string
                                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(tokenCsrf(), ENT_QUOTES, 'UTF-8') ?>">
                                             <button type="submit" class="btn-accion btn-eliminar"><i class="bi bi-x-lg"></i> Cancelar</button>
                                         </form>
-                                    </div>
-                                <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>

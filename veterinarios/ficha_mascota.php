@@ -451,7 +451,10 @@ function fechaFicha(?string $fecha): string
                 Vacunaciones
             </a>
             <a href="mensajes.php" class="item-menu"><i class="bi bi-chat-dots"></i>
-                Mensajes</a>
+                Mensajes</a>                <a href="estadisticas.php" class="item-menu">
+                    <i class="bi bi-graph-up-arrow"></i> Estadísticas
+                </a>
+
             <div class="seccion-nav">Configuración</div>
             <a href="configuracion_veterinario.php" class="item-menu">
                     <i class="bi bi-gear"></i> Mi configuración
@@ -514,12 +517,26 @@ function fechaFicha(?string $fecha): string
                         <?= (int) $mascota['fallecido'] === 1 ? 'Fallecida' : 'Activa' ?>
                     </span>
                 </div>
-                <a
-                    href="turnos_veterinario.php?mascota=<?= urlencode($mascota['nombre']) ?>"
-                    class="btn-ver-turnos-ficha">
-                    <i class="bi bi-calendar-check"></i>
-                    Ver turnos
-                </a>
+                <div class="d-flex flex-wrap gap-2">
+                    <a
+                        href="../reportes/pdf.php?tipo=ficha_mascota&id=<?= (int) $mascota['id_mascota'] ?>"
+                        class="btn-ver-turnos-ficha">
+                        <i class="bi bi-file-earmark-person"></i>
+                        Ficha PDF
+                    </a>
+                    <a
+                        href="../reportes/pdf.php?tipo=historia&id=<?= (int) $mascota['id_mascota'] ?>"
+                        class="btn-ver-turnos-ficha">
+                        <i class="bi bi-file-earmark-medical"></i>
+                        Historia PDF
+                    </a>
+                    <a
+                        href="turnos_veterinario.php?mascota=<?= urlencode($mascota['nombre']) ?>"
+                        class="btn-ver-turnos-ficha">
+                        <i class="bi bi-calendar-check"></i>
+                        Ver turnos
+                    </a>
+                </div>
             </section>
             <div class="row g-4">
                 <div class="col-12 col-xl-8">

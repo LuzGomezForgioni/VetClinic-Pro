@@ -8,11 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 include("config/conexion.php");
+require_once __DIR__ . '/config/enviar_correo.php';
 
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 $mensaje = '';
 $enlace_prueba = '';
+$detalle_envio_local = '';
 $email_form = '';
 
 function esEntornoLocal(): bool
@@ -60,13 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $tipo_usuario = '';
         $usuario_encontrado = false;
+        $nombre_usuario = '';
 
         // ========================================================
         // 1. BUSCAR COMO PROPIETARIO
         // ========================================================
 
         $stmt = $conn->prepare("
-            SELECT id_propietario
+            SELECT id_propietario, nombre
             FROM propietarios
             WHERE email = ?
             LIMIT 1
@@ -82,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $tipo_usuario = 'propietario';
             $usuario_encontrado = true;
+            $nombre_usuario = trim((string) ($propietario['nombre'] ?? ''));
 
         } else {
 
@@ -90,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // ====================================================
 
             $stmt = $conn->prepare("
-                SELECT id_veterinario
+                SELECT id_veterinario, nombre
                 FROM veterinarios
                 WHERE email = ?
                 LIMIT 1
@@ -105,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($veterinario) {
                 $tipo_usuario = 'veterinario';
                 $usuario_encontrado = true;
+                $nombre_usuario = trim((string) ($veterinario['nombre'] ?? ''));
             }
         }
 
@@ -161,41 +166,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $enlace = construirEnlaceRecuperacion($token);
 
-            if (esEntornoLocal()) {
+            // Intentar siempre el envío por Gmail SMTP, incluso en XAMPP.
+            $error_envio = null;
+            $correo_enviado = enviarCorreoRecuperacion(
+                $email_form,
+                $enlace,
+                $nombre_usuario,
+                $error_envio
+            );
 
-                // En XAMPP normalmente no hay servidor SMTP configurado.
-                // Mostramos el enlace solamente para poder probar el flujo.
+            // En localhost dejamos el enlace solamente como respaldo si Gmail falla.
+            if (!$correo_enviado && esEntornoLocal()) {
                 $enlace_prueba = $enlace;
-
-            } else {
-
-                // En un hosting con mail() habilitado, se intenta enviar
-                // el enlace por correo. Si el hosting no lo permite,
-                // más adelante se puede reemplazar por PHPMailer/SMTP.
-                $asunto = 'Restablecer contraseña - VetClinic Pro';
-
-                $cuerpo =
-                    "Recibimos una solicitud para restablecer tu contraseña.\n\n" .
-                    "Abrí este enlace dentro de los próximos 30 minutos:\n" .
-                    $enlace . "\n\n" .
-                    "Si no pediste este cambio, ignorá este mensaje.";
-
-                $headers =
-                    "From: VetClinic Pro <no-reply@vetclinicpro.local>\r\n" .
-                    "Content-Type: text/plain; charset=UTF-8\r\n";
-
-                @mail(
-                    $email_form,
-                    $asunto,
-                    $cuerpo,
-                    $headers
-                );
+                $detalle_envio_local = (string) $error_envio;
             }
         }
 
         // Mensaje genérico para no revelar si una cuenta existe o no.
         $mensaje =
-            'Si el correo está registrado, se generó un enlace para restablecer la contraseña.';
+            'Si el correo está registrado, te enviamos un enlace para restablecer la contraseña.';
     }
 }
 
@@ -325,12 +314,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($enlace_prueba !== ''): ?>
                     <div class="alert alert-warning mt-4">
                         <strong>
-                            Modo de prueba en XAMPP
+                            No se pudo enviar el correo
                         </strong>
                         <div class="mt-2">
-                            Como estás en localhost, el correo no se envía.
-                            Usá este enlace para probar la recuperación:
+                            Gmail SMTP no pudo completar el envío. Como estás en localhost,
+                            podés usar este enlace únicamente para seguir probando la recuperación.
                         </div>
+                        <?php if ($detalle_envio_local !== ''): ?>
+                            <div class="small mt-2">
+                                <?= htmlspecialchars($detalle_envio_local) ?>
+                            </div>
+                        <?php endif; ?>
                         <a
                             href="<?= htmlspecialchars($enlace_prueba) ?>"
                             class="btn btn-outline-dark mt-3">

@@ -633,6 +633,14 @@ if ($mascota_seleccionada) {
                             </div>
                         </div>
                     </div>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <a href="../reportes/pdf.php?tipo=historia&id=<?= (int) $mascota_seleccionada['id_mascota'] ?>" class="btn-principal">
+                            <i class="bi bi-file-earmark-pdf"></i> Descargar historia clínica PDF
+                        </a>
+                        <a href="../reportes/pdf.php?tipo=ficha_mascota&id=<?= (int) $mascota_seleccionada['id_mascota'] ?>" class="btn-secundario">
+                            <i class="bi bi-file-earmark-person"></i> Ficha completa PDF
+                        </a>
+                    </div>
                     <!-- =================================================
                      HISTORIA CLÍNICA
                 ================================================== -->
